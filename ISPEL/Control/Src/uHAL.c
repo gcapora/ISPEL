@@ -259,7 +259,7 @@ uint32_t        U2STM_HAL_PIN (uint8_t U_HAL_PIN) {
   * @retval PUERTO en formato STM32
   */
 GPIO_TypeDef *  U2STM_HAL_PORT (uint8_t U_HAL_PUERTO) {
-	if (U_HAL_PORT > 10) while (1) { /* ERROR */ };
+	if (U_HAL_PUERTO > 10) while (1) { /* ERROR */ };
 	GPIO_TypeDef * STM_HAL_PUERTO = NULL;
 	switch (U_HAL_PUERTO) {
 		case HAL_PORT_A:

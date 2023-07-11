@@ -29,9 +29,9 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  12 .ARM.attributes 00000030  00000000  00000000  00020080  2**0
                   CONTENTS, READONLY
- 13 .debug_info   0001d121  00000000  00000000  000200b0  2**0
+ 13 .debug_info   0001d124  00000000  00000000  000200b0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_abbrev 000038b4  00000000  00000000  0003d1d1  2**0
+ 14 .debug_abbrev 000038b4  00000000  00000000  0003d1d4  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  15 .debug_aranges 000015e0  00000000  00000000  00040a88  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
@@ -41,11 +41,11 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  18 .debug_line   00019cfb  00000000  00000000  0006aec4  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .debug_str    000ec698  00000000  00000000  00084bbf  2**0
+ 19 .debug_str    000ec6a2  00000000  00000000  00084bbf  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .comment      00000050  00000000  00000000  00171257  2**0
+ 20 .comment      00000050  00000000  00000000  00171261  2**0
                   CONTENTS, READONLY
- 21 .debug_frame  00005f78  00000000  00000000  001712a8  2**2
+ 21 .debug_frame  00005f78  00000000  00000000  001712b4  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -725,12 +725,12 @@ void vTaskLed( void *pvParameters )
  8000740:	e7da      	b.n	80006f8 <vTaskLed+0x18>
 
 08000742 <U2STM_HAL_PIN>:
-uint32_t     	U2STM_HAL_PIN (uint8_t);
-GPIO_TypeDef *	U2STM_HAL_PORT (uint8_t);
-void			U2STM_ENCENDER_RELOJ (uint8_t);
-
-/****** Definición de funciones privadas *********************************************************/
-uint32_t       U2STM_HAL_PIN (uint8_t U_HAL_PIN) {
+/**------------------------------------------------------------------------------------------------
+  * @brief  Traduce un PIN en formato uHAL a formato STM32
+  * @param	PIN en formato uHAL
+  * @retval PIN en formato STM32
+  */
+uint32_t        U2STM_HAL_PIN (uint8_t U_HAL_PIN) {
  8000742:	b480      	push	{r7}
  8000744:	b085      	sub	sp, #20
  8000746:	af00      	add	r7, sp, #0
@@ -759,22 +759,26 @@ uint32_t       U2STM_HAL_PIN (uint8_t U_HAL_PIN) {
  800076e:	4770      	bx	lr
 
 08000770 <U2STM_HAL_PORT>:
-
-GPIO_TypeDef * U2STM_HAL_PORT (uint8_t U_HAL_PORT) {
+/**------------------------------------------------------------------------------------------------
+  * @brief  Traduce un PUERTO en formato uHAL a formato STM32
+  * @param	PUERTO en formato uHAL
+  * @retval PUERTO en formato STM32
+  */
+GPIO_TypeDef *  U2STM_HAL_PORT (uint8_t U_HAL_PUERTO) {
  8000770:	b480      	push	{r7}
  8000772:	b085      	sub	sp, #20
  8000774:	af00      	add	r7, sp, #0
  8000776:	4603      	mov	r3, r0
  8000778:	71fb      	strb	r3, [r7, #7]
-	if (U_HAL_PORT > 10) while (1) { /* ERROR */ };
+	if (U_HAL_PUERTO > 10) while (1) { /* ERROR */ };
  800077a:	79fb      	ldrb	r3, [r7, #7]
  800077c:	2b0a      	cmp	r3, #10
  800077e:	d900      	bls.n	8000782 <U2STM_HAL_PORT+0x12>
  8000780:	e7fe      	b.n	8000780 <U2STM_HAL_PORT+0x10>
-	GPIO_TypeDef * STM_HAL_PORT = NULL;
+	GPIO_TypeDef * STM_HAL_PUERTO = NULL;
  8000782:	2300      	movs	r3, #0
  8000784:	60fb      	str	r3, [r7, #12]
-	switch (U_HAL_PORT) {
+	switch (U_HAL_PUERTO) {
  8000786:	79fb      	ldrb	r3, [r7, #7]
  8000788:	2b0a      	cmp	r3, #10
  800078a:	d83a      	bhi.n	8000802 <U2STM_HAL_PORT+0x92>
@@ -793,73 +797,73 @@ GPIO_TypeDef * U2STM_HAL_PORT (uint8_t U_HAL_PORT) {
  80007b8:	080007f7 	.word	0x080007f7
  80007bc:	080007fd 	.word	0x080007fd
 		case HAL_PORT_A:
-			STM_HAL_PORT = GPIOA;
+			STM_HAL_PUERTO = GPIOA;
  80007c0:	4b13      	ldr	r3, [pc, #76]	; (8000810 <U2STM_HAL_PORT+0xa0>)
  80007c2:	60fb      	str	r3, [r7, #12]
 			break;
  80007c4:	e01d      	b.n	8000802 <U2STM_HAL_PORT+0x92>
 		case HAL_PORT_B:
-			STM_HAL_PORT = GPIOB;
+			STM_HAL_PUERTO = GPIOB;
  80007c6:	4b13      	ldr	r3, [pc, #76]	; (8000814 <U2STM_HAL_PORT+0xa4>)
  80007c8:	60fb      	str	r3, [r7, #12]
 			break;
  80007ca:	e01a      	b.n	8000802 <U2STM_HAL_PORT+0x92>
 		case HAL_PORT_C:
-			STM_HAL_PORT = GPIOC;
+			STM_HAL_PUERTO = GPIOC;
  80007cc:	4b12      	ldr	r3, [pc, #72]	; (8000818 <U2STM_HAL_PORT+0xa8>)
  80007ce:	60fb      	str	r3, [r7, #12]
 			break;
  80007d0:	e017      	b.n	8000802 <U2STM_HAL_PORT+0x92>
 		case HAL_PORT_D:
-			STM_HAL_PORT = GPIOD;
+			STM_HAL_PUERTO = GPIOD;
  80007d2:	4b12      	ldr	r3, [pc, #72]	; (800081c <U2STM_HAL_PORT+0xac>)
  80007d4:	60fb      	str	r3, [r7, #12]
 			break;
  80007d6:	e014      	b.n	8000802 <U2STM_HAL_PORT+0x92>
 		case HAL_PORT_E:
-			STM_HAL_PORT = GPIOE;
+			STM_HAL_PUERTO = GPIOE;
  80007d8:	4b11      	ldr	r3, [pc, #68]	; (8000820 <U2STM_HAL_PORT+0xb0>)
  80007da:	60fb      	str	r3, [r7, #12]
 			break;
  80007dc:	e011      	b.n	8000802 <U2STM_HAL_PORT+0x92>
 		case HAL_PORT_F:
-			STM_HAL_PORT = GPIOF;
+			STM_HAL_PUERTO = GPIOF;
  80007de:	4b11      	ldr	r3, [pc, #68]	; (8000824 <U2STM_HAL_PORT+0xb4>)
  80007e0:	60fb      	str	r3, [r7, #12]
 			break;
  80007e2:	e00e      	b.n	8000802 <U2STM_HAL_PORT+0x92>
 		case HAL_PORT_G:
-			STM_HAL_PORT = GPIOG;
+			STM_HAL_PUERTO = GPIOG;
  80007e4:	4b10      	ldr	r3, [pc, #64]	; (8000828 <U2STM_HAL_PORT+0xb8>)
  80007e6:	60fb      	str	r3, [r7, #12]
 			break;
  80007e8:	e00b      	b.n	8000802 <U2STM_HAL_PORT+0x92>
 		case HAL_PORT_H:
-			STM_HAL_PORT = GPIOH;
+			STM_HAL_PUERTO = GPIOH;
  80007ea:	4b10      	ldr	r3, [pc, #64]	; (800082c <U2STM_HAL_PORT+0xbc>)
  80007ec:	60fb      	str	r3, [r7, #12]
 			break;
  80007ee:	e008      	b.n	8000802 <U2STM_HAL_PORT+0x92>
 		case HAL_PORT_I:
-			STM_HAL_PORT = GPIOI;
+			STM_HAL_PUERTO = GPIOI;
  80007f0:	4b0f      	ldr	r3, [pc, #60]	; (8000830 <U2STM_HAL_PORT+0xc0>)
  80007f2:	60fb      	str	r3, [r7, #12]
 			break;
  80007f4:	e005      	b.n	8000802 <U2STM_HAL_PORT+0x92>
 		case HAL_PORT_J:
-			STM_HAL_PORT = GPIOJ;
+			STM_HAL_PUERTO = GPIOJ;
  80007f6:	4b0f      	ldr	r3, [pc, #60]	; (8000834 <U2STM_HAL_PORT+0xc4>)
  80007f8:	60fb      	str	r3, [r7, #12]
 			break;
  80007fa:	e002      	b.n	8000802 <U2STM_HAL_PORT+0x92>
 		case HAL_PORT_K:
-			STM_HAL_PORT = GPIOK;
+			STM_HAL_PUERTO = GPIOK;
  80007fc:	4b0e      	ldr	r3, [pc, #56]	; (8000838 <U2STM_HAL_PORT+0xc8>)
  80007fe:	60fb      	str	r3, [r7, #12]
 			break;
  8000800:	bf00      	nop
 	}
-	return STM_HAL_PORT;
+	return STM_HAL_PUERTO;
  8000802:	68fb      	ldr	r3, [r7, #12]
 }
  8000804:	4618      	mov	r0, r3
@@ -880,8 +884,12 @@ GPIO_TypeDef * U2STM_HAL_PORT (uint8_t U_HAL_PORT) {
  8000838:	40022800 	.word	0x40022800
 
 0800083c <U2STM_ENCENDER_RELOJ>:
-
-void U2STM_ENCENDER_RELOJ (uint8_t PUERTO) {
+/**------------------------------------------------------------------------------------------------
+  * @brief  Enciende el reloj correspondiente a un puerto E/S
+  * @param	PUERTO
+  * @retval Ninguno
+  */
+void 			U2STM_ENCENDER_RELOJ (uint8_t PUERTO) {
  800083c:	b480      	push	{r7}
  800083e:	b08f      	sub	sp, #60	; 0x3c
  8000840:	af00      	add	r7, sp, #0
@@ -1171,7 +1179,7 @@ void uHALgpioInicializar (hal_pin_id_t PIN, hal_pin_config_s * CONFIG) {
  8000a58:	bd80      	pop	{r7, pc}
 
 08000a5a <uHALgpioLeer>:
-  * @brief  Lee en un PIN
+  * @brief  Lee un PIN
   * @param	PIN
   * @retval Valor leído
   * @note
@@ -1192,7 +1200,7 @@ bool uHALgpioLeer (hal_pin_id_t PIN) {
  8000a70:	4618      	mov	r0, r3
  8000a72:	f7ff fe7d 	bl	8000770 <U2STM_HAL_PORT>
  8000a76:	4604      	mov	r4, r0
-								U2STM_HAL_PIN  (PIN->pin));
+								U2STM_HAL_PIN  (PIN->pin) );
  8000a78:	687b      	ldr	r3, [r7, #4]
  8000a7a:	781b      	ldrb	r3, [r3, #0]
  8000a7c:	f3c3 0303 	ubfx	r3, r3, #0, #4

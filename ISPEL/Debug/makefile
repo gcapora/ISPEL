@@ -16,6 +16,7 @@ RM := rm -rf
 -include Drivers/STM32F4xx_HAL_Driver/Src/subdir.mk
 -include Core/Startup/subdir.mk
 -include Core/Src/subdir.mk
+-include Control/Src/subdir.mk
 -include Apli/Src/subdir.mk
 -include objects.mk
 
@@ -39,34 +40,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := ISPEL
+BUILD_ARTIFACT_NAME := Embebido_RTOS
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-ISPEL.elf \
+Embebido_RTOS.elf \
 
 MAP_FILES += \
-ISPEL.map \
+Embebido_RTOS.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-ISPEL.list \
+Embebido_RTOS.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: ISPEL.elf secondary-outputs
+main-build: Embebido_RTOS.elf secondary-outputs
 
 # Tool invocations
-ISPEL.elf ISPEL.map: $(OBJS) $(USER_OBJS) /home/guille/Documentos/CESE_docs/TF/SW/ISPEL/STM32F429ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "ISPEL.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/home/guille/Documentos/CESE_docs/TF/SW/ISPEL/STM32F429ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="ISPEL.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Embebido_RTOS.elf Embebido_RTOS.map: $(OBJS) $(USER_OBJS) /home/guille/Documentos/CESE/TF/SW/ISPEL/STM32F429ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Embebido_RTOS.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/home/guille/Documentos/CESE/TF/SW/ISPEL/STM32F429ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Embebido_RTOS.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -75,14 +76,14 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-ISPEL.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "ISPEL.list"
+Embebido_RTOS.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "Embebido_RTOS.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) ISPEL.elf ISPEL.list ISPEL.map default.size.stdout
+	-$(RM) Embebido_RTOS.elf Embebido_RTOS.list Embebido_RTOS.map default.size.stdout
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)

@@ -6,7 +6,8 @@
 
 // ------ Includes -------------------------------------------------
 /* Project includes. */
-#include "../../Apli/Inc/task_Led.h"
+#include "task_Led.h"
+#include "uHAL.h"
 
 #include "main.h"
 #include "cmsis_os.h"
@@ -30,17 +31,21 @@
 // ------ internal functions declaration -------------------------------
 
 // ------ internal data definition -------------------------------------
+
 /* Define the strings that will be passed in as the Supporting Functions parameters.
  * These are defined const and off the stack to ensure they remain valid when the
  * tasks are executing. */
 const char *pcTextForTask_LDXTOn		= " - LDX turn On \r\n";
 const char *pcTextForTask_LDXTOff		= " - LDX turn Off\r\n";
+#define		ledTickCntMAX		pdMS_TO_TICKS( 500UL )
 
-#define			ledTickCntMAX		pdMS_TO_TICKS( 125UL )
-
-LDX_Config_t	LDX_Config[] 	= { { LD1_GPIO_Port, LD1_Pin, GPIO_PIN_RESET, NotBlinking, 0 },
-							  	    { LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET, Blinking, 0 },
-									{ LD3_GPIO_Port, LD3_Pin, GPIO_PIN_RESET, Blinking, 0 } };
+LDX_Config_t	LDX_Config[TL_CANTIDAD_LEDS] = {0};
+	/* Así estaba definido antes:
+	LDX_Config_t	LDX_Config[] = { { LD1_GPIO_Port, LD1_Pin, GPIO_PIN_RESET, Blinking, 0, NULL },
+							  	   { LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET, NotBlinking, 0, NULL },
+								   { LD3_GPIO_Port, LD3_Pin, GPIO_PIN_RESET, Blinking, 0, NULL } };
+	Ahora se inicializa dentro de vTaskLedInicializar()
+	*/
 
 // ------ external data definition -------------------------------------
 
@@ -48,17 +53,50 @@ LDX_Config_t	LDX_Config[] 	= { { LD1_GPIO_Port, LD1_Pin, GPIO_PIN_RESET, NotBlin
 
 // ------ external functions definition --------------------------------
 
+
+bool vTaskLedInicializar (void) {
+
+	// Cargo parámetros de leds
+	LDX_Config[TL_LED_VERDE_EP] = (LDX_Config_t) { U_LED_VERDE_EP,
+												   //LD1_GPIO_Port, LD1_Pin,
+		                                           GPIO_PIN_SET, NotBlinking, 0 };
+	LDX_Config[TL_LED_AZUL_EP]  = (LDX_Config_t) { U_LED_AZUL_EP,
+												   //LD2_GPIO_Port, LD2_Pin,
+												   GPIO_PIN_SET, Blinking, 0 };
+	LDX_Config[TL_LED_ROJO_EP]  = (LDX_Config_t) { U_LED_ROJO_EP,
+												   //LD3_GPIO_Port, LD3_Pin,
+												   GPIO_PIN_RESET, Blinking, 0 };
+
+	// Inicializo todos los leds señalados en task_Led.h
+	hal_pin_config_s Configuracion_Led = {0};
+	Configuracion_Led.Modo = U_GPIO_MODO_SALIDA;
+	Configuracion_Led.Tirar = U_GPIO_NO_TIRAR;
+	Configuracion_Led.Velocidad = U_GPIO_VELOCIDAD_BAJA;
+
+	for (uint8_t i=0; i<TL_CANTIDAD_LEDS; i++) {
+		uHALgpioInicializar ( LDX_Config[i].PIN , &Configuracion_Led );
+		uHALgpioEscribir    ( LDX_Config[i].PIN , LDX_Config[i].ledState );
+	}
+
+	// Terminada la inicialización...
+	return true;
+}
+
+
+
 /*------------------------------------------------------------------*/
 /* Task Led thread */
 void vTaskLed( void *pvParameters )
 {
+
 	/*  Declaración e inicialización de variables de la tarea */
 	LDX_Config_t * ptr = (LDX_Config_t *)pvParameters;    // Nro de led pasado por argumento
 	TickType_t xLastWakeTime = xTaskGetTickCount();       // Tiempo inicial de referencia
 	   // La variable xLastWakeTime necesita ser inicializada con la cuenta Tick actual
+	bool EstadoLed = false;
 
-	//char *pcTaskName = (char *) pcTaskGetName( NULL );
 	/* Print out the name of this task. */
+	//char *pcTaskName = (char *) pcTaskGetName( NULL );
 	// vPrintTwoStrings( pcTaskName, "   - is running\r\n" );
 
 	/* As per most tasks, this task is implemented in an infinite loop. */
@@ -67,22 +105,13 @@ void vTaskLed( void *pvParameters )
 		/* Check Led Flag */
 		if( ptr->ledFlag == Blinking )
 		{
-			/* Check, Update and Print Led State */
-		   	if( ptr->ledState == GPIO_PIN_RESET )
-		   	{
-		   		ptr->ledState = GPIO_PIN_SET;
-            	//vPrintTwoStrings( pcTaskName, pcTextForTask_LDXTOn );
-		   	}
-	    	else
-	    	{
-	    		ptr->ledState = GPIO_PIN_RESET;
-            	//vPrintTwoStrings( pcTaskName, pcTextForTask_LDXTOff );
-		   	}
-			/* Update HW Led State */
-		   	HAL_GPIO_WritePin( ptr->LDX_GPIO_Port, ptr->LDX_Pin, ptr->ledState );
+			/* Leo y cambio estado del led */
+		   	EstadoLed = uHALgpioLeer (ptr->PIN);
+		   	uHALgpioEscribir ( ptr->PIN, !EstadoLed );
+		    //HAL_GPIO_WritePin( ptr->LDX_GPIO_Port, ptr->LDX_Pin, ptr->ledState );
 		}
 
-		/* We want this task to execute exactly every 250 milliseconds. */
+		/* We want this task to execute exactly every N milliseconds. */
 		vTaskDelayUntil( &xLastWakeTime, ledTickCntMAX );
 	}
 }

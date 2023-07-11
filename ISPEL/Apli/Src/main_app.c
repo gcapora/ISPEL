@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------
- * Interfaz electrónica para prácticas de laboratorio
+ * Interfaz de señales para prácticas educativas de laboratorio
  *
  * Año:     2023
  * Autor:   Guillermo F. Caporaletti
@@ -51,13 +51,18 @@ const char *pcTextForMain = "Embebido Interfaz ejecutandose...\r\n\n";
 /* App Initialization */
 void appInit( void )
 {
-	LDX_Config_t* ptr, *led2, *led3;
-	BaseType_t ret;
-
 	/* Print out the name of this Example. */
   	//vPrintString( pcTextForMain );
 
+	// Variables utilizadas por la aplicación
+	LDX_Config_t* ptr, *led2, *led3;
+	BaseType_t ret;
+
+	// Inicializo módulo task_led
+	configASSERT( true == vTaskLedInicializar());
+
 	/* Task Led thread at priority 1 */
+	LDX_Config[0].PIN = HAL_PIN_PB0;
 	ptr = &LDX_Config[0];
 	ret = xTaskCreate( vTaskLed,						/* Pointer to the function thats implement the task. */
 					   "Task Led",						/* Text name for the task. This is to facilitate debugging only. */

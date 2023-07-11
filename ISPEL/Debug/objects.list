@@ -1,5 +1,6 @@
 "./Apli/Src/main_app.o"
 "./Apli/Src/task_Led.o"
+"./Control/Src/uHAL.o"
 "./Core/Src/freertos.o"
 "./Core/Src/main.o"
 "./Core/Src/stm32f4xx_hal_msp.o"

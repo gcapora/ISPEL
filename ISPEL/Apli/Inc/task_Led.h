@@ -12,8 +12,14 @@
 // ------ inclusions ---------------------------------------------------
 #include "stm32f4xx_hal.h"
 #include "FreeRTOS.h"
+#include "stdbool.h"
+#include "uHAL.h"
 
 // ------ macros -------------------------------------------------------
+#define TL_CANTIDAD_LEDS	3
+#define TL_LED_VERDE_EP		0
+#define TL_LED_AZUL_EP		1
+#define TL_LED_ROJO_EP		2
 
 // ------ typedef ------------------------------------------------------
 
@@ -22,8 +28,9 @@ typedef enum	ledFlag_e{ Blinking, NotBlinking } ledFlag_t;
 
 typedef struct
 {
-	GPIO_TypeDef*	LDX_GPIO_Port;
-	uint16_t		LDX_Pin;
+	hal_pin_id_t	PIN;
+//	GPIO_TypeDef*	LDX_GPIO_Port;
+//	uint16_t		LDX_Pin;
 	GPIO_PinState	ledState;
 	ledFlag_t		ledFlag;
 	TickType_t 		ledTickCnt;
@@ -33,6 +40,7 @@ extern LDX_Config_t LDX_Config[];
 
 // ------ external functions declaration -------------------------------
 
+bool vTaskLedInicializar (void);
 void vTaskLed( void *pvParameters );
 
 #ifdef __cplusplus

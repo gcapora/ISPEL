@@ -8,10 +8,6 @@
  *--------------------------------------------------------------------*/
 
 // ------ Includes -----------------------------------------------------
-/* Project includes. */
-
-#include "main.h"
-#include "cmsis_os.h"	// ¿Por qué había que incluir esta librería?
 
 /* Standard includes. */
 #include <stdio.h>
@@ -19,14 +15,16 @@
 #include <string.h>
 #include <stdbool.h>
 
+/* Project includes. */
+#include "main_app.h"
+
 /* Demo includes. */
 // #include "supporting_Functions.h" // ¿De dónde incluimos esta librería?
 
 /* Application & Tasks includes. */
-
-
 //#include "task_Button.h"
-#include "../../Apli/Inc/task_Led.h"
+#include "task_Led.h"
+#include "tarea_leds.h"
 
 // ------ Macros and definitions ---------------------------------------
 
@@ -55,14 +53,16 @@ void appInit( void )
   	//vPrintString( pcTextForMain );
 
 	// Variables utilizadas por la aplicación
-	LDX_Config_t* ptr, *led2, *led3;
+	LDX_Config_t* ptr; // *led2; *led3;
 	BaseType_t ret;
 
 	// Inicializo módulo task_led
 	configASSERT( true == vTaskLedInicializar());
 
+	// Inicializo módulo tarea_leds
+	configASSERT( true == TareaLedsInicializar());
+
 	/* Task Led thread at priority 1 */
-	LDX_Config[0].PIN = HAL_PIN_PB0;
 	ptr = &LDX_Config[0];
 	ret = xTaskCreate( vTaskLed,						/* Pointer to the function thats implement the task. */
 					   "Task Led",						/* Text name for the task. This is to facilitate debugging only. */
@@ -75,16 +75,16 @@ void appInit( void )
 	configASSERT( ret == pdPASS );
 
 	/* Task Led thread at priority 1 */
-	led2 = &LDX_Config[1];
-	ret = xTaskCreate( vTaskLed, "Task Led", (2 * configMINIMAL_STACK_SIZE),
-			           (void*)led2, (tskIDLE_PRIORITY + 1UL), &xTaskLedHandle );
+	//led2 = &LDX_Config[1];
+	//ret = xTaskCreate( vTaskLed, "Task Led", (2 * configMINIMAL_STACK_SIZE),
+	//		           (void*)led2, (tskIDLE_PRIORITY + 1UL), &xTaskLedHandle );
 	/* Check the task was created successfully. */
-	configASSERT( ret == pdPASS );
+	//configASSERT( ret == pdPASS );
 
 	/* Task Led thread at priority 1 */
-	led3 = &LDX_Config[2];
-	ret = xTaskCreate( vTaskLed, "Task Led", (2 * configMINIMAL_STACK_SIZE),
-			           (void*)led3, (tskIDLE_PRIORITY + 1UL), &xTaskLedHandle );
+	//led3 = &LDX_Config[2];
+	ret = xTaskCreate( TareaLeds, "Tarea Leds", (2 * configMINIMAL_STACK_SIZE),
+						(void*)ptr, (tskIDLE_PRIORITY + 2UL), &xTaskLedHandle );
 	/* Check the task was created successfully. */
 	configASSERT( ret == pdPASS );
 

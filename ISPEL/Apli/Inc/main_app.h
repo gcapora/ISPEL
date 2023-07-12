@@ -14,8 +14,12 @@ extern "C" {
 #endif
 
 // ------ inclusions ---------------------------------------------------
-#include "cmsis_os.h"
+#include "cmsis_os.h"	// ¿Por qué había que incluir esta librería?
+#include "FreeRTOS.h"
+#include "tarea_leds.h"
 
+/* Demo includes. */
+//#include "supporting_Functions.h"
 
 // ------ macros -------------------------------------------------------
 // ------ typedef ------------------------------------------------------

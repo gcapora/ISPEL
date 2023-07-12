@@ -6,14 +6,17 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../Apli/Src/main_app.c \
+../Apli/Src/tarea_leds.c \
 ../Apli/Src/task_Led.c 
 
 OBJS += \
 ./Apli/Src/main_app.o \
+./Apli/Src/tarea_leds.o \
 ./Apli/Src/task_Led.o 
 
 C_DEPS += \
 ./Apli/Src/main_app.d \
+./Apli/Src/tarea_leds.d \
 ./Apli/Src/task_Led.d 
 
 
@@ -24,7 +27,7 @@ Apli/Src/%.o Apli/Src/%.su: ../Apli/Src/%.c Apli/Src/subdir.mk
 clean: clean-Apli-2f-Src
 
 clean-Apli-2f-Src:
-	-$(RM) ./Apli/Src/main_app.d ./Apli/Src/main_app.o ./Apli/Src/main_app.su ./Apli/Src/task_Led.d ./Apli/Src/task_Led.o ./Apli/Src/task_Led.su
+	-$(RM) ./Apli/Src/main_app.d ./Apli/Src/main_app.o ./Apli/Src/main_app.su ./Apli/Src/tarea_leds.d ./Apli/Src/tarea_leds.o ./Apli/Src/tarea_leds.su ./Apli/Src/task_Led.d ./Apli/Src/task_Led.o ./Apli/Src/task_Led.su
 
 .PHONY: clean-Apli-2f-Src
 

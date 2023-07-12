@@ -1,6 +1,8 @@
 /**************************************************************************************************
- * Archivo: uHAL.c
- * Breve:	Código de interfaz de abstracción de hardware (HAL). Proyecto ISPEL.
+ * Archivo: uHALgpio.c
+ * Breve:	Interfaz de abstracción de hardware (HAL) para
+ *       	pines de entrada-salida de propósito general (GPIO).
+ *          Proyecto ISPEL.
  * Fecha:	Creado julio 2023
  * Autor:	Guillermo F. Caporaletti
  *
@@ -8,12 +10,12 @@
 
 /****** Librerías (includes) *********************************************************************/
 
-#include "uHAL.h"
+#include "uHALgpio.h"
 #include "stm32f4xx_hal.h"
 
 /****** Definiciones privadas (macros) ***********************************************************/
 
-// Constantes numéricas asignadas a puertos E/S
+// Constantes numéricas asignadas a puertos E/S ---------------------------------------------------
 #define HAL_PORT_A 0
 #define HAL_PORT_B 1
 #define HAL_PORT_C 2
@@ -26,26 +28,27 @@
 #define HAL_PORT_J 9
 #define HAL_PORT_K 10
 
-// Macros para generar nombre de PIN, PUERTO y CHIP_PIN:
+// Macros para generar nombre de PIN, PUERTO y CHIP_PIN -------------------------------------------
 #define PIN_NAME(PORT, PIN) HAL_PIN_P##PORT##PIN
 #define PORT_NAME(PORT) HAL_PORT_##PORT
-#define CHIP_PIN(PORT, PIN)	PIN_NAME(PORT, PIN) = &(struct hal_pin_id_s) { .port = PORT_NAME(PORT), .pin = PIN }
+#define CHIP_PIN(PORT, PIN)	PIN_NAME(PORT, PIN) = &(struct hal_pin_id_s) \
+	                                              { .port = PORT_NAME(PORT), .pin = PIN }
 
 /****** Definiciones privadas de tipos (private typedef) *****************************************/
 
-// Estructura de pin de chip STM32 y su referencia por puntero
+// Estructura de pin de chip STM32 y su referencia por puntero ------------------------------------
 struct hal_pin_id_s {
     uint8_t pin  : 4; /**< Number of chip pin port */
     uint8_t port : 4; /**< Number of pin in chip port */
 };
 
-/****** Definición de variables y constantes públicas ********************************************/
+/****** Definición de datos públicos *************************************************************/
 
 // Constantes para referenciar a pines en pin y puerto del chip específico ------------------------
 const hal_pin_id_t CHIP_PIN(A, 0);  /**< Constant to define Pin 0 on chip port A */
-// Esto equivale a:
-// const hal_pin_id_t HAL_PIN_PA0 = &(struct hal_pin_id_s) { .port = HAL_PORT_A, .pin = 0 };
-// Crea una estructura y un puntero constante a esa estructura.
+/* Esto equivale a:
+   const hal_pin_id_t HAL_PIN_PA0 = &(struct hal_pin_id_s) { .port = HAL_PORT_A, .pin = 0 };
+   Crea una estructura y un puntero constante a esa estructura. */
 
 const hal_pin_id_t CHIP_PIN(A, 1);  /**< Constant to define Pin 1 on chip port A */
 const hal_pin_id_t CHIP_PIN(A, 2);  /**< Constant to define Pin 2 on chip port A */
@@ -395,3 +398,16 @@ void uHALgpioEscribir (hal_pin_id_t PIN, bool VALOR) {
 						U2STM_HAL_PIN  (PIN->pin),
 						VALOR );
 }
+
+/**------------------------------------------------------------------------------------------------
+  * @brief  Invierte el estado de un PIN
+  * @param	PIN
+  * @retval Ninguno
+  * @note
+  */
+void uHALgpioInvertir ( hal_pin_id_t PIN ) {
+	HAL_GPIO_TogglePin(	U2STM_HAL_PORT (PIN->port),
+						U2STM_HAL_PIN  (PIN->pin) );
+}
+
+/****************************************************************** FIN DE ARCHIVO ***************/

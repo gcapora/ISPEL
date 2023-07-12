@@ -16,7 +16,7 @@
 #include "uHAL.h"
 
 // ------ macros -------------------------------------------------------
-#define TL_CANTIDAD_LEDS	3
+#define TL_CANTIDAD_LEDS	2
 #define TL_LED_VERDE_EP		0
 #define TL_LED_AZUL_EP		1
 #define TL_LED_ROJO_EP		2

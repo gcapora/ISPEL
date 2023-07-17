@@ -5,24 +5,18 @@
 
 
 // ------ Includes -------------------------------------------------
-/* Project includes. */
-#include "task_Led.h"
-#include "uHAL.h"
-
-#include "main.h"
-#include "cmsis_os.h"
 
 /* Standard includes. */
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
+//#include <stdio.h>
+//#include <stdlib.h>
+//#include <string.h>
+//#include <stdbool.h>
 
-/* Demo includes. */
-//#include "supporting_Functions.h"
+/* Project includes. */
+#include "task_Led.h"
 
-/* Application includes. */
-//#include "app_Resources.h"
+/* Debug includes. */
+#include "supporting_Functions.h"
 
 // ------ Macros and definitions ---------------------------------------
 
@@ -32,27 +26,20 @@
 
 // ------ internal data definition -------------------------------------
 
-/* Define the strings that will be passed in as the Supporting Functions parameters.
- * These are defined const and off the stack to ensure they remain valid when the
- * tasks are executing. */
-const char *pcTextForTask_LDXTOn		= " - LDX turn On \r\n";
-const char *pcTextForTask_LDXTOff		= " - LDX turn Off\r\n";
 #define		ledTickCntMAX		pdMS_TO_TICKS( 500UL )
 
 LDX_Config_t	LDX_Config[TL_CANTIDAD_LEDS] = {0};
 	/* Así estaba definido antes:
 	LDX_Config_t	LDX_Config[] = { { LD1_GPIO_Port, LD1_Pin, GPIO_PIN_RESET, Blinking, 0, NULL },
-							  	   { LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET, NotBlinking, 0, NULL },
-								   { LD3_GPIO_Port, LD3_Pin, GPIO_PIN_RESET, Blinking, 0, NULL } };
-	Ahora se inicializa dentro de vTaskLedInicializar()
-	*/
+						  	   	   { LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET, NotBlinking, 0, NULL},
+							   	   { LD3_GPIO_Port, LD3_Pin, GPIO_PIN_RESET, Blinking, 0, NULL } };
+	Ahora se inicializa dentro de vTaskLedInicializar() */
 
 // ------ external data definition -------------------------------------
 
 // ------ internal functions definition --------------------------------
 
 // ------ external functions definition --------------------------------
-
 
 bool vTaskLedInicializar (void) {
 
@@ -79,10 +66,9 @@ bool vTaskLedInicializar (void) {
 	}
 
 	// Terminada la inicialización...
+	vPrintString( "Modulo Task Led inicializado.\r\n" );
 	return true;
 }
-
-
 
 /*------------------------------------------------------------------*/
 /* Task Led thread */
@@ -96,8 +82,8 @@ void vTaskLed( void *pvParameters )
 	//bool EstadoLed = false;
 
 	/* Print out the name of this task. */
-	//char *pcTaskName = (char *) pcTaskGetName( NULL );
-	// vPrintTwoStrings( pcTaskName, "   - is running\r\n" );
+	char *pcTaskName = (char *) pcTaskGetName( NULL );
+	vPrintTwoStrings( pcTaskName, " esta ejecutandose." );
 
 	/* As per most tasks, this task is implemented in an infinite loop. */
 	for( ;; )
@@ -113,6 +99,7 @@ void vTaskLed( void *pvParameters )
 		}
 
 		/* We want this task to execute exactly every N milliseconds. */
+		vPrintString( "Led X invertido.\r\n" );
 		vTaskDelayUntil( &xLastWakeTime, ledTickCntMAX );
 	}
 }

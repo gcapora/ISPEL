@@ -2,7 +2,7 @@
  *
  * Año:     2023
  * Autor:   Guillermo F. Caporaletti
- * Archivo: main_app.h
+ * Archivo: apli.h
  *
  */
 
@@ -18,8 +18,9 @@ extern "C" {
 #include "FreeRTOS.h"
 #include "tarea_leds.h"
 
-/* Demo includes. */
-//#include "supporting_Functions.h"
+/* Desarrollo includes. */
+#include "tarea_test_1.h"
+#include "supporting_Functions.h"
 
 // ------ macros -------------------------------------------------------
 // ------ typedef ------------------------------------------------------
@@ -27,7 +28,7 @@ extern "C" {
 // TaskHandle_t xTaskLedHandle;
 
 // ------ external functions declaration -------------------------------
- void appInit( void );
+void apliInicializar( void );
 
 #ifdef __cplusplus
 }

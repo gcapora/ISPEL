@@ -1,13 +1,13 @@
 /**************************************************************************************************
-* @file		tarea_leds.h
+* @file		tarea_test_1.h
 * @author	Guillermo Caporaletti
-* @brief	Tarea que controla todos los leds.
+* @brief	Tarea para testeo
 * @date		julio de 2023
 *
 **************************************************************************************************/
 
-#ifndef __TAREA_LEDS_H
-#define __TAREA_LEDS_H
+#ifndef __TAREA_TEST_1_H
+#define __TAREA_TEST_1_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -15,16 +15,11 @@
 
 /****** Librerías (includes) *********************************************************************/
 
-#include "stdbool.h"	// Esta librería es usada por la función TareaLedsInicializar
 #include "apli.h"		// Aquí están declarados los recursos compartidos
-#include "uleds.h"		// Módulo específico de utilización de leds
+#include "tarea_leds.h"	// Tarea a testear
 
 /****** Definiciones públicas (macros) ***********************************************************/
 
-#define TLS_CANTIDAD_LEDS	3
-#define TLS_LED_VERDE_EP	0
-#define TLS_LED_AZUL_EP		1
-#define TLS_LED_ROJO_EP		2
 
 /****** Definiciones públicas de tipos de datos (public typedef) *********************************/
 
@@ -35,13 +30,12 @@
 
 /****** Declaración de funciones públicas ********************************************************/
 
-bool TareaLedsInicializar ( void );
-void TareaLeds ( void * );
-bool TareaLedsModo (led_id_t, led_modo_t);
+bool TareaTestInicializar ( void );
+void TareaTest ( void * );
 
 /*************************************************************************************************/
 #ifdef __cplusplus
 }
 #endif
-#endif /* __TAREA_LEDS_H */
+#endif /* __TAREA_TEST_1_H */
 /****************************************************************** FIN DE ARCHIVO ***************/

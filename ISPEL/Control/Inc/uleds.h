@@ -51,6 +51,7 @@ led_id_t	uLedInicializar (hal_pin_id_t);
 bool		uLedEncender (led_id_t);
 bool		uLedApagar (led_id_t);
 bool		uLedActualizar (led_id_t);
+bool		uLedActualizarTodo ( void );
 bool		uLedConfigurarModo (led_id_t, led_modo_t);
 led_estado_t uLedObtenerEstado (led_id_t);
 led_estado_t uLedObtenerEstadoFisico (led_id_t);

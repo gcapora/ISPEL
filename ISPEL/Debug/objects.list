@@ -1,5 +1,6 @@
-"./Apli/Src/main_app.o"
+"./Apli/Src/apli.o"
 "./Apli/Src/tarea_leds.o"
+"./Apli/Src/tarea_test_1.o"
 "./Apli/Src/task_Led.o"
 "./Control/Src/uHALgpio.o"
 "./Control/Src/uleds.o"
@@ -42,3 +43,4 @@
 "./Middlewares/Third_Party/FreeRTOS/Source/timers.o"
 "./Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.o"
 "./Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.o"
+"./Supporting_Functions/Src/supporting_Functions.o"

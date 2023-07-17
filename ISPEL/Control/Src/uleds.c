@@ -63,8 +63,6 @@ led_id_t uLedInicializar(hal_pin_id_t pin_led) {
     led_id_t IdLed = 0;
     bool Id_Establecido = false;
     hal_pin_config_s pin_config = {0};
-//    if (pin_led < GPIO_LED_MINIMO) return ERROR_LED;
-//    if (pin_led > GPIO_LED_MAXIMO) return ERROR_LED;
 
     // Verifico que este gpio_t pin_led no haya sido inicializado antes
     for (IdLed = 0; IdLed<CANTIDAD_LED; IdLed++) {
@@ -105,8 +103,8 @@ led_id_t uLedInicializar(hal_pin_id_t pin_led) {
     pin_config.Modo = U_GPIO_MODO_SALIDA;
     pin_config.Tirar = U_GPIO_NO_TIRAR;
     pin_config.Velocidad = U_GPIO_VELOCIDAD_BAJA;
-    uHALgpioInicializar ( pin_led, &pin_config ); // ¿Puede devolver resultado?
-    //uHALgpioEscribir    ( pin_led, true );
+    uHALgpioInicializar ( pin_led, &pin_config );
+    uHALgpioEscribir    ( pin_led, false );
 
     // Inicialización exitosa
     return IdLed;
@@ -197,6 +195,20 @@ bool uLedActualizar(led_id_t led_id) {
     return true;
 }
 
+/*-------------------------------------------------------------------------------------------------
+ * @brief
+ * @param
+ * @retval
+ */
+bool uLedActualizarTodo ( void ) {
+	bool algo_actualizado = false;
+	for (led_id_t i=0; i<CANTIDAD_LED; i++) {
+		if ( true == uLedActualizar(i) ) {
+			algo_actualizado = true;
+		}
+	}
+	return algo_actualizado;
+}
 /*-------------------------------------------------------------------------------------------------
  * @brief
  * @param

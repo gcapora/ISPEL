@@ -18,13 +18,13 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include <apli.h>
 #include "main.h"
 #include "string.h"
 #include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "../../Apli/Inc/main_app.h"
 
 /* USER CODE END Includes */
 
@@ -112,7 +112,7 @@ int main(void)
    * Este llamado sirve para codear el programa en otro archivo.
    * Creamos una carpeta App, con sus respectivas subcarpetas.
    * ------------------------------------------------------------------------------------------*/
-  appInit();
+  apliInicializar();
 
   /* USER CODE END 2 */
 

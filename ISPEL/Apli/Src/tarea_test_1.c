@@ -1,7 +1,7 @@
 /**************************************************************************************************
-* @file		tarea_leds.c
+* @file		tarea_test_1.c
 * @author	Guillermo Caporaletti
-* @brief	Tarea que controla todos los leds.
+* @brief	Tarea para testear.
 * @date		julio de 2023
 *
 **************************************************************************************************/
@@ -9,18 +9,18 @@
 
 /****** Librerías (includes) *********************************************************************/
 
-#include "tarea_leds.h"
-#include "uleds.h"
+#include "tarea_test_1.h"
 
 /****** Definiciones privadas (macros) ***********************************************************/
 
-#define		LED_DELTAT			pdMS_TO_TICKS( 1UL )
+#define DELTAT_TEST			pdMS_TO_TICKS( 5000UL )
 
 /****** Definiciones privadas de tipos (private typedef) *****************************************/
 
 
 /****** Definición de datos privados *************************************************************/
 
+led_id_t LedRojoEnPlaca, LedAzulEnPlaca;
 
 /****** Definición de datos públicos *************************************************************/
 
@@ -38,8 +38,21 @@
  * @param	Ninguno
  * @retval true, si no hubo problemas
  */
-bool TareaLedsInicializar (void)
-{
+bool TareaTestInicializar (void) {
+
+	// Variables locales
+
+	// Cargo parámetros de leds
+	configASSERT ( ERROR_LED != (LedRojoEnPlaca = uLedInicializar ( U_LED_ROJO_EP )) );
+	configASSERT ( true == TareaLedsModo ( LedRojoEnPlaca, SUSPENSION ) );
+
+	configASSERT ( ERROR_LED != (LedAzulEnPlaca = uLedInicializar ( U_LED_AZUL_EP )) );
+	configASSERT ( true == TareaLedsModo ( LedAzulEnPlaca, BALIZA ) );
+
+	//uLedActualizar( LedRojoEnPlaca );
+	//uHALgpioEscribir (U_LED_ROJO_EP, true);
+	// Acá podría haber más leds, pero no por ahora...
+
 	// Terminada la inicialización...
 	return true;
 }
@@ -48,31 +61,30 @@ bool TareaLedsInicializar (void)
  * @brief  Tarea que actualiza el estado de los leds
  * @param	Ninguno
  */
-void TareaLeds( void *pvParameters )
+void TareaTest( void *pvParameters )
 {
-	/* Imprimir la tarea iniciada: */
+	/* Imprimir la tarea inicializada: */
 	char *pcTaskName = (char *) pcTaskGetName( NULL );
 	vPrintTwoStrings( pcTaskName, " esta ejecutandose." );
 
-	/* Ciclo infinito, como la mayoría de las tareas: */
+	/* Enciendo leds: */
+	configASSERT ( true == uLedEncender (LedRojoEnPlaca) );
+	configASSERT ( true == uLedEncender (LedAzulEnPlaca) );
+
+	/* Como la mayoría de las tareas, ciclo infinito... */
 	for( ;; )
 	{
-		uLedActualizarTodo();
-		//uLedActualizar( 0 );
-		//uLedActualizar( 1 );
-		vTaskDelay( LED_DELTAT );
+		vTaskDelay( DELTAT_TEST );
+		configASSERT ( true == TareaLedsModo ( LedAzulEnPlaca, PLENO ) );
+		vTaskDelay( DELTAT_TEST );
+		configASSERT ( true == TareaLedsModo ( LedAzulEnPlaca, INTENSIDAD10 ) );
+		vTaskDelay( DELTAT_TEST );
+		configASSERT ( true == TareaLedsModo ( LedAzulEnPlaca, TITILANTE ) );
+		vTaskDelay( DELTAT_TEST );
+		configASSERT ( true == TareaLedsModo ( LedAzulEnPlaca, TITILANTE_LENTO ) );
+		vTaskDelay( DELTAT_TEST );
+		configASSERT ( true == TareaLedsModo ( LedAzulEnPlaca, BALIZA ) );
 	}
-}
-
-/*-------------------------------------------------------------------------------------------------
- * @brief	Cambia el modo de un led de forma segura
- * @param	Identificador del led y modo deseado
- */
-bool TareaLedsModo (led_id_t LED, led_modo_t MODO)
-{
-	bool RET = false;
-	RET = uLedConfigurarModo ( LED, MODO );
-	return RET;
 }
 
 /****************************************************************** FIN DE ARCHIVO ***************/

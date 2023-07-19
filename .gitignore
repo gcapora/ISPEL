@@ -38,6 +38,7 @@
 
 # Debug files
 Debug/
+/Debug/
 debug/
 Release/
 release/

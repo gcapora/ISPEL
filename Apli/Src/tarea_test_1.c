@@ -1,7 +1,7 @@
 /**************************************************************************************************
 * @file		tarea_test_1.c
 * @author	Guillermo Caporaletti
-* @brief	Tarea para testear.
+* @brief	Tarea para testear aplicación.
 * @date		julio de 2023
 *
 **************************************************************************************************/
@@ -43,11 +43,11 @@ bool TareaTestInicializar (void) {
 	// Variables locales
 
 	// Cargo parámetros de leds
-	configASSERT ( ERROR_LED != (LedRojoEnPlaca = uLedInicializar ( U_LED_ROJO_EP )) );
-	configASSERT ( true == TareaLedsModo ( LedRojoEnPlaca, SUSPENSION ) );
+	configASSERT ( ERROR_LED != (LedRojoEnPlaca = TareaLeds_InicializarLed ( U_LED_ROJO_EP )) );
+	configASSERT ( TareaLeds_ModoLed ( LedRojoEnPlaca, SUSPENSION ) );
 
-	configASSERT ( ERROR_LED != (LedAzulEnPlaca = uLedInicializar ( U_LED_AZUL_EP )) );
-	configASSERT ( true == TareaLedsModo ( LedAzulEnPlaca, BALIZA ) );
+	configASSERT ( ERROR_LED != (LedAzulEnPlaca = TareaLeds_InicializarLed ( U_LED_AZUL_EP )) );
+	configASSERT ( TareaLeds_ModoLed ( LedAzulEnPlaca, BALIZA ) );
 
 	//uLedActualizar( LedRojoEnPlaca );
 	//uHALgpioEscribir (U_LED_ROJO_EP, true);
@@ -68,22 +68,24 @@ void TareaTest( void *pvParameters )
 	vPrintTwoStrings( pcTaskName, " esta ejecutandose." );
 
 	/* Enciendo leds: */
-	configASSERT ( true == uLedEncender (LedRojoEnPlaca) );
-	configASSERT ( true == uLedEncender (LedAzulEnPlaca) );
+	configASSERT ( TareaLeds_EncenderLed (LedRojoEnPlaca) );
+	configASSERT ( TareaLeds_EncenderLed (LedAzulEnPlaca) );
 
 	/* Como la mayoría de las tareas, ciclo infinito... */
 	for( ;; )
 	{
 		vTaskDelay( DELTAT_TEST );
-		configASSERT ( true == TareaLedsModo ( LedAzulEnPlaca, PLENO ) );
+		configASSERT ( TareaLeds_ModoLed ( LedAzulEnPlaca, PLENO ) );
+		configASSERT ( TareaLeds_EncenderLed ( LedRojoEnPlaca ) );
 		vTaskDelay( DELTAT_TEST );
-		configASSERT ( true == TareaLedsModo ( LedAzulEnPlaca, INTENSIDAD10 ) );
+		configASSERT ( TareaLeds_ModoLed ( LedAzulEnPlaca, INTENSIDAD10 ) );
 		vTaskDelay( DELTAT_TEST );
-		configASSERT ( true == TareaLedsModo ( LedAzulEnPlaca, TITILANTE ) );
+		configASSERT ( TareaLeds_ModoLed ( LedAzulEnPlaca, TITILANTE ) );
 		vTaskDelay( DELTAT_TEST );
-		configASSERT ( true == TareaLedsModo ( LedAzulEnPlaca, TITILANTE_LENTO ) );
+		configASSERT ( TareaLeds_ModoLed ( LedAzulEnPlaca, TITILANTE_LENTO ) );
 		vTaskDelay( DELTAT_TEST );
-		configASSERT ( true == TareaLedsModo ( LedAzulEnPlaca, BALIZA ) );
+		configASSERT ( TareaLeds_ModoLed ( LedAzulEnPlaca, BALIZA ) );
+		configASSERT ( TareaLeds_ApagarLed ( LedRojoEnPlaca ) );
 	}
 }
 

@@ -21,6 +21,8 @@
 
 /****** Definición de datos privados *************************************************************/
 
+SemaphoreHandle_t MutexManejador;	// Esta variable global administra el manejo del semáforo
+									// que administra el acceso a los leds.
 
 /****** Definición de datos públicos *************************************************************/
 
@@ -40,6 +42,9 @@
  */
 bool TareaLedsInicializar (void)
 {
+	// Creamos un semáforo Mutex para el acceso concurrente a leds
+	MutexManejador = xSemaphoreCreateMutex();
+	configASSERT ( NULL != MutexManejador );
 	// Terminada la inicialización...
 	return true;
 }
@@ -57,9 +62,9 @@ void TareaLeds( void *pvParameters )
 	/* Ciclo infinito, como la mayoría de las tareas: */
 	for( ;; )
 	{
+		xSemaphoreTake( MutexManejador, portMAX_DELAY );
 		uLedActualizarTodo();
-		//uLedActualizar( 0 );
-		//uLedActualizar( 1 );
+		xSemaphoreGive( MutexManejador );
 		vTaskDelay( LED_DELTAT );
 	}
 }
@@ -67,11 +72,56 @@ void TareaLeds( void *pvParameters )
 /*-------------------------------------------------------------------------------------------------
  * @brief	Cambia el modo de un led de forma segura
  * @param	Identificador del led y modo deseado
+ * @retval	true, si no hubo problemas
  */
-bool TareaLedsModo (led_id_t LED, led_modo_t MODO)
+led_id_t TareaLeds_InicializarLed ( hal_pin_id_t PIN )
+{
+	led_id_t RET = ERROR_LED;
+	xSemaphoreTake( MutexManejador, portMAX_DELAY );
+	RET = uLedInicializar( PIN );
+	xSemaphoreGive( MutexManejador );
+	return RET;
+}
+
+/*-------------------------------------------------------------------------------------------------
+ * @brief	Cambia el modo de un led de forma segura
+ * @param	Identificador del led y modo deseado
+ * @retval	true, si no hubo problemas
+ */
+bool TareaLeds_ModoLed (led_id_t LED, led_modo_t MODO)
 {
 	bool RET = false;
+	xSemaphoreTake( MutexManejador, portMAX_DELAY );
 	RET = uLedConfigurarModo ( LED, MODO );
+	xSemaphoreGive( MutexManejador );
+	return RET;
+}
+
+/*-------------------------------------------------------------------------------------------------
+ * @brief	Cambia el modo de un led de forma segura
+ * @param	Identificador del led y modo deseado
+ * @retval	true, si no hubo problemas
+ */
+bool TareaLeds_EncenderLed ( led_id_t LED )
+{
+	bool RET = false;
+	xSemaphoreTake( MutexManejador, portMAX_DELAY );
+	RET = uLedEncender ( LED );
+	xSemaphoreGive( MutexManejador );
+	return RET;
+}
+
+/*-------------------------------------------------------------------------------------------------
+ * @brief	Cambia el modo de un led de forma segura
+ * @param	Identificador del led y modo deseado
+ * @retval	true, si no hubo problemas
+ */
+bool TareaLeds_ApagarLed ( led_id_t LED )
+{
+	bool RET = false;
+	xSemaphoreTake( MutexManejador, portMAX_DELAY );
+	RET = uLedApagar ( LED );
+	xSemaphoreGive( MutexManejador );
 	return RET;
 }
 

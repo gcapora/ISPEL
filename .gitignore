@@ -45,6 +45,7 @@ release/
 *.su
 *.idb
 *.pdb
+MXTmpFiles/
 
 # Kernel Module Compile Results
 *.mod*

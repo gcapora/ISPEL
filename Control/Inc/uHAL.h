@@ -19,6 +19,7 @@
 #define U_LED_VERDE_EP HAL_PIN_PB0
 #define U_LED_AZUL_EP  HAL_PIN_PB7
 #define U_LED_ROJO_EP  HAL_PIN_PB14
+#define U_BOTON_EP     HAL_PIN_PC13
 
 /****** Definiciones públicas de tipos de datos (public typedef) *********************************/
 

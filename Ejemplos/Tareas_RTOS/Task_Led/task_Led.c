@@ -13,9 +13,8 @@
 //#include <stdbool.h>
 
 /* Project includes. */
-#include "task_Led.h"
+#include "../../Ejemplos/Tareas_RTOS/Task_Led/task_Led.h"
 
-/* Debug includes. */
 #include "supporting_Functions.h"
 
 // ------ Macros and definitions ---------------------------------------

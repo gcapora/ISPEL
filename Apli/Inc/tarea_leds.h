@@ -40,6 +40,7 @@ led_id_t TareaLeds_InicializarLed (hal_pin_id_t);
 bool TareaLeds_ModoLed ( led_id_t, led_modo_t );
 bool TareaLeds_EncenderLed ( led_id_t );
 bool TareaLeds_ApagarLed ( led_id_t );
+bool TareaLeds_LedEncendido ( led_id_t );
 
 /*************************************************************************************************/
 #ifdef __cplusplus

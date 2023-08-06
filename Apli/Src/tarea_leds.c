@@ -125,4 +125,18 @@ bool TareaLeds_ApagarLed ( led_id_t LED )
 	return RET;
 }
 
+/*-------------------------------------------------------------------------------------------------
+ * @brief	Indica si el LED indicado está encendido
+ * @param	Identificador del led y modo deseado
+ * @retval	true si está encendido
+ */
+bool TareaLeds_LedEncendido ( led_id_t LED )
+{
+	bool RET = false;
+	xSemaphoreTake( MutexManejador, portMAX_DELAY );
+	RET = ( LED_ENCENDIDO == uLedObtenerEstado ( LED ) );
+	xSemaphoreGive( MutexManejador );
+	return RET;
+}
+
 /****************************************************************** FIN DE ARCHIVO ***************/

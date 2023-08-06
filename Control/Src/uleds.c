@@ -262,3 +262,5 @@ led_estado_t uLedObtenerEstadoFisico(led_id_t led_id) {
     if ( false == uLedVerificarId(led_id) ) return false;
     return (led_estado_t) uHALgpioLeer ( vectorLedControl[led_id].pinLed );
 }
+
+/****************************************************************** FIN DE ARCHIVO ***************/

@@ -20,7 +20,8 @@
 
 /****** Definición de datos privados *************************************************************/
 
-led_id_t LedRojoEnPlaca, LedAzulEnPlaca;
+led_id_t    LedVerdeEnPlaca, LedRojoEnPlaca, LedAzulEnPlaca;
+boton_id_t  BotonEnPlaca;
 
 /****** Definición de datos públicos *************************************************************/
 
@@ -38,20 +39,19 @@ led_id_t LedRojoEnPlaca, LedAzulEnPlaca;
  * @param	Ninguno
  * @retval true, si no hubo problemas
  */
-bool TareaTestInicializar (void) {
-
-	// Variables locales
-
+bool TareaTestInicializar (void)
+{
 	// Cargo parámetros de leds
 	configASSERT ( ERROR_LED != (LedRojoEnPlaca = TareaLeds_InicializarLed ( U_LED_ROJO_EP )) );
 	configASSERT ( TareaLeds_ModoLed ( LedRojoEnPlaca, SUSPENSION ) );
 
-	configASSERT ( ERROR_LED != (LedAzulEnPlaca = TareaLeds_InicializarLed ( U_LED_AZUL_EP )) );
+	configASSERT ( ERROR_LED != (LedAzulEnPlaca  = TareaLeds_InicializarLed ( U_LED_AZUL_EP )) );
 	configASSERT ( TareaLeds_ModoLed ( LedAzulEnPlaca, BALIZA ) );
 
-	//uLedActualizar( LedRojoEnPlaca );
-	//uHALgpioEscribir (U_LED_ROJO_EP, true);
-	// Acá podría haber más leds, pero no por ahora...
+	configASSERT ( ERROR_LED != (LedVerdeEnPlaca = TareaLeds_InicializarLed ( U_LED_VERDE_EP )) );
+
+	// Inicializo boton
+	configASSERT ( ERROR_BOTON != (BotonEnPlaca = TareaBotones_InicializarBoton ( U_BOTON_EP )) );
 
 	// Terminada la inicialización...
 	return true;
@@ -61,31 +61,54 @@ bool TareaTestInicializar (void) {
  * @brief  Tarea que actualiza el estado de los leds
  * @param	Ninguno
  */
-void TareaTest( void *pvParameters )
+void TareaTest_1( void *pvParameters )
 {
 	/* Imprimir la tarea inicializada: */
 	char *pcTaskName = (char *) pcTaskGetName( NULL );
 	vPrintTwoStrings( pcTaskName, " esta ejecutandose." );
 
 	/* Enciendo leds: */
-	configASSERT ( TareaLeds_EncenderLed (LedRojoEnPlaca) );
-	configASSERT ( TareaLeds_EncenderLed (LedAzulEnPlaca) );
+	configASSERT ( TareaLeds_EncenderLed (LedRojoEnPlaca)  );
+	configASSERT ( TareaLeds_EncenderLed (LedAzulEnPlaca)  );
+	configASSERT ( TareaLeds_EncenderLed (LedVerdeEnPlaca) );
 
 	/* Como la mayoría de las tareas, ciclo infinito... */
 	for( ;; )
 	{
 		vTaskDelay( DELTAT_TEST );
 		configASSERT ( TareaLeds_ModoLed ( LedAzulEnPlaca, PLENO ) );
-		configASSERT ( TareaLeds_EncenderLed ( LedRojoEnPlaca ) );
-		vTaskDelay( DELTAT_TEST );
-		configASSERT ( TareaLeds_ModoLed ( LedAzulEnPlaca, INTENSIDAD10 ) );
+
 		vTaskDelay( DELTAT_TEST );
 		configASSERT ( TareaLeds_ModoLed ( LedAzulEnPlaca, TITILANTE ) );
+
 		vTaskDelay( DELTAT_TEST );
 		configASSERT ( TareaLeds_ModoLed ( LedAzulEnPlaca, TITILANTE_LENTO ) );
-		vTaskDelay( DELTAT_TEST );
-		configASSERT ( TareaLeds_ModoLed ( LedAzulEnPlaca, BALIZA ) );
-		configASSERT ( TareaLeds_ApagarLed ( LedRojoEnPlaca ) );
+
+	}
+}
+
+/*-------------------------------------------------------------------------------------------------
+ * @brief  Tarea que actualiza el estado de los leds
+ * @param	Ninguno
+ */
+void TareaTest_2( void *pvParameters )
+{
+	/* Imprimir la tarea inicializada: */
+	char *pcTaskName = (char *) pcTaskGetName( NULL );
+	vPrintTwoStrings( pcTaskName, " esta ejecutandose." );
+
+	/* Como la mayoría de las tareas, ciclo infinito... */
+	for( ;; )
+	{
+		vTaskDelay( 50UL );
+		if ( true == TareaBotones_BotonFlancoPresionado ( BotonEnPlaca ) ){
+			// Cambio estado del led...
+			if ( false == TareaLeds_LedEncendido (LedVerdeEnPlaca) ) {
+				TareaLeds_EncenderLed (LedVerdeEnPlaca);
+ 			} else {
+ 				TareaLeds_ApagarLed (LedVerdeEnPlaca);
+ 			}
+		}
 	}
 }
 

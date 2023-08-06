@@ -137,7 +137,7 @@ bool uBotonActualizar(boton_id_t ID) {
 
     // Leo pin-boton
     LecturaBoton = uHALgpioLeer (vectorBotonControl[ID].pinBoton);
-    TiempoLectura = (uint32_t) xTaskGetTickCount();	// TODO pasarlo a uOSAL
+    TiempoLectura = uOSALmiliseg();
 
     // Analizo estado y decido ------------------------------------------------
     switch (vectorBotonControl[ID].estado) {

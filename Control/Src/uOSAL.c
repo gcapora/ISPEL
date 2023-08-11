@@ -8,6 +8,8 @@
 
 /****** Librerías (includes) *********************************************************************/
 
+#include "stm32f4xx_hal.h"
+#include "cmsis_os.h"
 #include "FreeRTOS.h"
 
 /****** Definiciones privadas (macros) ***********************************************************/
@@ -36,6 +38,21 @@ uint32_t uOSALmiliseg( void )
 {
 	return (uint32_t) xTaskGetTickCount () * 1000 / configTICK_RATE_HZ;
 }
+
+/*-------------------------------------------------------------------------------------------------
+ * @brief	Maneja el error
+ * @param	Ninguno
+ * @retval  Ninguno
+ */
+void uManejaError (void)   // TODO que coincida con error de freertos
+{
+  __disable_irq();
+  while (1)
+  {
+  }
+}
+
+
 
 
 /****************************************************************** FIN DE ARCHIVO ***************/

@@ -25,6 +25,7 @@
 /****** Declaración de funciones públicas ********************************************************/
 
 uint32_t uOSALmiliseg( void );
+void uManejaError ( void );
 
 /*************************************************************************************************/
 #endif /* ISPEL_UOSAL_H_ */

@@ -93,7 +93,7 @@ static void U_DAC_Init( dac_id_t NUM_DAC )
   hdac[NUM_DAC].Instance = DAC;
   if ( HAL_DAC_Init(&hdac[NUM_DAC]) != HAL_OK )
   {
-	  uManejaError();
+	  uoHuboError();
   }
 
   /** DAC channel OUT config   */
@@ -101,7 +101,7 @@ static void U_DAC_Init( dac_id_t NUM_DAC )
   sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
   if (HAL_DAC_ConfigChannel(&hdac[NUM_DAC], &sConfig, CANAL_DAC[NUM_DAC]) != HAL_OK)
   {
-	  uManejaError();
+	  uoHuboError();
   }
 }
 
@@ -124,18 +124,18 @@ static void U_TIM_Init( dac_id_t NUM_DAC )
   htim[NUM_DAC].Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if ( HAL_TIM_Base_Init(&htim[NUM_DAC]) != HAL_OK )
   {
-    uManejaError();
+    uoHuboError();
   }
   sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
   if ( HAL_TIM_ConfigClockSource(&htim[NUM_DAC], &sClockSourceConfig) != HAL_OK )
   {
-    uManejaError();
+    uoHuboError();
   }
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim[NUM_DAC], &sMasterConfig) != HAL_OK)
   {
-    uManejaError();
+    uoHuboError();
   }
 }
 
@@ -156,7 +156,7 @@ static void U_DMA_Init( dac_id_t NUM_DAC )
 		HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
 		break;
 	default:
-	    uManejaError();
+	    uoHuboError();
 	    break;
 	}
 }

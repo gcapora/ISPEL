@@ -13,7 +13,7 @@
 
 /****** Definiciones privadas (macros) ***********************************************************/
 
-#define DELTAT_TEST			pdMS_TO_TICKS( 5000UL )
+#define DELTAT_TEST			pdMS_TO_TICKS( 2000UL )
 
 /****** Definiciones privadas de tipos (private typedef) *****************************************/
 
@@ -41,6 +41,13 @@ boton_id_t  BotonEnPlaca;
  */
 bool TareaTestInicializar (void)
 {
+	// Enciendo DAC
+	uint32_t senial[32] = {3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000,
+			                     3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000,
+								 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	uHALdacdmaConfigurar(UHAL_DAC_1, NULL);
+   uHALdacdmaComenzar ( UHAL_DAC_1, senial , 32 );
+
 	// Cargo parámetros de leds
 	configASSERT ( ERROR_LED != (LedRojoEnPlaca = TareaLeds_InicializarLed ( U_LED_ROJO_EP )) );
 	configASSERT ( TareaLeds_ModoLed ( LedRojoEnPlaca, SUSPENSION ) );
@@ -63,27 +70,49 @@ bool TareaTestInicializar (void)
  */
 void TareaTest_1( void *pvParameters )
 {
+	uint32_t tiempo1, tiempo2;
+
 	/* Imprimir la tarea inicializada: */
 	char *pcTaskName = (char *) pcTaskGetName( NULL );
-	vPrintTwoStrings( pcTaskName, " esta ejecutandose." );
+	uoEscribirTxtTxt ( pcTaskName, " esta ejecutandose.\n\r" );
+	// vPrintStringAndNumber ("Cuenta actual: ", xTaskGetTickCount());
+  	// vPrintStringAndNumber ("Cuenta micro: ", uMicrosegundos());
+
+  	//vPrintString (" us.\n\r");
 
 	/* Enciendo leds: */
 	configASSERT ( TareaLeds_EncenderLed (LedRojoEnPlaca)  );
 	configASSERT ( TareaLeds_EncenderLed (LedAzulEnPlaca)  );
 	configASSERT ( TareaLeds_EncenderLed (LedVerdeEnPlaca) );
 
+  	tiempo2 = uoMicrosegundos();
+  	tiempo1 = uoMilisegundos();
+  	while ( (uoMilisegundos()-tiempo1) < 1000) {
+  	  		// NADA!!!
+  	}
+  	uoEscribirTxtUintTxt ("Microsegundos tras 1000 milisegundos: ", uoMicrosegundos()-tiempo2, "\n\r");
+
+  	tiempo2 = uoMicrosegundos();
+  	tiempo1 = uoMilisegundos();
+  	while ( (uoMicrosegundos()-tiempo2) < 1000) {
+  	  		// NADA!!!
+  	}
+  	uoEscribirTxtUintTxt ("Milisegundos tras 1000 microsegundos: ", uoMilisegundos()-tiempo1, "\n\r");
+
 	/* Como la mayoría de las tareas, ciclo infinito... */
 	for( ;; )
 	{
 		vTaskDelay( DELTAT_TEST );
 		configASSERT ( TareaLeds_ModoLed ( LedAzulEnPlaca, PLENO ) );
+		//vPrintStringAndNumber ("Tiempo ", xTaskGetTickCount());
 
 		vTaskDelay( DELTAT_TEST );
 		configASSERT ( TareaLeds_ModoLed ( LedAzulEnPlaca, TITILANTE ) );
+		//vPrintStringAndNumber ("Tiempo ", xTaskGetTickCount());
 
 		vTaskDelay( DELTAT_TEST );
 		configASSERT ( TareaLeds_ModoLed ( LedAzulEnPlaca, TITILANTE_LENTO ) );
-
+	  	//vPrintStringAndNumber ("Tiempo ", xTaskGetTickCount());
 	}
 }
 
@@ -95,7 +124,7 @@ void TareaTest_2( void *pvParameters )
 {
 	/* Imprimir la tarea inicializada: */
 	char *pcTaskName = (char *) pcTaskGetName( NULL );
-	vPrintTwoStrings( pcTaskName, " esta ejecutandose." );
+	uoEscribirTxtTxt ( pcTaskName, " esta ejecutandose.\n\r" );
 
 	/* Como la mayoría de las tareas, ciclo infinito... */
 	for( ;; )
@@ -103,11 +132,7 @@ void TareaTest_2( void *pvParameters )
 		vTaskDelay( 50UL );
 		if ( true == TareaBotones_BotonFlancoPresionado ( BotonEnPlaca ) ){
 			// Cambio estado del led...
-			if ( false == TareaLeds_LedEncendido (LedVerdeEnPlaca) ) {
-				TareaLeds_EncenderLed (LedVerdeEnPlaca);
- 			} else {
- 				TareaLeds_ApagarLed (LedVerdeEnPlaca);
- 			}
+			TareaLeds_InvertirLed (LedVerdeEnPlaca);
 		}
 	}
 }

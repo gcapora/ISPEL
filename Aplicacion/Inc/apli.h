@@ -17,6 +17,7 @@ extern "C" {
 
 #include "cmsis_os.h"	// ¿Por qué había que incluir esta librería?
 #include "FreeRTOS.h"
+#include "uOSAL.h"
 #include "tarea_leds.h"
 #include "tarea_botones.h"
 

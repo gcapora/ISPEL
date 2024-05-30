@@ -138,7 +138,7 @@ bool uBotonActualizar(boton_id_t ID) {
 
     // Leo pin-boton
     LecturaBoton = uHALgpioLeer (vectorBotonControl[ID].pinBoton);
-    TiempoLectura = uOSALmiliseg();
+    TiempoLectura = uoMilisegundos();
 
     // Analizo estado y decido ------------------------------------------------
     switch (vectorBotonControl[ID].estado) {
@@ -240,7 +240,7 @@ bool uBotonNoPresionado (boton_id_t ID) {
  * @retval	true si hubo un FLANCO hacia boón NO PRESIONADO
  * 			Sólo un true por un flanco detectado
  */
-bool uBotonFlancoNoPresionado (boton_id_t ID) {
+bool uBotonFlancoSoltando (boton_id_t ID) {
 	if ( true == vectorBotonControl[ID].FlancoNoPresionadoDetectado ) {
 		vectorBotonControl[ID].FlancoNoPresionadoDetectado = false;
 		return true;
@@ -281,7 +281,7 @@ bool uBotonPresionadoLargo (boton_id_t ID) {
  * @retval	true si hubo FLANCO hacia boón PRESIONADO
  * 			Sólo un true por un flanco detectado
  */
-bool uBotonFlancoPresionado (boton_id_t ID) {
+bool uBotonFlancoPresionando (boton_id_t ID) {
 	if ( true == vectorBotonControl[ID].FlancoPresionadoDetectado ) {
 		vectorBotonControl[ID].FlancoPresionadoDetectado = false;
 		return true;

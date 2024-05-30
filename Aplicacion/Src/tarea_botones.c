@@ -57,7 +57,7 @@ void TareaBotones ( void *pvParameters )
 {
 	/* Imprimir la tarea iniciada: */
 	char *pcTaskName = (char *) pcTaskGetName( NULL );
-	vPrintTwoStrings( pcTaskName, " esta ejecutandose." );
+	uoEscribirTxtTxt ( pcTaskName, " esta ejecutandose.\n\r" );
 
 	/* Ciclo infinito, como la mayoría de las tareas: */
 	for( ;; )
@@ -93,7 +93,7 @@ bool TareaBotones_BotonFlancoPresionado ( boton_id_t BOTON )
 {
 	bool RET = false;
 	xSemaphoreTake( MutexManejadorBTNS, portMAX_DELAY );
-	RET = uBotonFlancoPresionado ( BOTON );
+	RET = uBotonFlancoPresionando ( BOTON );
 	xSemaphoreGive( MutexManejadorBTNS );
 	return RET;
 }

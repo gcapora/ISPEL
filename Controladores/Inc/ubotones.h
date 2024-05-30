@@ -28,15 +28,17 @@ typedef int8_t	boton_id_t;
 
 /****** Declaración de funciones públicas ********************************************************/
 
-boton_id_t	uBotonInicializar (hal_pin_id_t);
-bool		uBotonDesinicializar (boton_id_t);
-bool		uBotonActualizar (boton_id_t);
-bool		uBotonActualizarTodo ( void );
-bool		uBotonPresionado (boton_id_t);
-bool		uBotonPresionadoLargo (boton_id_t);
-bool		uBotonFlancoPresionado (boton_id_t);
-bool		uBotonNoPresionado (boton_id_t);
-bool		uBotonFlancoNoPresionado (boton_id_t);
+boton_id_t	uBotonInicializar			( hal_pin_id_t );
+bool			uBotonDesinicializar		( boton_id_t );
+bool			uBotonActualizar 			( boton_id_t );
+bool			uBotonActualizarTodo 	( void );
+
+bool			uBotonPresionado 			( boton_id_t );
+bool			uBotonNoPresionado 		( boton_id_t );
+bool			uBotonPresionadoLargo	( boton_id_t );
+
+bool			uBotonFlancoPresionando	( boton_id_t );
+bool			uBotonFlancoSoltando 	( boton_id_t );
 
 /*************************************************************************************************/
 #endif /* __ISPEL_UBOTONES_H */

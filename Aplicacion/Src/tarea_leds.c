@@ -57,7 +57,7 @@ void TareaLeds( void *pvParameters )
 {
 	/* Imprimir la tarea iniciada: */
 	char *pcTaskName = (char *) pcTaskGetName( NULL );
-	vPrintTwoStrings( pcTaskName, " esta ejecutandose." );
+	uoEscribirTxtTxt ( pcTaskName, " esta ejecutandose.\n\r" );
 
 	/* Ciclo infinito, como la mayoría de las tareas: */
 	for( ;; )
@@ -107,6 +107,25 @@ bool TareaLeds_EncenderLed ( led_id_t LED )
 	bool RET = false;
 	xSemaphoreTake( MutexManejador, portMAX_DELAY );
 	RET = uLedEncender ( LED );
+	xSemaphoreGive( MutexManejador );
+	return RET;
+}
+
+/*-------------------------------------------------------------------------------------------------
+ * @brief	Cambia el modo de un led de forma segura
+ * @param	Identificador del led y modo deseado
+ * @retval	true, si no hubo problemas
+ */
+bool TareaLeds_InvertirLed ( led_id_t LED )
+{
+	bool RET = false;
+	xSemaphoreTake( MutexManejador, portMAX_DELAY );
+
+	if ( LED_APAGADO == uLedObtenerEstado(LED) ) {
+		RET = uLedEncender(LED);
+	} else {
+		RET = uLedApagar(LED);
+	}
 	xSemaphoreGive( MutexManejador );
 	return RET;
 }

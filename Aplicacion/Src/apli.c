@@ -9,13 +9,13 @@
 /****** Librerías (includes) *********************************************************************/
 
 /* Standard includes. */
-#include <apli.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
 
 /* Project includes. */
+#include <apli.h>
 
 /****** Definiciones privadas (macros) ***********************************************************/
 
@@ -34,7 +34,8 @@ TaskHandle_t TareaBotones_m;
 TaskHandle_t TareaTest1_m, TareaTest2_m;
 
 /* Mensajes... */
-const char *pcTextForMain = "Embebido ISPEL ejecutandose...\r\n";
+const char *pcTextForMain = "Test ISPEL en ejecucion\r\n";
+const char *Barra         = "========================================\r\n";
 
 /****** Definición de datos públicos *************************************************************/
 
@@ -54,21 +55,31 @@ const char *pcTextForMain = "Embebido ISPEL ejecutandose...\r\n";
  */
 void apliInicializar( void )
 {
-	// Iniciación de la aplicación ----------------------------------------------------------------
-
-	// Escribimos mensaje de iniciación de la aplicación...
-	vPrintString( "----------------------------------------\r\n");
-  	vPrintString( pcTextForMain );
-
-	// Variables utilizadas por la aplicación
-  	// void* ptr = NULL;
+	// Variables locales
 	BaseType_t ret = pdFAIL;
+  	// void* ptr = NULL;
+
+	// Iniciación de la aplicación ----------------------------------------------------------------
+	uoInicializar();
 
 	// Inicialización de módulos ------------------------------------------------------------------
 
 	configASSERT( true == TareaLedsInicializar()    );
 	configASSERT( true == TareaBotonesInicializar() );
 	configASSERT( true == TareaTestInicializar()    );
+
+	// Escribimos mensaje de iniciación de la aplicación...
+	uoEscribirTxt ( "\r\n");
+	uoEscribirTxt ( Barra );
+	uoEscribirTxt ( pcTextForMain );
+	uoEscribirTxt ( Barra );
+
+  	uoLedEncender (UOSAL_PIN_LED_VERDE_INCORPORADO);
+  	uoLedEncender (UOSAL_PIN_LED_AZUL_INCORPORADO);
+  	uoLedEncender (UOSAL_PIN_LED_ROJO_INCORPORADO);
+
+  	uoEscribirTxt ( "Espero 3 segundos con leds incorporados encendidos...\r\n");
+  	uoEsperarMilis (3000);
 
 	// Creación de las tareas ---------------------------------------------------------------------
 

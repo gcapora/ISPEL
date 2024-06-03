@@ -59,10 +59,14 @@ void apliInicializar( void )
 	BaseType_t ret = pdFAIL;
   	// void* ptr = NULL;
 
-	// Iniciación de la aplicación ----------------------------------------------------------------
-	uoInicializar();
+	// Iniciación de capas y hardware --------------------------------------------------------------
+	uoInicializar();							// Capa OSAL
+	uHALinicializar();						// Capa HAL
+	uHALmapInicializar( UHAL_MAP_PE5 );	// MAP=PWM en pin PE5 a 10kHz
+	uHALmapConfigurarFrecuencia( UHAL_MAP_PE5 , 10000 );
+	uHALmapEncender( UHAL_MAP_PE5 );
 
-	// Inicialización de módulos ------------------------------------------------------------------
+	// Inicialización de módulos -------------------------------------------------------------------
 
 	configASSERT( true == TareaLedsInicializar()    );
 	configASSERT( true == TareaBotonesInicializar() );
@@ -74,6 +78,10 @@ void apliInicializar( void )
 	uoEscribirTxt ( pcTextForMain );
 	uoEscribirTxt ( Barra );
 
+	uoEscribirTxtUintTxt ( "Frecuencia de senial cuadrada\t= ",
+			  	  	  	  	  	  (uint32_t) round( uHALmapObtenerFrecuencia(UHAL_MAP_PE5)),
+								  " Hz. \n\r");
+
   	uoLedEncender (UOSAL_PIN_LED_VERDE_INCORPORADO);
   	uoLedEncender (UOSAL_PIN_LED_AZUL_INCORPORADO);
   	uoLedEncender (UOSAL_PIN_LED_ROJO_INCORPORADO);
@@ -84,39 +92,39 @@ void apliInicializar( void )
 	// Creación de las tareas ---------------------------------------------------------------------
 
 	/* Tarea Leds en prioridad 1 */
-	ret = xTaskCreate( TareaLeds,						// Puntero a la función-tarea.
-					   "Tarea LEDS",					// Nombre de tarea. Para desarrollo.
-					   (2 * configMINIMAL_STACK_SIZE),	// Tamaño de stack en palabras.
-					   NULL,    						// Parametros de la tarea, que no tiene acá
-					   TAREA_PRIORIDAD_BAJA,			// Prioridad baja.
-					   &TareaLeds_m );					// Variable de task handle.
+	ret = xTaskCreate(	TareaLeds,								// Puntero a la función-tarea.
+								"Tarea LEDS",							// Nombre de tarea. Para desarrollo.
+								(2 * configMINIMAL_STACK_SIZE),	// Tamaño de stack en palabras.
+								NULL,    								// Parametros de la tarea, que no tiene acá
+								TAREA_PRIORIDAD_BAJA,				// Prioridad baja.
+								&TareaLeds_m );						// Variable de administración de tarea.
 	configASSERT( ret == pdPASS );
 
 	/* Tarea Botones en prioridad 1 */
-	ret = xTaskCreate( TareaBotones,
-					   "Tarea BOTONES",
-					   (2 * configMINIMAL_STACK_SIZE),
-	                   NULL,
-					   TAREA_PRIORIDAD_MEDIA,
-					   &TareaBotones_m );
+	ret = xTaskCreate( 	TareaBotones,
+								"Tarea BOTONES",
+								(2 * configMINIMAL_STACK_SIZE),
+								NULL,
+								TAREA_PRIORIDAD_MEDIA,
+								&TareaBotones_m );
 	configASSERT( ret == pdPASS );
 
 	/* Tarea Test 1 */
-	ret = xTaskCreate( TareaTest_1,
-			           "Tarea TEST 1",
-					   (2 * configMINIMAL_STACK_SIZE),
-					   NULL,
-					   TAREA_PRIORIDAD_BAJA,
-					   &TareaTest1_m );
+	ret = xTaskCreate( 	TareaTest_1,
+								"Tarea TEST 1",
+								(2 * configMINIMAL_STACK_SIZE),
+								NULL,
+								TAREA_PRIORIDAD_BAJA,
+								&TareaTest1_m );
 	configASSERT( ret == pdPASS );
 
 	/* Tarea Test 2 */
-	ret = xTaskCreate( TareaTest_2,
-			           "Tarea TEST 2",
-					   (2 * configMINIMAL_STACK_SIZE),
-					   NULL,
-					   TAREA_PRIORIDAD_MEDIA,
-					   &TareaTest2_m );
+	ret = xTaskCreate( 	TareaTest_2,
+								"Tarea TEST 2",
+								(2 * configMINIMAL_STACK_SIZE),
+								NULL,
+								TAREA_PRIORIDAD_MEDIA,
+								&TareaTest2_m );
 	configASSERT( ret == pdPASS );
 
 }

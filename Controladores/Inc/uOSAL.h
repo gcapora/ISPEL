@@ -45,6 +45,8 @@ void     uoEscribirUint      	( uint32_t );
 void     uoEscribirTxtTxt     ( const char *, const char * );
 void     uoEscribirTxtUint		( const char *, uint32_t );
 void     uoEscribirTxtUintTxt	( const char *, uint32_t, const char * );
+bool		uoLeerChar 				( char *, uint32_t );
+uint32_t uoLeerTxt 				( char *, uint32_t, uint32_t );
 
 void		uoHuboError 			( void );
 void     uoHuboErrorTxt       ( const char * );

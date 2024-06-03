@@ -122,18 +122,25 @@ void TareaTest_1( void *pvParameters )
  */
 void TareaTest_2( void *pvParameters )
 {
-	/* Imprimir la tarea inicializada: */
+	/* Variables locales */
 	char *pcTaskName = (char *) pcTaskGetName( NULL );
+	char Lectura [11] = {0};
+
+	/* Imprimir la tarea inicializada: */
 	uoEscribirTxtTxt ( pcTaskName, " esta ejecutandose.\n\r" );
 
 	/* Como la mayoría de las tareas, ciclo infinito... */
 	for( ;; )
 	{
-		vTaskDelay( 50UL );
+		vTaskDelay( 1UL );
 		if ( true == TareaBotones_BotonFlancoPresionado ( BotonEnPlaca ) ){
 			// Cambio estado del led...
 			TareaLeds_InvertirLed (LedVerdeEnPlaca);
 		}
+		if ( uoLeerTxt(Lectura,10,50)>0 ) {
+			uoEscribirTxt (Lectura);
+		}
+
 	}
 }
 

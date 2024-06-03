@@ -20,6 +20,7 @@
 
 /****** Definiciones privadas de tipos (private typedef) *****************************************/
 
+#define UOSAL_UART_TIEMPO_ESPERA_US		UOSAL_UART_TIEMPO_ESPERA*1000  // Mismo valor pero en us
 
 /****** Definición de datos privados *************************************************************/
 
@@ -235,6 +236,62 @@ void uoEscribirTxtUintTxt ( const char * P_TEXTO, uint32_t ENTEROP, const char *
    UART_ENVIAR_CADENA ( Cadena );
   	UART_ENVIAR_CADENA ( (uint8_t *) P_TEXTO2);
 	xSemaphoreGive( MutexEscribirAdmin );
+}
+
+/*******************************************************************************
+  * @brief  Lee por UART un caracter
+  * @param  Puntero donde guardar un char
+  * @param  Tiempo de espera [us]
+  * @retval true si leyó algo
+  */
+bool uoLeerChar (char * caracter, uint32_t Espera)
+{
+	// Variables locales;
+	HAL_StatusTypeDef Resultado;
+	uint32_t				TiempoInicio;
+
+	// Precondiciones
+	if (caracter == NULL) uoHuboErrorTxt("en uLeerChar de uOSAL.");
+	Espera = (Espera>UOSAL_UART_TIEMPO_ESPERA_US) ? UOSAL_UART_TIEMPO_ESPERA_US : Espera;
+
+	// Recibo...
+	TiempoInicio = uoMicrosegundos();
+	do {
+		Resultado = HAL_UART_Receive(&uart_e, (uint8_t *) caracter, 1, 0);
+	} while ( (uoMicrosegundos()-TiempoInicio < Espera) && (Resultado != HAL_OK) );
+	if (Resultado == HAL_OK) return true;
+	return false;
+}
+
+/*******************************************************************************
+  * @brief  Lee por UART una cantidad máxima de caracteres
+  * @param  Puntero donde guardar vector de char
+  * @param  Cantidad máxima de char
+  * @param  Tiempo de espera [us]
+  * @retval true si leyó algo
+  */
+uint32_t uoLeerTxt ( char * TEXTO, uint32_t CANTIDAD, uint32_t ESPERA )
+{
+	// Variables locales
+	uint32_t TiempoInicio = 0;
+	uint32_t Indice = 0;
+
+	// Precondiciones
+	if (TEXTO == NULL) uoHuboErrorTxt("en uLeerTxt de uOSAL.");
+	if (0==CANTIDAD)   return 0;
+	CANTIDAD = (CANTIDAD > UOSAL_UART_LARGO_MAXIMO    ) ? UOSAL_UART_LARGO_MAXIMO     : CANTIDAD;
+	ESPERA   = (ESPERA   > UOSAL_UART_TIEMPO_ESPERA_US) ? UOSAL_UART_TIEMPO_ESPERA_US : ESPERA;
+
+	// Lectura
+	TiempoInicio = uoMicrosegundos();
+	do {
+		if ( uoLeerChar ( &TEXTO[Indice], 0 ) ) {
+			// Leímos un caracter!!!
+			Indice++;
+		}
+	} while ( (uoMicrosegundos()-TiempoInicio < ESPERA) && (Indice < CANTIDAD) );
+	if (Indice<CANTIDAD) TEXTO[Indice]='\0';  // Esto es para cumplir con formato de cadena
+	return Indice;
 }
 
 /*-------------------------------------------------------------------------------------------------

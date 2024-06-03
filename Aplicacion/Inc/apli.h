@@ -15,6 +15,7 @@ extern "C" {
 
 // ------ inclusions ---------------------------------------------------
 
+#include <math.h>
 #include "cmsis_os.h"	// ¿Por qué había que incluir esta librería?
 #include "FreeRTOS.h"
 #include "uOSAL.h"

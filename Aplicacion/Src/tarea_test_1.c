@@ -55,7 +55,7 @@ bool TareaTestInicializar (void)
 	configASSERT ( ERROR_LED != (LedAzulEnPlaca  = TareaLeds_InicializarLed ( U_LED_AZUL_EP )) );
 	configASSERT ( TareaLeds_ModoLed ( LedAzulEnPlaca, BALIZA ) );
 
-	configASSERT ( ERROR_LED != (LedVerdeEnPlaca = TareaLeds_InicializarLed ( U_LED_VERDE_EP )) );
+	// configASSERT ( ERROR_LED != (LedVerdeEnPlaca = TareaLeds_InicializarLed ( U_LED_VERDE_EP )) );
 
 	// Inicializo boton
 	configASSERT ( ERROR_BOTON != (BotonEnPlaca = TareaBotones_InicializarBoton ( U_BOTON_EP )) );
@@ -83,7 +83,7 @@ void TareaTest_1( void *pvParameters )
 	/* Enciendo leds: */
 	configASSERT ( TareaLeds_EncenderLed (LedRojoEnPlaca)  );
 	configASSERT ( TareaLeds_EncenderLed (LedAzulEnPlaca)  );
-	configASSERT ( TareaLeds_EncenderLed (LedVerdeEnPlaca) );
+	//configASSERT ( TareaLeds_EncenderLed (LedVerdeEnPlaca) );
 
   	tiempo2 = uoMicrosegundos();
   	tiempo1 = uoMilisegundos();
@@ -113,6 +113,15 @@ void TareaTest_1( void *pvParameters )
 		vTaskDelay( DELTAT_TEST );
 		configASSERT ( TareaLeds_ModoLed ( LedAzulEnPlaca, TITILANTE_LENTO ) );
 	  	//vPrintStringAndNumber ("Tiempo ", xTaskGetTickCount());
+
+		// Verificamos si debo imprimir una señal
+		uoEscribirTxt("Hola?\n\r");
+		if ( uCapturadoraSenialCargada() ){
+			  //ImprimirSenial32_main();
+			  uoEscribirTxt ( Barra );
+			  uoLedApagar ( UOSAL_PIN_LED_VERDE_INCORPORADO );
+			  ImprimirSenial32_main();
+		}
 	}
 }
 
@@ -133,12 +142,21 @@ void TareaTest_2( void *pvParameters )
 	for( ;; )
 	{
 		vTaskDelay( 1UL );
-		if ( true == TareaBotones_BotonFlancoPresionado ( BotonEnPlaca ) ){
-			// Cambio estado del led...
-			TareaLeds_InvertirLed (LedVerdeEnPlaca);
-		}
+
+		// Verificamos lectura de UART
 		if ( uoLeerTxt(Lectura,10,50)>0 ) {
 			uoEscribirTxt (Lectura);
+		}
+
+		// Verificamos lectura de boton
+		if ( true == TareaBotones_BotonFlancoPresionado ( BotonEnPlaca ) ){
+			// Cambio estado del led...
+			// TareaLeds_InvertirLed (LedVerdeEnPlaca);
+			if (uCapturadoraIniciar ()) {
+				uoEscribirTxt ("Lanzamos captura... \n\r");
+			} else {
+				uoEscribirTxt ("No pudimos lanzar captura. :-( \n\r");
+			}
 		}
 
 	}

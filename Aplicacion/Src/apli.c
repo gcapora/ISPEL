@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <math.h>
 
 /* Project includes. */
 #include <apli.h>
@@ -37,6 +38,12 @@ TaskHandle_t TareaTest1_m, TareaTest2_m;
 const char *pcTextForMain = "Test ISPEL en ejecucion\r\n";
 const char *Barra         = "========================================\r\n";
 
+/* Configuración ADC */
+capturadora_config_s CAPTU_CONFIG    = {0};
+entrada_config_s     ENTRADA_CONFIG  = {0};
+senial_s * 				P_Senial_E1 = NULL;
+senial_s * 				P_Senial_E2 = NULL;
+
 /****** Definición de datos públicos *************************************************************/
 
 
@@ -60,11 +67,39 @@ void apliInicializar( void )
   	// void* ptr = NULL;
 
 	// Iniciación de capas y hardware --------------------------------------------------------------
+
 	uoInicializar();							// Capa OSAL
 	uHALinicializar();						// Capa HAL
-	uHALmapInicializar( UHAL_MAP_PE5 );	// MAP=PWM en pin PE5 a 10kHz
-	uHALmapConfigurarFrecuencia( UHAL_MAP_PE5 , 10000 );
+
+	// Inicializa señal cuadrada MAP=PWM en pin PE5 a FREC_TESTIGO
+
+	uHALmapInicializar( UHAL_MAP_PE5 );
+	uHALmapConfigurarFrecuencia( UHAL_MAP_PE5 , FREC_TESTIGO );
 	uHALmapEncender( UHAL_MAP_PE5 );
+
+	// Inicializa y configura Capturadora
+
+	uCapturadoraInicializar	();
+	uCapturadoraObtener		( &CAPTU_CONFIG );
+	CAPTU_CONFIG.EscalaHorizontal = 1.5/FREC_TESTIGO;
+	CAPTU_CONFIG.ModoCaptura      = 0;
+	uCapturadoraConfigurar	( &CAPTU_CONFIG );
+	P_Senial_E1 = uCapturadoraSenialObtener ( ENTRADA_1 );
+	P_Senial_E2 = uCapturadoraSenialObtener ( ENTRADA_2 );
+
+	// Configuramos entradas
+
+	uCapturadoraEntradaObtener    ( ENTRADA_1, &ENTRADA_CONFIG );
+	ENTRADA_CONFIG.EscalaVertical = 3;
+	ENTRADA_CONFIG.NivelDisparo   = 1.5;
+	ENTRADA_CONFIG.FlancoDisparo  = SUBIDA;
+	uCapturadoraEntradaConfigurar ( ENTRADA_1, &ENTRADA_CONFIG );
+	ENTRADA_CONFIG.EscalaVertical = 3;
+	ENTRADA_CONFIG.NivelDisparo   = 0.5;
+	ENTRADA_CONFIG.FlancoDisparo  = SUBIDA;
+	uCapturadoraEntradaConfigurar ( ENTRADA_2, &ENTRADA_CONFIG );
+	uCapturadoraEntradaEncender ( ENTRADA_1 );
+	uCapturadoraEntradaEncender ( ENTRADA_2 );
 
 	// Inicialización de módulos -------------------------------------------------------------------
 
@@ -73,6 +108,7 @@ void apliInicializar( void )
 	configASSERT( true == TareaTestInicializar()    );
 
 	// Escribimos mensaje de iniciación de la aplicación...
+
 	uoEscribirTxt ( "\r\n");
 	uoEscribirTxt ( Barra );
 	uoEscribirTxt ( pcTextForMain );
@@ -82,12 +118,13 @@ void apliInicializar( void )
 			  	  	  	  	  	  (uint32_t) round( uHALmapObtenerFrecuencia(UHAL_MAP_PE5)),
 								  " Hz. \n\r");
 
-  	uoLedEncender (UOSAL_PIN_LED_VERDE_INCORPORADO);
-  	uoLedEncender (UOSAL_PIN_LED_AZUL_INCORPORADO);
-  	uoLedEncender (UOSAL_PIN_LED_ROJO_INCORPORADO);
+  	uoLedEncender	(UOSAL_PIN_LED_VERDE_INCORPORADO);
+  	uoLedEncender	(UOSAL_PIN_LED_AZUL_INCORPORADO);
+  	uoLedEncender	(UOSAL_PIN_LED_ROJO_INCORPORADO);
 
-  	uoEscribirTxt ( "Espero 3 segundos con leds incorporados encendidos...\r\n");
-  	uoEsperarMilis (3000);
+  	uoEscribirTxt	( "Espero 1 segundo con leds incorporados encendidos...\r\n");
+  	uoEsperarMilis (1000);
+  	uoLedApagar		(UOSAL_PIN_LED_VERDE_INCORPORADO);
 
 	// Creación de las tareas ---------------------------------------------------------------------
 

@@ -15,10 +15,10 @@ extern "C" {
 
 // ------ inclusions ---------------------------------------------------
 
-#include <math.h>
 #include "cmsis_os.h"	// ¿Por qué había que incluir esta librería?
 #include "FreeRTOS.h"
 #include "uOSAL.h"
+#include "uCapturadora.h"
 #include "tarea_leds.h"
 #include "tarea_botones.h"
 
@@ -29,17 +29,21 @@ extern "C" {
 // ------ macros -------------------------------------------------------
 
 #define UN_SEGUNDO			pdMS_TO_TICKS( 1000UL )
+#define FREC_TESTIGO 		10000.0
 
 // ------ typedef ------------------------------------------------------
 
 
 // ------ external data declaration ------------------------------------
 
+extern const char *Barra;
+
 // TaskHandle_t xTaskLedHandle;
 
-// ------ external functions declaration -------------------------------
+// ------ public functions declaration -------------------------------
 
 void apliInicializar( void );
+void ImprimirSenial32_main (void);
 
 #ifdef __cplusplus
 }

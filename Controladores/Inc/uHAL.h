@@ -18,6 +18,7 @@
 #include "uHALgpio.h"
 #include "uHALdac.h"
 #include "uHALmap.h"
+#include "uHALadc.h"
 
 /****** Definiciones públicas (macros) ***********************************************************/
 
@@ -30,7 +31,7 @@
 
 /****** Declaración de funciones públicas ********************************************************/
 
-bool    uHALinicializar       ( void );
+bool	uHALinicializar       ( void );
 
 /*************************************************************************************************/
 #endif /* ISPEL_UHAL_H_ */

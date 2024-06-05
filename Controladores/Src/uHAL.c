@@ -46,4 +46,29 @@ bool uHALinicializar ( void )
   return control;
 }
 
+void UHAL_GPIO_ADC_INICIALIZAR  (GPIO_TypeDef * GPIOx, uint32_t PIN)
+{
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+	if (GPIOx==GPIOA) {
+		__HAL_RCC_GPIOA_CLK_ENABLE();
+
+	} else if (GPIOx==GPIOB) {
+		__HAL_RCC_GPIOB_CLK_ENABLE();
+
+	} else if (GPIOx==GPIOC) {
+		__HAL_RCC_GPIOC_CLK_ENABLE();
+
+	} else if (GPIOx==GPIOF) {
+		__HAL_RCC_GPIOF_CLK_ENABLE();
+	}
+
+	GPIO_InitStruct.Pin  = PIN;
+   GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+   GPIO_InitStruct.Pull = GPIO_NOPULL;
+   HAL_GPIO_Init(GPIOx, &GPIO_InitStruct);
+}
+
+
+
 /****************************************************************** FIN DE ARCHIVO ***************/

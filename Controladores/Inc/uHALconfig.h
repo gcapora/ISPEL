@@ -47,6 +47,7 @@
 
 /****** Declaración de funciones públicas ********************************************************/
 
+void	UHAL_GPIO_ADC_INICIALIZAR  (GPIO_TypeDef * GPIOx, uint32_t PIN);
 
 /*************************************************************************************************/
 #endif /* ISPEL_UHAL_CONFIG_H_ */

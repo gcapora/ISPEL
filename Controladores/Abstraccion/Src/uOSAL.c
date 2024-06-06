@@ -195,11 +195,25 @@ void uoEscribirUint ( uint32_t ENTEROP)
 * @param		Puntero a texto
 * @retval	Ninguno
 */
-void uoEscribirTxtTxt ( const char * P_TEXTO, const char * P_TEXTO2)
+void uoEscribirTxtTxt ( const char * P_TEXTO, const char * P_TEXTO2 )
 {
    xSemaphoreTake( MutexEscribirAdmin, portMAX_DELAY );
 	UART_ENVIAR_CADENA ( (uint8_t *) P_TEXTO);
   	UART_ENVIAR_CADENA ( (uint8_t *) P_TEXTO2);
+	xSemaphoreGive( MutexEscribirAdmin );
+}
+
+/*void uoEscribirTxt2 ( const char * P_TEXTO, const char * P_TEXTO2 )
+{
+	uoEscribirTxtTxt ( P_TEXTO, P_TEXTO2 );
+}*/
+
+void uoEscribirTxtTxtTxt ( const char * P_TEXTO, const char * P_TEXTO2, const char * P_TEXTO3 )
+{
+	xSemaphoreTake( MutexEscribirAdmin, portMAX_DELAY );
+	UART_ENVIAR_CADENA ( (uint8_t *) P_TEXTO);
+	UART_ENVIAR_CADENA ( (uint8_t *) P_TEXTO2);
+	UART_ENVIAR_CADENA ( (uint8_t *) P_TEXTO3);
 	xSemaphoreGive( MutexEscribirAdmin );
 }
 

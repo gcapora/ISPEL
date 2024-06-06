@@ -46,6 +46,7 @@ senial_s * 				P_Senial_E2 = NULL;
 
 /****** Definición de datos públicos *************************************************************/
 
+boton_id_t  BotonEnPlaca;
 
 /****** Declaración de funciones privadas ********************************************************/
 
@@ -66,28 +67,39 @@ void apliInicializar( void )
 	BaseType_t ret = pdFAIL;
   	// void* ptr = NULL;
 
-	// Iniciación de capas y hardware --------------------------------------------------------------
+	// Inicialización de capas y hardware ----------------------------------------------------------
 
 	uoInicializar();							// Capa OSAL
 	uHALinicializar();						// Capa HAL
+	uHALmapInicializar( UHAL_MAP_PE5 ); // Objeto señal cuadrada MAP=PWM en pin PE5
 
-	// Inicializa señal cuadrada MAP=PWM en pin PE5 a FREC_TESTIGO
+	// Inicialización de módulos, tareas y objetos--------------------------------------------------
 
-	uHALmapInicializar( UHAL_MAP_PE5 );
-	uHALmapConfigurarFrecuencia( UHAL_MAP_PE5 , FREC_TESTIGO );
-	uHALmapEncender( UHAL_MAP_PE5 );
+	configASSERT( true == CapturadoraRTOS_Inicializar() );
+	configASSERT( true == LedsRTOS_Inicializar()    );
+	configASSERT( true == BotonesRTOS_Inicializar() );
 
-	// Inicializa y configura Capturadora
+	configASSERT( true == TareaTestInicializar()    );
 
-	uCapturadoraInicializar	();
+	configASSERT ( ERROR_BOTON != (BotonEnPlaca = BotonesRTOS_InicializarBoton ( U_BOTON_EP )) );
+
+	// Mensaje de inicio de APLICACION -------------------------------------------------------------
+
+	uoEscribirTxt ( "\r\n");
+	uoEscribirTxt ( Barra );
+	uoEscribirTxt ( pcTextForMain );
+	uoEscribirTxt ( Barra );
+
+	// Configura Capturadora
+
 	uCapturadoraObtener		( &CAPTU_CONFIG );
-	CAPTU_CONFIG.EscalaHorizontal = 1.5/FREC_TESTIGO;
-	CAPTU_CONFIG.ModoCaptura      = 0;
+	CAPTU_CONFIG.EscalaHorizontal = 2/FREC_TESTIGO;
+	CAPTU_CONFIG.ModoCaptura      = CAPTURA_PROMEDIADA_16;
 	uCapturadoraConfigurar	( &CAPTU_CONFIG );
 	P_Senial_E1 = uCapturadoraSenialObtener ( ENTRADA_1 );
 	P_Senial_E2 = uCapturadoraSenialObtener ( ENTRADA_2 );
 
-	// Configuramos entradas
+	// Configuramos entradas de Capturadora
 
 	uCapturadoraEntradaObtener    ( ENTRADA_1, &ENTRADA_CONFIG );
 	ENTRADA_CONFIG.EscalaVertical = 3;
@@ -101,22 +113,15 @@ void apliInicializar( void )
 	uCapturadoraEntradaEncender ( ENTRADA_1 );
 	uCapturadoraEntradaEncender ( ENTRADA_2 );
 
-	// Inicialización de módulos -------------------------------------------------------------------
+	// Configuramos señal testigo a FREC_TESTIGO
 
-	configASSERT( true == TareaLedsInicializar()    );
-	configASSERT( true == TareaBotonesInicializar() );
-	configASSERT( true == TareaTestInicializar()    );
-
-	// Escribimos mensaje de iniciación de la aplicación...
-
-	uoEscribirTxt ( "\r\n");
-	uoEscribirTxt ( Barra );
-	uoEscribirTxt ( pcTextForMain );
-	uoEscribirTxt ( Barra );
-
+	uHALmapConfigurarFrecuencia( UHAL_MAP_PE5 , FREC_TESTIGO );
+	uHALmapEncender( UHAL_MAP_PE5 );
 	uoEscribirTxtUintTxt ( "Frecuencia de senial cuadrada\t= ",
 			  	  	  	  	  	  (uint32_t) round( uHALmapObtenerFrecuencia(UHAL_MAP_PE5)),
 								  " Hz. \n\r");
+
+	// Probamos leds controlados por UOSAL
 
   	uoLedEncender	(UOSAL_PIN_LED_VERDE_INCORPORADO);
   	uoLedEncender	(UOSAL_PIN_LED_AZUL_INCORPORADO);
@@ -129,17 +134,17 @@ void apliInicializar( void )
 	// Creación de las tareas ---------------------------------------------------------------------
 
 	/* Tarea Leds en prioridad 1 */
-	ret = xTaskCreate(	TareaLeds,								// Puntero a la función-tarea.
-								"Tarea LEDS",							// Nombre de tarea. Para desarrollo.
+	ret = xTaskCreate(	Tarea_PALTA_1ms,						// Puntero a la función-tarea.
+								"PALTA_1ms",							// Nombre de tarea. Para desarrollo.
 								(2 * configMINIMAL_STACK_SIZE),	// Tamaño de stack en palabras.
 								NULL,    								// Parametros de la tarea, que no tiene acá
-								TAREA_PRIORIDAD_BAJA,				// Prioridad baja.
+								TAREA_PRIORIDAD_ALTA,				// Prioridad alta.
 								&TareaLeds_m );						// Variable de administración de tarea.
 	configASSERT( ret == pdPASS );
 
 	/* Tarea Botones en prioridad 1 */
-	ret = xTaskCreate( 	TareaBotones,
-								"Tarea BOTONES",
+	ret = xTaskCreate( 	Tarea_PMEDIA_10ms,
+								"PMEDIA_10ms",
 								(2 * configMINIMAL_STACK_SIZE),
 								NULL,
 								TAREA_PRIORIDAD_MEDIA,
@@ -148,7 +153,7 @@ void apliInicializar( void )
 
 	/* Tarea Test 1 */
 	ret = xTaskCreate( 	TareaTest_1,
-								"Tarea TEST 1",
+								"TEST 1",
 								(2 * configMINIMAL_STACK_SIZE),
 								NULL,
 								TAREA_PRIORIDAD_BAJA,
@@ -156,8 +161,8 @@ void apliInicializar( void )
 	configASSERT( ret == pdPASS );
 
 	/* Tarea Test 2 */
-	ret = xTaskCreate( 	TareaTest_2,
-								"Tarea TEST 2",
+	ret = xTaskCreate( 	Tarea_Capturadora,
+								"TEST 2",
 								(2 * configMINIMAL_STACK_SIZE),
 								NULL,
 								TAREA_PRIORIDAD_MEDIA,
@@ -165,6 +170,64 @@ void apliInicializar( void )
 	configASSERT( ret == pdPASS );
 
 }
+
+/*-------------------------------------------------------------------------------------------------
+ * @brief	Tarea que se actualiza con ALTA RPIORIDAD cada 1 ms
+ * @param	Ninguno
+ * @descripcion:
+ * 	Incluye:
+ * 	- Lectura de UART (solo carga, no procesa).
+ * 	- Actualización de leds.
+ */
+void Tarea_PALTA_1ms( void *pvParameters )
+{
+	/* Variables locales */
+	char *pcTaskName = (char *) pcTaskGetName( NULL );
+	char Lectura [11] = {0};
+   TickType_t Tiempo0;
+
+	/* Imprimir la tarea iniciada */
+	uoEscribirTxt3 ( "MSJ ", pcTaskName, " esta ejecutandose.\n\r" );
+
+	/* Ciclo infinito, como la mayoría de las tareas: */
+	Tiempo0 = xTaskGetTickCount();
+	for( ;; )
+	{
+
+		// Verificamos lectura de UART
+		if ( uoLeerTxt(Lectura,10,5)>0 ) {
+			uoEscribirTxt (Lectura);
+		}
+
+		// Actualización de leds
+		LedsRTOS_ActualizarTodos ( 0 );  // "0" porque prefiero saltear operación que esperarla
+
+		// Retardo sincronizado
+		vTaskDelayUntil( &Tiempo0, PERIODO_1MS );
+	}
+}
+
+/*-------------------------------------------------------------------------------------------------
+ * @brief	Tarea que se actualiza con MEDIA RPIORIDAD cada 10 ms
+ * @param	Ninguno
+ * @descripcion:
+ * 	Incluye:
+ * 	- Actualización de botones.
+ */
+void Tarea_PMEDIA_10ms ( void *pvParameters )
+{
+	/* Imprimir la tarea iniciada: */
+	char *pcTaskName = (char *) pcTaskGetName( NULL );
+	uoEscribirTxt3 ( "MSJ ", pcTaskName, " esta ejecutandose.\n\r" );
+
+	/* Ciclo infinito, como la mayoría de las tareas: */
+	for( ;; )
+	{
+		BotonesRTOS_ActualizarTodo ( portMAX_DELAY );
+		vTaskDelay( PERIODO_10MS );  // Se supone que no es tan crítico el sincronismo.
+	}
+}
+
 
 /*---------------------------------------------------------------------
   FIN DE ARCHIVO

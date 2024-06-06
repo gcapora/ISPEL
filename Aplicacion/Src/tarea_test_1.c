@@ -21,7 +21,6 @@
 /****** Definición de datos privados *************************************************************/
 
 led_id_t    LedVerdeEnPlaca, LedRojoEnPlaca, LedAzulEnPlaca;
-boton_id_t  BotonEnPlaca;
 
 /****** Definición de datos públicos *************************************************************/
 
@@ -49,16 +48,13 @@ bool TareaTestInicializar (void)
    uHALdacdmaComenzar ( UHAL_DAC_1, senial , 32 );
 
 	// Cargo parámetros de leds
-	configASSERT ( ERROR_LED != (LedRojoEnPlaca = TareaLeds_InicializarLed ( U_LED_ROJO_EP )) );
-	configASSERT ( TareaLeds_ModoLed ( LedRojoEnPlaca, SUSPENSION ) );
+	configASSERT ( ERROR_LED != (LedRojoEnPlaca = LedsRTOS_InicializarLed ( U_LED_ROJO_EP )) );
+	configASSERT ( LedsRTOS_ModoLed ( LedRojoEnPlaca, SUSPENSION ) );
 
-	configASSERT ( ERROR_LED != (LedAzulEnPlaca  = TareaLeds_InicializarLed ( U_LED_AZUL_EP )) );
-	configASSERT ( TareaLeds_ModoLed ( LedAzulEnPlaca, BALIZA ) );
+	configASSERT ( ERROR_LED != (LedAzulEnPlaca  = LedsRTOS_InicializarLed ( U_LED_AZUL_EP )) );
+	configASSERT ( LedsRTOS_ModoLed ( LedAzulEnPlaca, BALIZA ) );
 
 	// configASSERT ( ERROR_LED != (LedVerdeEnPlaca = TareaLeds_InicializarLed ( U_LED_VERDE_EP )) );
-
-	// Inicializo boton
-	configASSERT ( ERROR_BOTON != (BotonEnPlaca = TareaBotones_InicializarBoton ( U_BOTON_EP )) );
 
 	// Terminada la inicialización...
 	return true;
@@ -81,8 +77,8 @@ void TareaTest_1( void *pvParameters )
   	//vPrintString (" us.\n\r");
 
 	/* Enciendo leds: */
-	configASSERT ( TareaLeds_EncenderLed (LedRojoEnPlaca)  );
-	configASSERT ( TareaLeds_EncenderLed (LedAzulEnPlaca)  );
+	configASSERT ( LedsRTOS_EncenderLed (LedRojoEnPlaca)  );
+	configASSERT ( LedsRTOS_EncenderLed (LedAzulEnPlaca)  );
 	//configASSERT ( TareaLeds_EncenderLed (LedVerdeEnPlaca) );
 
   	tiempo2 = uoMicrosegundos();
@@ -103,63 +99,21 @@ void TareaTest_1( void *pvParameters )
 	for( ;; )
 	{
 		vTaskDelay( DELTAT_TEST );
-		configASSERT ( TareaLeds_ModoLed ( LedAzulEnPlaca, PLENO ) );
+		configASSERT ( LedsRTOS_ModoLed ( LedAzulEnPlaca, PLENO ) );
 		//vPrintStringAndNumber ("Tiempo ", xTaskGetTickCount());
 
 		vTaskDelay( DELTAT_TEST );
-		configASSERT ( TareaLeds_ModoLed ( LedAzulEnPlaca, TITILANTE ) );
+		configASSERT ( LedsRTOS_ModoLed ( LedAzulEnPlaca, TITILANTE ) );
 		//vPrintStringAndNumber ("Tiempo ", xTaskGetTickCount());
 
 		vTaskDelay( DELTAT_TEST );
-		configASSERT ( TareaLeds_ModoLed ( LedAzulEnPlaca, TITILANTE_LENTO ) );
+		configASSERT ( LedsRTOS_ModoLed ( LedAzulEnPlaca, TITILANTE_LENTO ) );
 	  	//vPrintStringAndNumber ("Tiempo ", xTaskGetTickCount());
 
-		// Verificamos si debo imprimir una señal
-		uoEscribirTxt("Hola?\n\r");
-		if ( uCapturadoraSenialCargada() ){
-			  //ImprimirSenial32_main();
-			  uoEscribirTxt ( Barra );
-			  uoLedApagar ( UOSAL_PIN_LED_VERDE_INCORPORADO );
-			  ImprimirSenial32_main();
-		}
+		uoEscribirTxt("Nuevo ciclo de led azul en placa.\n\r");
 	}
 }
 
-/*-------------------------------------------------------------------------------------------------
- * @brief  Tarea que actualiza el estado de los leds
- * @param	Ninguno
- */
-void TareaTest_2( void *pvParameters )
-{
-	/* Variables locales */
-	char *pcTaskName = (char *) pcTaskGetName( NULL );
-	char Lectura [11] = {0};
 
-	/* Imprimir la tarea inicializada: */
-	uoEscribirTxtTxt ( pcTaskName, " esta ejecutandose.\n\r" );
-
-	/* Como la mayoría de las tareas, ciclo infinito... */
-	for( ;; )
-	{
-		vTaskDelay( 1UL );
-
-		// Verificamos lectura de UART
-		if ( uoLeerTxt(Lectura,10,50)>0 ) {
-			uoEscribirTxt (Lectura);
-		}
-
-		// Verificamos lectura de boton
-		if ( true == TareaBotones_BotonFlancoPresionado ( BotonEnPlaca ) ){
-			// Cambio estado del led...
-			// TareaLeds_InvertirLed (LedVerdeEnPlaca);
-			if (uCapturadoraIniciar ()) {
-				uoEscribirTxt ("Lanzamos captura... \n\r");
-			} else {
-				uoEscribirTxt ("No pudimos lanzar captura. :-( \n\r");
-			}
-		}
-
-	}
-}
 
 /****************************************************************** FIN DE ARCHIVO ***************/

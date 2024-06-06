@@ -19,6 +19,8 @@
 
 /****** Definiciones públicas (macros) ***********************************************************/
 
+#define uoEscribirTxt2(Txt1,Txt2)			uoEscribirTxtTxt(Txt1,Txt2)
+#define uoEscribirTxt3(Txt1,Txt2,Txt3)		uoEscribirTxtTxtTxt(Txt1,Txt2,Txt3)
 
 /****** Definiciones públicas de tipos de datos (public typedef) *********************************/
 
@@ -44,6 +46,7 @@ void     uoEscribirTxt        ( const char * );
 void     uoEscribirUint      	( uint32_t );
 void     uoEscribirTxtTxt     ( const char *, const char * );
 void     uoEscribirTxtUint		( const char *, uint32_t );
+void		uoEscribirTxtTxtTxt	( const char *, const char *, const char * );
 void     uoEscribirTxtUintTxt	( const char *, uint32_t, const char * );
 bool		uoLeerChar 				( char *, uint32_t );
 uint32_t uoLeerTxt 				( char *, uint32_t, uint32_t );

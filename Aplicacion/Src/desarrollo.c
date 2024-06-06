@@ -101,4 +101,6 @@ void ImprimirSenial32_main (void)
 	uoEscribirTxtUint ( "( Escrito en ", Tiempo );
 	uoEscribirTxt     ( " ms. )\n\r" );
 
+	uoLedApagar ( UOSAL_PIN_LED_VERDE_INCORPORADO );
+
 }

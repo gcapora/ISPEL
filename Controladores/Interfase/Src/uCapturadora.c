@@ -457,7 +457,7 @@ bool uCapturadoraSenialCargada ( void )
 	if ( CAPTURADORA_CAPTURA_COMPLETADA == Capturadora.Estado ) {
 		retorno = true;
 		// ImprimirSenial32();
-		uoLedApagar ( UOSAL_PIN_LED_AZUL_INCORPORADO );
+		//uoLedApagar ( UOSAL_PIN_LED_VERDE_INCORPORADO );
 		Capturadora.Estado = CAPTURADORA_INACTIVA;
 	}
 	return retorno;

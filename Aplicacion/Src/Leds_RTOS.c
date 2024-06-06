@@ -9,12 +9,11 @@
 
 /****** Librerías (includes) *********************************************************************/
 
-#include "tarea_leds.h"
-#include "uleds.h"
+#include <uLeds.h>
+#include "Leds_RTOS.h"
 
 /****** Definiciones privadas (macros) ***********************************************************/
 
-#define		LED_DELTAT			pdMS_TO_TICKS( 1UL )
 
 /****** Definiciones privadas de tipos (private typedef) *****************************************/
 
@@ -40,7 +39,7 @@ SemaphoreHandle_t MutexManejador;	// Esta variable global administra el manejo d
  * @param	Ninguno
  * @retval true, si no hubo problemas
  */
-bool TareaLedsInicializar (void)
+bool LedsRTOS_Inicializar (void)
 {
 	// Creamos un semáforo Mutex para el acceso concurrente a leds
 	MutexManejador = xSemaphoreCreateMutex();
@@ -50,23 +49,19 @@ bool TareaLedsInicializar (void)
 }
 
 /*-------------------------------------------------------------------------------------------------
- * @brief  Tarea que actualiza el estado de los leds
- * @param	Ninguno
+ * @brief	Actualiza todos los leds de forma segura
+ * @param	Tiempo que puede esperar a cumplir la tarea
+ * @retval	true si tuvo éxito
  */
-void TareaLeds( void *pvParameters )
+bool LedsRTOS_ActualizarTodos ( TickType_t xTicksToWait )
 {
-	/* Imprimir la tarea iniciada: */
-	char *pcTaskName = (char *) pcTaskGetName( NULL );
-	uoEscribirTxtTxt ( pcTaskName, " esta ejecutandose.\n\r" );
-
-	/* Ciclo infinito, como la mayoría de las tareas: */
-	for( ;; )
-	{
-		xSemaphoreTake( MutexManejador, portMAX_DELAY );
+	bool RET = false;
+	if (pdTRUE == xSemaphoreTake( MutexManejador, xTicksToWait )) {
 		uLedActualizarTodo();
+		RET = true;
 		xSemaphoreGive( MutexManejador );
-		vTaskDelay( LED_DELTAT );
 	}
+	return RET;
 }
 
 /*-------------------------------------------------------------------------------------------------
@@ -74,7 +69,7 @@ void TareaLeds( void *pvParameters )
  * @param	Identificador del led y modo deseado
  * @retval	true, si no hubo problemas
  */
-led_id_t TareaLeds_InicializarLed ( hal_pin_id_t PIN )
+led_id_t LedsRTOS_InicializarLed ( hal_pin_id_t PIN )
 {
 	led_id_t RET = ERROR_LED;
 	xSemaphoreTake( MutexManejador, portMAX_DELAY );
@@ -88,7 +83,7 @@ led_id_t TareaLeds_InicializarLed ( hal_pin_id_t PIN )
  * @param	Identificador del led y modo deseado
  * @retval	true, si no hubo problemas
  */
-bool TareaLeds_ModoLed (led_id_t LED, led_modo_t MODO)
+bool LedsRTOS_ModoLed (led_id_t LED, led_modo_t MODO)
 {
 	bool RET = false;
 	xSemaphoreTake( MutexManejador, portMAX_DELAY );
@@ -102,7 +97,7 @@ bool TareaLeds_ModoLed (led_id_t LED, led_modo_t MODO)
  * @param	Identificador del led y modo deseado
  * @retval	true, si no hubo problemas
  */
-bool TareaLeds_EncenderLed ( led_id_t LED )
+bool LedsRTOS_EncenderLed ( led_id_t LED )
 {
 	bool RET = false;
 	xSemaphoreTake( MutexManejador, portMAX_DELAY );
@@ -116,7 +111,7 @@ bool TareaLeds_EncenderLed ( led_id_t LED )
  * @param	Identificador del led y modo deseado
  * @retval	true, si no hubo problemas
  */
-bool TareaLeds_InvertirLed ( led_id_t LED )
+bool LedsRTOS_InvertirLed ( led_id_t LED )
 {
 	bool RET = false;
 	xSemaphoreTake( MutexManejador, portMAX_DELAY );
@@ -135,7 +130,7 @@ bool TareaLeds_InvertirLed ( led_id_t LED )
  * @param	Identificador del led y modo deseado
  * @retval	true, si no hubo problemas
  */
-bool TareaLeds_ApagarLed ( led_id_t LED )
+bool LedsRTOS_ApagarLed ( led_id_t LED )
 {
 	bool RET = false;
 	xSemaphoreTake( MutexManejador, portMAX_DELAY );
@@ -149,7 +144,7 @@ bool TareaLeds_ApagarLed ( led_id_t LED )
  * @param	Identificador del led y modo deseado
  * @retval	true si está encendido
  */
-bool TareaLeds_LedEncendido ( led_id_t LED )
+bool LedsRTOS_LedEncendido ( led_id_t LED )
 {
 	bool RET = false;
 	xSemaphoreTake( MutexManejador, portMAX_DELAY );

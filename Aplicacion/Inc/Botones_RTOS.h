@@ -1,7 +1,7 @@
 /**************************************************************************************************
 * @file		tarea_leds.h
 * @author	Guillermo Caporaletti
-* @brief	Tarea que controla todos los botones.
+* @brief		Control de botones en RTOS.
 * @date		agosto de 2023
 *
 **************************************************************************************************/
@@ -15,9 +15,9 @@
 
 /****** Librerías (includes) *********************************************************************/
 
-#include "stdbool.h"	// Esta librería es usada por la función TareaLedsInicializar
-#include "apli.h"		// Aquí están declarados los recursos compartidos
-#include "ubotones.h"	// Módulo específico de utilización de botones
+#include "stdbool.h"		// Esta librería es usada por la función TareaLedsInicializar
+#include "apli.h"			// Aquí están declarados los recursos compartidos
+#include <uBotones.h>	// Módulo específico de utilización de botones
 
 /****** Definiciones públicas (macros) ***********************************************************/
 
@@ -30,11 +30,11 @@
 
 /****** Declaración de funciones públicas ********************************************************/
 
-bool TareaBotonesInicializar ( void );
-void TareaBotones ( void * );
-boton_id_t TareaBotones_InicializarBoton (hal_pin_id_t);
-bool TareaBotones_BotonFlancoPresionado ( boton_id_t );
-bool TareaBotones_BotonPresionadoLargo ( boton_id_t );
+bool 			BotonesRTOS_Inicializar 				( void );
+boton_id_t	BotonesRTOS_InicializarBoton 			( hal_pin_id_t );
+bool			BotonesRTOS_ActualizarTodo 			( TickType_t );
+bool 			BotonesRTOS_BotonFlancoPresionado	( boton_id_t );
+bool 			BotonesRTOS_BotonPresionadoLargo		( boton_id_t );
 
 /*************************************************************************************************/
 #ifdef __cplusplus

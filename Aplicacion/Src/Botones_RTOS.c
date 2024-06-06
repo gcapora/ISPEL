@@ -9,12 +9,11 @@
 
 /****** Librerías (includes) *********************************************************************/
 
-#include "tarea_botones.h"
-#include "ubotones.h"
+#include <uBotones.h>
+#include "Botones_RTOS.h"
 
 /****** Definiciones privadas (macros) ***********************************************************/
 
-#define		LED_DELTAT			pdMS_TO_TICKS( 10UL )
 
 /****** Definiciones privadas de tipos (private typedef) *****************************************/
 
@@ -22,7 +21,7 @@
 /****** Definición de datos privados *************************************************************/
 
 SemaphoreHandle_t MutexManejadorBTNS;	// Esta variable privada global administra el manejo del
-									// semáforo que administra el acceso a los botones.
+													// semáforo que administra el acceso a los botones.
 
 /****** Definición de datos públicos *************************************************************/
 
@@ -40,7 +39,7 @@ SemaphoreHandle_t MutexManejadorBTNS;	// Esta variable privada global administra
  * @param	Ninguno
  * @retval	true, si no hubo problemas
  */
-bool TareaBotonesInicializar (void)
+bool BotonesRTOS_Inicializar (void)
 {
 	// Creamos un semáforo Mutex para el acceso concurrente a leds
 	MutexManejadorBTNS = xSemaphoreCreateMutex();
@@ -51,22 +50,18 @@ bool TareaBotonesInicializar (void)
 
 /*-------------------------------------------------------------------------------------------------
  * @brief	Tarea que actualiza el estado de los botones
- * @param	Ninguno
+ * @param
  */
-void TareaBotones ( void *pvParameters )
-{
-	/* Imprimir la tarea iniciada: */
-	char *pcTaskName = (char *) pcTaskGetName( NULL );
-	uoEscribirTxtTxt ( pcTaskName, " esta ejecutandose.\n\r" );
 
-	/* Ciclo infinito, como la mayoría de las tareas: */
-	for( ;; )
-	{
-		xSemaphoreTake( MutexManejadorBTNS, portMAX_DELAY );
+bool BotonesRTOS_ActualizarTodo ( TickType_t Espera )
+{
+	bool RET = false;
+	if( pdTRUE == xSemaphoreTake(MutexManejadorBTNS,Espera) ) {
 		uBotonActualizarTodo();
 		xSemaphoreGive( MutexManejadorBTNS );
-		vTaskDelay( LED_DELTAT );
+		RET = true;
 	}
+	return RET;
 }
 
 /*-------------------------------------------------------------------------------------------------
@@ -74,7 +69,7 @@ void TareaBotones ( void *pvParameters )
  * @param	PIN = identificador de HW del boton
  * @retval	true, si no hubo problemas
  */
-boton_id_t TareaBotones_InicializarBoton ( hal_pin_id_t PIN )
+boton_id_t BotonesRTOS_InicializarBoton ( hal_pin_id_t PIN )
 {
 	boton_id_t RET = ERROR_LED;
 	xSemaphoreTake( MutexManejadorBTNS, portMAX_DELAY );
@@ -89,7 +84,7 @@ boton_id_t TareaBotones_InicializarBoton ( hal_pin_id_t PIN )
  * @retval	true si hubo FLANCO hacia boón PRESIONADO
  * 			Utiliza un semáforo para leer de forma segura
  */
-bool TareaBotones_BotonFlancoPresionado ( boton_id_t BOTON )
+bool BotonesRTOS_BotonFlancoPresionado ( boton_id_t BOTON )
 {
 	bool RET = false;
 	xSemaphoreTake( MutexManejadorBTNS, portMAX_DELAY );
@@ -104,7 +99,7 @@ bool TareaBotones_BotonFlancoPresionado ( boton_id_t BOTON )
  * @retval	true si hubo PRESIONADO LARGO
  * 			Utiliza un semáforo para leer de forma segura
  */
-bool TareaBotones_BotonPresionadoLargo ( boton_id_t BOTON )
+bool BotonesRTOS_BotonPresionadoLargo ( boton_id_t BOTON )
 {
 	bool RET = false;
 	xSemaphoreTake( MutexManejadorBTNS, portMAX_DELAY );

@@ -1,13 +1,13 @@
 /**************************************************************************************************
-* @file		tarea_leds.h
+* @file		Capturadora_RTOS.h
 * @author	Guillermo Caporaletti
-* @brief	Tarea que controla todos los leds.
-* @date		julio de 2023
+* @brief
+* @date
 *
 **************************************************************************************************/
 
-#ifndef __TAREA_LEDS_H
-#define __TAREA_LEDS_H
+#ifndef _CAPTURADORA_RTOS_H
+#define _CAPTURADORA_RTOS_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -15,16 +15,12 @@
 
 /****** Librerías (includes) *********************************************************************/
 
-#include "stdbool.h"	// Esta librería es usada por la función TareaLedsInicializar
-#include "apli.h"		// Aquí están declarados los recursos compartidos
-#include "uleds.h"		// Módulo específico de utilización de leds
+#include "stdbool.h"
+#include "apli.h"
+#include "uCapturadora.h"
 
 /****** Definiciones públicas (macros) ***********************************************************/
 
-#define TLS_CANTIDAD_LEDS	3
-#define TLS_LED_VERDE_EP	0
-#define TLS_LED_AZUL_EP		1
-#define TLS_LED_ROJO_EP		2
 
 /****** Definiciones públicas de tipos de datos (public typedef) *********************************/
 
@@ -34,14 +30,16 @@
 
 /****** Declaración de funciones públicas ********************************************************/
 
-bool TareaLedsInicializar 				( void );
-void TareaLeds 							( void * );
-led_id_t TareaLeds_InicializarLed	( hal_pin_id_t );
-bool TareaLeds_ModoLed 					( led_id_t, led_modo_t );
-bool TareaLeds_EncenderLed 			( led_id_t );
-bool TareaLeds_ApagarLed 				( led_id_t );
-bool TareaLeds_InvertirLed 			( led_id_t );
-bool TareaLeds_LedEncendido 			( led_id_t );
+bool 		CapturadoraRTOS_Inicializar 		( void );
+void		Tarea_Capturadora						( void * );
+
+/*led_id_t LedsRTOS_InicializarLed		( hal_pin_id_t );
+bool 		LedsRTOS_ModoLed 				( led_id_t, led_modo_t );
+bool		LedsRTOS_EncenderLed 		( led_id_t );
+bool		LedsRTOS_ApagarLed 			( led_id_t );
+bool		LedsRTOS_InvertirLed 		( led_id_t );
+bool 		LedsRTOS_LedEncendido 		( led_id_t );
+bool 		LedsRTOS_ActualizarTodos	( TickType_t );*/
 
 /*************************************************************************************************/
 #ifdef __cplusplus

@@ -3,7 +3,6 @@
 * @author	Guillermo Caporaletti
 * @brief
 * @date
-*
 **************************************************************************************************/
 
 #ifndef _CAPTURADORA_RTOS_H
@@ -15,7 +14,7 @@
 
 /****** Librerías (includes) *********************************************************************/
 
-#include "stdbool.h"
+#include <stdbool.h>
 #include "apli.h"
 #include "uCapturadora.h"
 
@@ -33,6 +32,7 @@
 bool 	CaptuRTOS_Inicializar				( void );
 bool	CaptuRTOS_Comenzar					( TickType_t );  // Inicia una nueva captura.
 bool	CaptuRTOS_Parar						( TickType_t );  // Cancela una captura en curso.
+void	CaptuRTOS_ImprimirSenial32			( void );
 
 bool	CaptuRTOS_Configurar					( capturadora_config_s *, TickType_t );  // Configuración de base de tiempo y disparo.
 bool	CaptuRTOS_Obtener						( capturadora_config_s *, TickType_t );
@@ -44,14 +44,6 @@ bool  CaptuRTOS_EntradaEncender			( entrada_id_e, TickType_t );  // Encendido y 
 bool  CaptuRTOS_EntradaApagar				( entrada_id_e, TickType_t );
 
 void	Tarea_Capturadora						( void * );
-
-/*led_id_t LedsRTOS_InicializarLed		( hal_pin_id_t );
-bool 		LedsRTOS_ModoLed 				( led_id_t, led_modo_t );
-bool		LedsRTOS_EncenderLed 		( led_id_t );
-bool		LedsRTOS_ApagarLed 			( led_id_t );
-bool		LedsRTOS_InvertirLed 		( led_id_t );
-bool 		LedsRTOS_LedEncendido 		( led_id_t );
-bool 		LedsRTOS_ActualizarTodos	( TickType_t );*/
 
 /*************************************************************************************************/
 #ifdef __cplusplus

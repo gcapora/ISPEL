@@ -155,16 +155,16 @@ bool uCapturadoraConfigurar ( capturadora_config_s * CONFIG)
 
 	// Precondiciones y correcciones
 	if ( CAPTURADORA_INACTIVA != Capturadora.Estado) {
-		uoEscribirTxt("ADVERTENCIA Se intento configurar Capturadora estando activa.\n\r");
+		//uoEscribirTxt("ADVERTENCIA Se intento configurar Capturadora estando activa.\n\r");
 		return false;
 	}
 	if ( CONFIG->EscalaHorizontal < U_ESCALA_HORIZONTAL_MINIMA ) {
 		CONFIG->EscalaHorizontal = U_ESCALA_HORIZONTAL_MINIMA;
-		uoEscribirTxt ("ADVERTENCIA Correccion de ESCALA HORIZONTAL de capturadora.\n\r");
+		//uoEscribirTxt ("ADVERTENCIA Correccion de ESCALA HORIZONTAL de capturadora.\n\r");
 	}
 	// TODO Verificar escala máxima posible.
 	if ( false==ValidarOrigenDisparo(&CONFIG->OrigenDisparo) ) {
-		uoEscribirTxt ("ADVERTENCIA Correccion de ORIGEN de disparo.\n\r");
+		//uoEscribirTxt ("ADVERTENCIA Correccion de ORIGEN de disparo.\n\r");
 	}
 	CONFIG->ModoCaptura = CAPTURA_UNICA | (CONFIG->ModoCaptura&MASCARA_PROMEDIO);
 
@@ -382,7 +382,7 @@ bool uCapturadoraParar ( void )
 	// Paramos muestreo
 	if ( true == control && Capturadora.Estado == CAPTURADORA_CAPTURANDO ) {
 		control = uHALadcPararLectura ( UHAL_ADC_1 );
-		uoEscribirTxt ("MSJ Paramos captura...\n\r");
+		//uoEscribirTxt ("MSJ Paramos captura...\n\r");
 		Capturadora.Estado = CAPTURADORA_INACTIVA;
 	}
 

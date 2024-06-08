@@ -28,19 +28,19 @@ typedef enum {
 	 LED_ENCENDIDO
 }				led_estado_t;
 typedef enum {
-    PLENO,
-    PREDETERMINADO = PLENO,
-    INTENSIDAD100 = PLENO,
-    INTENSIDAD60,
-    INTENSIDAD30,
-    INTENSIDAD10,
-    INTENSIDAD05,
+	PLENO,
+	PREDETERMINADO = PLENO,
+	INTENSIDAD100 = PLENO,
+	INTENSIDAD60,
+	INTENSIDAD30,
+	INTENSIDAD10,
+	INTENSIDAD05,
 	TITILANTE,
-    TITILANTE_LENTO,
-    BALIZA,
+	TITILANTE_LENTO,
+	BALIZA,
 	SUSPENSION,
 	CANTIDAD_MODOS_LED,
-    ERROR_MODO_LED = CANTIDAD_MODOS_LED,
+	ERROR_MODO_LED = CANTIDAD_MODOS_LED,
 } 				led_modo_t;
 
 /****** Declaraciones de datos externos **********************************************************/

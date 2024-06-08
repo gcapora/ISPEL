@@ -1,7 +1,7 @@
 /**************************************************************************************************
 * @file		apli.c
 * @author	Guillermo Caporaletti
-* @brief	Módulo principal de la aplicación ISPEL
+* @brief		Módulo principal de la aplicación ISPEL
 * @date		julio de 2023
 *
 **************************************************************************************************/
@@ -34,13 +34,16 @@ TaskHandle_t TareaLeds_m;
 TaskHandle_t TareaBotones_m;
 TaskHandle_t TareaTest1_m, TareaTest2_m;
 
-/* Mensajes... */
-const char *pcTextForMain = "Test ISPEL en ejecucion\r\n";
-const char *Barra         = "========================================\r\n";
-
 /****** Definición de datos públicos *************************************************************/
 
 boton_id_t  BotonEnPlaca;
+
+/* Semáforos */
+SemaphoreHandle_t		MutexApliEscribir;  // Para integridad de escritura
+
+/* Mensajes... */
+const char *pcTextForMain = "Test ISPEL en ejecucion\r\n";
+const char *Barra         = "========================================\r\n";
 
 /****** Declaración de funciones privadas ********************************************************/
 
@@ -55,7 +58,7 @@ boton_id_t  BotonEnPlaca;
  * @param	Ninguno
  * @retval	Ninguno
  */
-void apliInicializar( void )
+void apli_inicializar( void )
 {
 	// Variables locales
 	BaseType_t ret = pdFAIL;
@@ -69,13 +72,14 @@ void apliInicializar( void )
 
 	// Inicialización de módulos, tareas y objetos--------------------------------------------------
 
-	configASSERT( true == CaptuRTOS_Inicializar() );
+	configASSERT( true == CaptuRTOS_Inicializar()	);
 	configASSERT( true == LedsRTOS_Inicializar()    );
-	configASSERT( true == BotonesRTOS_Inicializar() );
+	configASSERT( true == BotonesRTOS_Inicializar()	);
 
 	configASSERT( true == TareaTestInicializar()    );
 
-	configASSERT ( ERROR_BOTON != (BotonEnPlaca = BotonesRTOS_InicializarBoton ( U_BOTON_EP )) );
+	configASSERT( ERROR_BOTON != (BotonEnPlaca=BotonesRTOS_InicializarBoton(U_BOTON_EP)) );
+	configASSERT( NULL        != (MutexApliEscribir=xSemaphoreCreateMutex()) );
 
 	// Mensaje de inicio de APLICACION -------------------------------------------------------------
 

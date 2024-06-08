@@ -123,7 +123,7 @@ int main(void)
    * Este llamado sirve para codear el programa en otro archivo.
    * Creamos una carpeta App, con sus respectivas subcarpetas.
    * ---------------------------------------------------------------------------------------------*/
-  apliInicializar();
+  apli_inicializar();
 
   /* USER CODE END 2 */
 

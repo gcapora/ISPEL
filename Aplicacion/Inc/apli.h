@@ -1,10 +1,9 @@
-/* Interfaz electrónica para prácticas de laboratorio
- *
- * Año:     2023
- * Autor:   Guillermo F. Caporaletti
- * Archivo: apli.h
- *
- */
+/**************************************************************************************************
+* @file		apli.h
+* @author	Guillermo Caporaletti
+* @brief
+* @date
+**************************************************************************************************/
 
 #ifndef __ISPEL_APLI_H
 #define __ISPEL_APLI_H
@@ -13,7 +12,7 @@
 extern "C" {
 #endif
 
-// ------ inclusions ---------------------------------------------------
+/****** Librerías (includes) *********************************************************************/
 
 #include "cmsis_os.h"	// ¿Por qué había que incluir esta librería?
 #include "FreeRTOS.h"
@@ -27,32 +26,36 @@ extern "C" {
 #include "tarea_test_1.h"
 #include "supporting_Functions.h"
 
-// ------ macros -------------------------------------------------------
+/****** Definiciones públicas (macros) ***********************************************************/
 
+#define FREC_TESTIGO 		1000.0
 #define UN_SEGUNDO			pdMS_TO_TICKS( 1000UL )
-#define FREC_TESTIGO 		10000.0
 #define PERIODO_1MS			pdMS_TO_TICKS( 1UL )
 #define PERIODO_10MS			pdMS_TO_TICKS( 10UL )
 
-// ------ typedef ------------------------------------------------------
+/****** Definiciones públicas de tipos de datos (public typedef) *********************************/
 
 
-// ------ external data declaration ------------------------------------
+/****** Declaraciones de datos externos **********************************************************/
 
-extern const char *Barra;
-extern boton_id_t  BotonEnPlaca;
+extern const char *			Barra;
+extern boton_id_t  			BotonEnPlaca;
+extern SemaphoreHandle_t	MutexApliEscribir;
 
-// TaskHandle_t xTaskLedHandle;
+/****** Declaración de funciones públicas ********************************************************/
 
-// ------ public functions declaration -------------------------------
+void 			apli_inicializar( void );
+void 			apli_alerta( const char * );
+BaseType_t	apli_mensaje( const char *, TickType_t );
+BaseType_t	tomar_escritura( TickType_t );
+BaseType_t	devolver_escritura( void );
 
-void apliInicializar( void );
-void Tarea_PALTA_1ms ( void * );
-void Tarea_PMEDIA_10ms ( void * );
-void ImprimirSenial32_main (void);
+void Tarea_PALTA_1ms( void * );
+void Tarea_PMEDIA_10ms( void * );
 
+/*************************************************************************************************/
 #ifdef __cplusplus
 }
 #endif
-
-#endif
+#endif/* __ISPEL_APLI_H */
+/****************************************************************** FIN DE ARCHIVO ***************/

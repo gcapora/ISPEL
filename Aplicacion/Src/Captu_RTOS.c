@@ -214,7 +214,7 @@ void Tarea_Capturadora( void *pvParameters )
 	ENTRADA_CONFIG.FlancoDisparo  = SUBIDA;
 	uCapturadoraEntradaConfigurar ( ENTRADA_1, &ENTRADA_CONFIG );
 	ENTRADA_CONFIG.EscalaVertical = 3;
-	ENTRADA_CONFIG.NivelDisparo   = 0.5;
+	ENTRADA_CONFIG.NivelDisparo   = 2.5;
 	ENTRADA_CONFIG.FlancoDisparo  = SUBIDA;
 	uCapturadoraEntradaConfigurar ( ENTRADA_2, &ENTRADA_CONFIG );
 	uCapturadoraEntradaEncender ( ENTRADA_1 );
@@ -262,7 +262,7 @@ void Tarea_Capturadora( void *pvParameters )
 				// Verificamos si debo imprimir una señal
 				if ( uCapturadoraSenialCargada() ){
 					uoEscribirTxt ( Barra );
-					ImprimirSenial32_main();  // Esto debería adecuarse a un formato luego.
+					CaptuRTOS_ImprimirSenial32();  // Esto debería adecuarse a un formato luego.
 					uoEscribirTxt ( Barra );
 					uoLedApagar ( UOSAL_PIN_LED_VERDE_INCORPORADO );
 				}
@@ -274,7 +274,7 @@ void Tarea_Capturadora( void *pvParameters )
 } // <----------- Fin Tarea_Capturadora()
 
 
-void ImprimirSenial32_main (void)
+void CaptuRTOS_ImprimirSenial32 (void)
 {
 	// Variables locales:
 	uint32_t i, Muestra, MUESTRA_ENTRADA_1, MUESTRA_ENTRADA_2, Disparo, Tiempo;

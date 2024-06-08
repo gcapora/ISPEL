@@ -13,7 +13,8 @@
 
 /****** Definiciones privadas (macros) ***********************************************************/
 
-#define DELTAT_TEST			pdMS_TO_TICKS( 2000UL )
+#define DELTAT_TEST			pdMS_TO_TICKS( 5000UL )
+#define ESPERA_CAPTU			pdMS_TO_TICKS( 5UL )
 
 /****** Definiciones privadas de tipos (private typedef) *****************************************/
 
@@ -67,6 +68,8 @@ bool TareaTestInicializar (void)
 void TareaTest_1( void *pvParameters )
 {
 	uint32_t tiempo1, tiempo2;
+	capturadora_config_s	CaptuConfig;
+	entrada_config_s		EntraConfig;
 
 	/* Imprimir la tarea inicializada: */
 	char *pcTaskName = (char *) pcTaskGetName( NULL );
@@ -94,19 +97,32 @@ void TareaTest_1( void *pvParameters )
 	/* Como la mayoría de las tareas, ciclo infinito... */
 	for( ;; )
 	{
+		LedsRTOS_ModoLed( LedAzulEnPlaca, TITILANTE );
+		if (!CaptuRTOS_Comenzar(ESPERA_CAPTU)) apli_alerta ("No pudimos comenzar CAPTURADORA.");
 		vTaskDelay( DELTAT_TEST );
-		configASSERT ( LedsRTOS_ModoLed ( LedAzulEnPlaca, PLENO ) );
-		//vPrintStringAndNumber ("Tiempo ", xTaskGetTickCount());
 
+		LedsRTOS_ModoLed( LedAzulEnPlaca, TITILANTE_LENTO );
+		if (!CaptuRTOS_Comenzar(ESPERA_CAPTU)) apli_alerta ("No pudimos comenzar CAPTURADORA.");
+		vTaskDelay( 1UL );
+		CaptuRTOS_Parar(ESPERA_CAPTU);
 		vTaskDelay( DELTAT_TEST );
-		configASSERT ( LedsRTOS_ModoLed ( LedAzulEnPlaca, TITILANTE ) );
-		//vPrintStringAndNumber ("Tiempo ", xTaskGetTickCount());
 
+		LedsRTOS_ModoLed( LedAzulEnPlaca, PLENO );
+		CaptuRTOS_Obtener( &CaptuConfig, ESPERA_CAPTU );
+		CaptuConfig.OrigenDisparo = ENTRADA_2;
+		CaptuRTOS_Configurar( &CaptuConfig, ESPERA_CAPTU );
+		if (!CaptuRTOS_Comenzar(ESPERA_CAPTU)) apli_alerta ("No pudimos comenzar CAPTURADORA.");
 		vTaskDelay( DELTAT_TEST );
-		configASSERT ( LedsRTOS_ModoLed ( LedAzulEnPlaca, TITILANTE_LENTO ) );
-	  	//vPrintStringAndNumber ("Tiempo ", xTaskGetTickCount());
 
-		uoEscribirTxt("Nuevo ciclo de led azul en placa.\n\r");
+		LedsRTOS_ModoLed( LedAzulEnPlaca, BALIZA );
+		CaptuRTOS_EntradaObtener( ENTRADA_2, &EntraConfig, ESPERA_CAPTU);
+		EntraConfig.NivelDisparo = 1.65;
+		EntraConfig.FlancoDisparo = BAJADA;
+		CaptuRTOS_EntradaConfigurar( ENTRADA_2, &EntraConfig, ESPERA_CAPTU);
+		if (!CaptuRTOS_Comenzar(ESPERA_CAPTU)) apli_alerta ("No pudimos comenzar CAPTURADORA.");
+		vTaskDelay( DELTAT_TEST );
+
+		apli_mensaje("Nuevo ciclo de led azul en placa.\n\r", UN_SEGUNDO );
 	}
 }
 

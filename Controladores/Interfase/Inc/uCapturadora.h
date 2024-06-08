@@ -19,7 +19,7 @@
 
 #define U_ENTRADAS_CANTIDAD       				2
 #define U_NUM_MAX_CAPTURAS_PROMEDIAR			16
-#define U_LARGO_CAPTURA								1000	// Total de muestras a capturar (incluye PRE_DISPARO y POS_DISPARO)
+#define U_LARGO_CAPTURA								100	// Total de muestras a capturar (incluye PRE_DISPARO y POS_DISPARO)
 
 #define CAPTURA_UNICA								0b00000001
 #define CAPTURA_CONTINUA							0b00000010  // Sin habilitar por ahora
@@ -74,6 +74,7 @@ double	uCapturadoraLeerFrecuenciaMuestreo ( void );
 float		uCapturadoraLeerEscalaVertical( float );							// Devuelve la escala correspondiente
 uint8_t	uCapturadoraLeerSincronizadas	( void );							// Devuelve la cantidad de capturas que se lograron sincronizar
 uint32_t	uCapturadoraLeerTiempoCaptura	( void );
+bool		uCapturadoraEstaDisponible		( void );
 
 bool   	uCapturadoraEntradaConfigurar	( entrada_id_e, entrada_config_s * ); // Configuración de un canal.
 bool   	uCapturadoraEntradaObtener		( entrada_id_e, entrada_config_s * );

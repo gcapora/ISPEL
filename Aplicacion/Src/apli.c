@@ -38,12 +38,6 @@ TaskHandle_t TareaTest1_m, TareaTest2_m;
 const char *pcTextForMain = "Test ISPEL en ejecucion\r\n";
 const char *Barra         = "========================================\r\n";
 
-/* Configuración ADC */
-capturadora_config_s CAPTU_CONFIG    = {0};
-entrada_config_s     ENTRADA_CONFIG  = {0};
-senial_s * 				P_Senial_E1 = NULL;
-senial_s * 				P_Senial_E2 = NULL;
-
 /****** Definición de datos públicos *************************************************************/
 
 boton_id_t  BotonEnPlaca;
@@ -67,7 +61,7 @@ void apliInicializar( void )
 	BaseType_t ret = pdFAIL;
   	// void* ptr = NULL;
 
-	// Inicialización de capas y hardware ----------------------------------------------------------
+	// Inicialización de capas de abstracción uHAL y uOSAL -----------------------------------------
 
 	uoInicializar();							// Capa OSAL
 	uHALinicializar();						// Capa HAL
@@ -75,7 +69,7 @@ void apliInicializar( void )
 
 	// Inicialización de módulos, tareas y objetos--------------------------------------------------
 
-	configASSERT( true == CapturadoraRTOS_Inicializar() );
+	configASSERT( true == CaptuRTOS_Inicializar() );
 	configASSERT( true == LedsRTOS_Inicializar()    );
 	configASSERT( true == BotonesRTOS_Inicializar() );
 
@@ -89,29 +83,6 @@ void apliInicializar( void )
 	uoEscribirTxt ( Barra );
 	uoEscribirTxt ( pcTextForMain );
 	uoEscribirTxt ( Barra );
-
-	// Configura Capturadora
-
-	uCapturadoraObtener		( &CAPTU_CONFIG );
-	CAPTU_CONFIG.EscalaHorizontal = 2/FREC_TESTIGO;
-	CAPTU_CONFIG.ModoCaptura      = CAPTURA_PROMEDIADA_16;
-	uCapturadoraConfigurar	( &CAPTU_CONFIG );
-	P_Senial_E1 = uCapturadoraSenialObtener ( ENTRADA_1 );
-	P_Senial_E2 = uCapturadoraSenialObtener ( ENTRADA_2 );
-
-	// Configuramos entradas de Capturadora
-
-	uCapturadoraEntradaObtener    ( ENTRADA_1, &ENTRADA_CONFIG );
-	ENTRADA_CONFIG.EscalaVertical = 3;
-	ENTRADA_CONFIG.NivelDisparo   = 1.5;
-	ENTRADA_CONFIG.FlancoDisparo  = SUBIDA;
-	uCapturadoraEntradaConfigurar ( ENTRADA_1, &ENTRADA_CONFIG );
-	ENTRADA_CONFIG.EscalaVertical = 3;
-	ENTRADA_CONFIG.NivelDisparo   = 0.5;
-	ENTRADA_CONFIG.FlancoDisparo  = SUBIDA;
-	uCapturadoraEntradaConfigurar ( ENTRADA_2, &ENTRADA_CONFIG );
-	uCapturadoraEntradaEncender ( ENTRADA_1 );
-	uCapturadoraEntradaEncender ( ENTRADA_2 );
 
 	// Configuramos señal testigo a FREC_TESTIGO
 
@@ -156,16 +127,16 @@ void apliInicializar( void )
 								"TEST 1",
 								(2 * configMINIMAL_STACK_SIZE),
 								NULL,
-								TAREA_PRIORIDAD_BAJA,
+								TAREA_PRIORIDAD_MEDIA,
 								&TareaTest1_m );
 	configASSERT( ret == pdPASS );
 
 	/* Tarea Test 2 */
 	ret = xTaskCreate( 	Tarea_Capturadora,
-								"TEST 2",
+								"CAPTURADORA",
 								(2 * configMINIMAL_STACK_SIZE),
 								NULL,
-								TAREA_PRIORIDAD_MEDIA,
+								TAREA_PRIORIDAD_BAJA,
 								&TareaTest2_m );
 	configASSERT( ret == pdPASS );
 

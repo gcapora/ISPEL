@@ -1,10 +1,10 @@
 /**************************************************************************************************
- * Archivo: uHALconfig.h
- * Breve:	Configuración de aplicación específica para los módulos uHAL
- * Fecha:
- * Autor:	Guillermo F. Caporaletti
- *
- *************************************************************************************************/
+* Archivo:	uHALconfig.h
+* Breve:		Configuración de aplicación específica para los módulos uHAL
+* Fecha:
+* Autor:		Guillermo F. Caporaletti
+*
+**************************************************************************************************/
 
 #ifndef ISPEL_UHAL_CONFIG_H_
 #define ISPEL_UHAL_CONFIG_H_

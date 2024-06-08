@@ -30,7 +30,7 @@
 
 // Puerto UART ------------------------------------------------------------------------------------
 /* Constantes de usuario para comunicación */
-#define UOSAL_UART_BAUDIOS                460800  // Predeterminado es 115200
+#define UOSAL_UART_BAUDIOS                230400  // Predeterminado es 115200
 #define UOSAL_UART_LARGO_MAXIMO           256
 #define UOSAL_UART_TIEMPO_ESPERA          100    // [ms]
 /* Definition for USARTx clock resources */

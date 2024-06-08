@@ -211,6 +211,12 @@ uint32_t	uCapturadoraLeerTiempoCaptura	( void )
 	return Capturadora.TiempoCaptura;
 }
 
+bool uCapturadoraEstaDisponible ( void )
+{
+	return (CAPTURADORA_INACTIVA==Capturadora.Estado);
+}
+
+
 bool uCapturadoraEntradaConfigurar 	( entrada_id_e ID, entrada_config_s * PCONFIG )
 {
 	// Variables locales
@@ -352,7 +358,6 @@ bool uCapturadoraIniciar ( void )
 		control = uHALadcComenzarLectura (	UHAL_ADC_1,						// Lanza muestreo en ADC 1 y 2
 														MuestrasCapturadas12,		// Vector donde almaceno lo muestreado
 														U_LARGO_CAPTURA_INICIAL );	// Largo del vector
-		uoLedEncender ( UOSAL_PIN_LED_VERDE_INCORPORADO );
 	}
 
 	// Actualizamos estado general y salimos

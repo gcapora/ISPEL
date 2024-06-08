@@ -70,11 +70,7 @@ void TareaTest_1( void *pvParameters )
 
 	/* Imprimir la tarea inicializada: */
 	char *pcTaskName = (char *) pcTaskGetName( NULL );
-	uoEscribirTxtTxt ( pcTaskName, " esta ejecutandose.\n\r" );
-	// vPrintStringAndNumber ("Cuenta actual: ", xTaskGetTickCount());
-  	// vPrintStringAndNumber ("Cuenta micro: ", uMicrosegundos());
-
-  	//vPrintString (" us.\n\r");
+	uoEscribirTxt3 ( "MSJ ", pcTaskName, " esta ejecutandose.\n\r" );
 
 	/* Enciendo leds: */
 	configASSERT ( LedsRTOS_EncenderLed (LedRojoEnPlaca)  );

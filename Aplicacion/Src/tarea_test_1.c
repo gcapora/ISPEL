@@ -13,7 +13,7 @@
 
 /****** Definiciones privadas (macros) ***********************************************************/
 
-#define DELTAT_TEST			pdMS_TO_TICKS( 5000UL )
+#define DELTAT_TEST			pdMS_TO_TICKS( 500UL )
 #define ESPERA_CAPTU			pdMS_TO_TICKS( 5UL )
 
 /****** Definiciones privadas de tipos (private typedef) *****************************************/
@@ -68,8 +68,8 @@ bool TareaTestInicializar (void)
 void TareaTest_1( void *pvParameters )
 {
 	uint32_t tiempo1, tiempo2;
-	capturadora_config_s	CaptuConfig;
-	entrada_config_s		EntraConfig;
+	//capturadora_config_s	CaptuConfig;
+	//entrada_config_s		EntraConfig;
 
 	/* Imprimir la tarea inicializada: */
 	char *pcTaskName = (char *) pcTaskGetName( NULL );
@@ -82,47 +82,52 @@ void TareaTest_1( void *pvParameters )
 
   	tiempo2 = uoMicrosegundos();
   	tiempo1 = uoMilisegundos();
-  	while ( (uoMilisegundos()-tiempo1) < 1000) {
+  	while ( (uoMilisegundos()-tiempo1) < 5) {
   	  		// NADA!!!
   	}
-  	uoEscribirTxtUintTxt ("Microsegundos tras 1000 milisegundos: ", uoMicrosegundos()-tiempo2, "\n\r");
+  	uoEscribirTxtUintTxt ("Microsegundos tras 5 milisegundos: ", uoMicrosegundos()-tiempo2, "\n\r");
 
   	tiempo2 = uoMicrosegundos();
   	tiempo1 = uoMilisegundos();
-  	while ( (uoMicrosegundos()-tiempo2) < 1000) {
+  	while ( (uoMicrosegundos()-tiempo2) < 2000) {
   	  		// NADA!!!
   	}
-  	uoEscribirTxtUintTxt ("Milisegundos tras 1000 microsegundos: ", uoMilisegundos()-tiempo1, "\n\r");
+  	uoEscribirTxtUintTxt ("Milisegundos tras 2000 microsegundos: ", uoMilisegundos()-tiempo1, "\n\r");
 
 	/* Como la mayoría de las tareas, ciclo infinito... */
 	for( ;; )
 	{
 		LedsRTOS_ModoLed( LedAzulEnPlaca, TITILANTE );
-		if (!CaptuRTOS_Comenzar(ESPERA_CAPTU)) apli_alerta ("No pudimos comenzar CAPTURADORA.");
+		//if (!CaptuRTOS_Comenzar(ESPERA_CAPTU)) apli_alerta ("No pudimos comenzar CAPTURADORA.");
 		vTaskDelay( DELTAT_TEST );
 
-		LedsRTOS_ModoLed( LedAzulEnPlaca, TITILANTE_LENTO );
+		/*LedsRTOS_ModoLed( LedAzulEnPlaca, TITILANTE_LENTO );
 		if (!CaptuRTOS_Comenzar(ESPERA_CAPTU)) apli_alerta ("No pudimos comenzar CAPTURADORA.");
 		vTaskDelay( 1UL );
 		CaptuRTOS_Parar(ESPERA_CAPTU);
-		vTaskDelay( DELTAT_TEST );
+		vTaskDelay( DELTAT_TEST );*/
 
 		LedsRTOS_ModoLed( LedAzulEnPlaca, PLENO );
-		CaptuRTOS_Obtener( &CaptuConfig, ESPERA_CAPTU );
+		/*CaptuRTOS_Obtener( &CaptuConfig, ESPERA_CAPTU );
 		CaptuConfig.OrigenDisparo = ENTRADA_2;
 		CaptuRTOS_Configurar( &CaptuConfig, ESPERA_CAPTU );
 		if (!CaptuRTOS_Comenzar(ESPERA_CAPTU)) apli_alerta ("No pudimos comenzar CAPTURADORA.");
-		vTaskDelay( DELTAT_TEST );
+		vTaskDelay( DELTAT_TEST );*/
 
-		LedsRTOS_ModoLed( LedAzulEnPlaca, BALIZA );
+		/*LedsRTOS_ModoLed( LedAzulEnPlaca, BALIZA );
 		CaptuRTOS_EntradaObtener( ENTRADA_2, &EntraConfig, ESPERA_CAPTU);
 		EntraConfig.NivelDisparo = 1.65;
 		EntraConfig.FlancoDisparo = BAJADA;
 		CaptuRTOS_EntradaConfigurar( ENTRADA_2, &EntraConfig, ESPERA_CAPTU);
 		if (!CaptuRTOS_Comenzar(ESPERA_CAPTU)) apli_alerta ("No pudimos comenzar CAPTURADORA.");
-		vTaskDelay( DELTAT_TEST );
+		*/
 
-		apli_mensaje("Nuevo ciclo de led azul en placa.\n\r", UN_SEGUNDO );
+		//apli_mensaje(".Nuevo ciclo de led azul en placa.\n\r", UN_SEGUNDO );
+		tomar_escritura(portMAX_DELAY);
+		uoEscribirTxt(".");
+		devolver_escritura();
+		ai_procesar_mensajes();
+		vTaskDelay( DELTAT_TEST );
 	}
 }
 

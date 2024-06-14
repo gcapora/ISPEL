@@ -16,7 +16,7 @@
 #include <math.h>
 
 /* Project includes. */
-#include <apli.h>
+#include "apli.h"
 
 /****** Definiciones privadas (macros) ***********************************************************/
 
@@ -75,6 +75,7 @@ void apli_inicializar( void )
 	configASSERT( true == CaptuRTOS_Inicializar()	);
 	configASSERT( true == LedsRTOS_Inicializar()    );
 	configASSERT( true == BotonesRTOS_Inicializar()	);
+	configASSERT( true == ai_inicializar()				);
 
 	configASSERT( true == TareaTestInicializar()    );
 
@@ -158,7 +159,8 @@ void Tarea_PALTA_1ms( void *pvParameters )
 {
 	/* Variables locales */
 	char *pcTaskName = (char *) pcTaskGetName( NULL );
-	char Lectura [11] = {0};
+	char Lectura [4] = {0};
+	//uint16_t CaracteresLeidos = 0;
    TickType_t Tiempo0;
 
 	/* Imprimir la tarea iniciada */
@@ -170,8 +172,9 @@ void Tarea_PALTA_1ms( void *pvParameters )
 	{
 
 		// Verificamos lectura de UART
-		if ( uoLeerTxt(Lectura,10,5)>0 ) {
-			uoEscribirTxt (Lectura);
+		if ( (uoLeerTxt(Lectura,1,5)) > 0 ) {
+			ai_cargar_caracter( Lectura[0] );
+			//uoEscribirTxt (Lectura);
 		}
 
 		// Actualización de leds
@@ -199,6 +202,7 @@ void Tarea_PMEDIA_10ms ( void *pvParameters )
 	for( ;; )
 	{
 		BotonesRTOS_ActualizarTodo ( portMAX_DELAY );
+		//ai_procesar_mensaje();
 		vTaskDelay( PERIODO_10MS );  // Se supone que no es tan crítico el sincronismo.
 	}
 }

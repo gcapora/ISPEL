@@ -285,7 +285,7 @@ void CaptuRTOS_ImprimirSenial32 (void)
 	if ( NULL == P_Senial_E1 || NULL == P_Senial_E2 ) uoHuboErrorTxt ("en Imprimir... ppal.");
 
 	// Asignaciones iniciales
-	Disparo = P_Senial_E1->ReferenciaT0;
+	Disparo = P_Senial_E1->Tiempo0;
 
 	// Escribimos última muestra:
 	uoEscribirTxt ("Senial cargada:");

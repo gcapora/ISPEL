@@ -439,11 +439,11 @@ bool uCapturadoraActualizar ( void)
 			ProcesarSenial();
 			if ( ORIGEN_ASINCRONICO == Capturadora.Config.OrigenDisparo ||
 				  Capturadora.CapturasRestantes == CapturasObjetivo()     ) {
-				SenialAdmin[ENTRADA_1].ReferenciaT0 = 0;
-				SenialAdmin[ENTRADA_2].ReferenciaT0 = 0;
+				SenialAdmin[ENTRADA_1].Tiempo0 = 0;
+				SenialAdmin[ENTRADA_2].Tiempo0 = 0;
 			} else if ( ENTRADA_2 >= Capturadora.Config.OrigenDisparo ) {
-				SenialAdmin[ENTRADA_1].ReferenciaT0 = U_MUESTRAS_PRE_DISPARO;
-				SenialAdmin[ENTRADA_2].ReferenciaT0 = U_MUESTRAS_PRE_DISPARO;
+				SenialAdmin[ENTRADA_1].Tiempo0 = U_MUESTRAS_PRE_DISPARO;
+				SenialAdmin[ENTRADA_2].Tiempo0 = U_MUESTRAS_PRE_DISPARO;
 			}
 			SenialAdmin[ENTRADA_1].FrecuenciaMuestreo = Capturadora.FrecuenciaMuestreo;
 			SenialAdmin[ENTRADA_2].FrecuenciaMuestreo = Capturadora.FrecuenciaMuestreo;
@@ -608,7 +608,7 @@ void ImprimirSenial32 (void)
 {
 	// Variables locales:
 	uint32_t i, MUESTRA_ENTRADA_1, MUESTRA_ENTRADA_2, Disparo;
-	Disparo = SenialAdmin[ENTRADA_1].ReferenciaT0;
+	Disparo = SenialAdmin[ENTRADA_1].Tiempo0;
 
 	// Escribimos última muestra:
 	uoEscribirTxt ("Senial cargada:");

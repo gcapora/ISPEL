@@ -5,8 +5,8 @@
 * @date
 **************************************************************************************************/
 
-#ifndef __ISPEL_APLI_H
-#define __ISPEL_APLI_H
+#ifndef __ISPEL_APLI_INTERPRETADOR_H
+#define __ISPEL_APLI_INTERPRETADOR_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,46 +14,36 @@ extern "C" {
 
 /****** Librerías (includes) *********************************************************************/
 
-#include "cmsis_os.h"	// ¿Por qué había que incluir esta librería?
-#include "FreeRTOS.h"
-#include "uOSAL.h"
-#include "uCapturadora.h"
-#include "Captu_RTOS.h"
-#include "Leds_RTOS.h"
-#include "Botones_RTOS.h"
-#include "apli_interpretador.h"
-
-/* Desarrollo includes. */
-#include "tarea_test_1.h"
-#include "supporting_Functions.h"
+#include <stdbool.h>
+#include "apli.h"
 
 /****** Definiciones públicas (macros) ***********************************************************/
 
-#define FREC_TESTIGO 		1000.0
-#define UN_SEGUNDO			pdMS_TO_TICKS( 1000UL )
-#define PERIODO_1MS			pdMS_TO_TICKS( 1UL )
-#define PERIODO_10MS			pdMS_TO_TICKS( 10UL )
-#define MENSAJE_LARGO_MAX	100
+#define CMD_HOLA				"HOLA"
+#define CMD_CAPTURADORA		"CAPTU"
+#define CMD_ENTRADA			"ENTRADA"
+#define CMD_GENERADOR		"GEN"
+#define CMD_CONFIGURAR		"CONFIG"
+#define CMD_OBTENER			"OBTENER"
+#define CMD_INICIAR			"INICIAR"
+#define CMD_PARAR				"PARAR"
+#define CMD_ENCENDER			"ENCENDER"
+#define CMD_APAGAR			"APAGAR"
+#define CMD_ESCRIBIR			"ESCRIBIR"
+#define CMD_LEER			   "LEER"
 
 /****** Definiciones públicas de tipos de datos (public typedef) *********************************/
 
 
 /****** Declaraciones de datos externos **********************************************************/
 
-extern const char *			Barra;
-extern boton_id_t  			BotonEnPlaca;
-extern SemaphoreHandle_t	MutexApliEscribir;
 
 /****** Declaración de funciones públicas ********************************************************/
 
-void 			apli_inicializar( void );
-void 			apli_alerta( const char * );
-BaseType_t	apli_mensaje( const char *, TickType_t );
-BaseType_t	tomar_escritura( TickType_t );
-BaseType_t	devolver_escritura( void );
-
-void Tarea_PALTA_1ms( void * );
-void Tarea_PMEDIA_10ms( void * );
+bool			ai_inicializar( void );
+void			ai_cargar_caracter( char );
+void			ai_cargar_mensaje( char *, uint32_t );
+bool			ai_procesar_mensajes( void );
 
 /*************************************************************************************************/
 #ifdef __cplusplus

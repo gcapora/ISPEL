@@ -15,6 +15,7 @@
 
 #include "stdbool.h"
 #include "stdint.h"
+#include "uHAL.h"
 
 /****** Definiciones públicas (macros) ***********************************************************/
 

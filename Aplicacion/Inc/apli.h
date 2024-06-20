@@ -18,6 +18,7 @@ extern "C" {
 #include "FreeRTOS.h"
 #include "uOSAL.h"
 #include "uCapturadora.h"
+#include "uGenerador.h"
 #include "Captu_RTOS.h"
 #include "Leds_RTOS.h"
 #include "Botones_RTOS.h"

@@ -92,10 +92,10 @@ void apli_inicializar( void )
 	// Configuramos señal testigo a FREC_TESTIGO
 
 	uHALmapConfigurarFrecuencia( UHAL_MAP_PE5 , FREC_TESTIGO );
-	uHALmapEncender( UHAL_MAP_PE5 );
-	uoEscribirTxtUintTxt ( "Frecuencia de senial cuadrada\t= ",
-			  	  	  	  	  	  (uint32_t) round( uHALmapObtenerFrecuencia(UHAL_MAP_PE5)),
-								  " Hz. \n\r");
+	uHALmapEncender            ( UHAL_MAP_PE5 );
+	uoEscribirTxtUintTxt       ( "Frecuencia de senial cuadrada\t= ",
+			  	  	  	  	  	        (uint32_t) round( uHALmapObtenerFrecuencia(UHAL_MAP_PE5)),
+								        " Hz. \n\r" );
 
 	// Probamos leds controlados por UOSAL
 
@@ -103,7 +103,7 @@ void apli_inicializar( void )
   	uoLedEncender	(UOSAL_PIN_LED_AZUL_INCORPORADO);
   	uoLedEncender	(UOSAL_PIN_LED_ROJO_INCORPORADO);
 
-  	uoEscribirTxt	( "Espero 1 segundo con leds incorporados encendidos...\r\n");
+  	uoEscribirTxt	("Espero 1 segundo con leds incorporados encendidos...\r\n");
   	uoEsperarMilis (1000);
   	uoLedApagar		(UOSAL_PIN_LED_VERDE_INCORPORADO);
 

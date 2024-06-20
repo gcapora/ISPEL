@@ -19,12 +19,28 @@
 /****** Definiciones privadas de tipos (private typedef) *****************************************/
 
 
-/****** Definición de datos privados *************************************************************/
+/****** Definición de datos públicos *************************************************************/
 
 led_id_t    LedVerdeEnPlaca, LedRojoEnPlaca, LedAzulEnPlaca;
 
-/****** Definición de datos públicos *************************************************************/
+/****** Definición de datos privados *************************************************************/
 
+uint32_t senial1[60] = {	0, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4000,
+									4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000,
+									3500, 3000, 2500, 2000, 1500, 1000, 500, 0, 0, 0,
+									0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+									0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+									0, 0, 0, 0, 0, 0, 0, 0, 0, 0	};
+
+uint32_t senial2[60] = {	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+									0, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4000,
+									4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000,
+									3500, 3000, 2500, 2000, 1500, 1000, 500, 0, 0, 0,
+									0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+									0, 0, 0, 0, 0, 0, 0, 0, 0, 0	};
+
+double   Frecuencia = 0;
+gen_conf_s GenConfig = {0};
 
 /****** Declaración de funciones privadas ********************************************************/
 
@@ -42,11 +58,26 @@ led_id_t    LedVerdeEnPlaca, LedRojoEnPlaca, LedAzulEnPlaca;
 bool TareaTestInicializar (void)
 {
 	// Enciendo DAC
-	uint32_t senial[32] = {3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000,
-			                     3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000,
-								 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-	uHALdacdmaConfigurar(UHAL_DAC_1, NULL);
-   uHALdacdmaComenzar ( UHAL_DAC_1, senial , 32 );
+
+	uGeneradorInicializar ( GENERADORES_TODOS );
+	Frecuencia = 5000;
+	if ( uGeneradorLeerConfiguracion ( GENERADOR_1, &GenConfig )) {
+		GenConfig.Frecuencia = Frecuencia;
+		GenConfig.Tipo = SENOIDAL;
+		GenConfig.Simetria = 0.5;
+		if (!uGeneradorConfigurar ( GENERADOR_1, &GenConfig )) uoHuboErrorTxt("No pudimos configurar GEN.");
+		GenConfig.Tipo = CUADRADA;
+		GenConfig.Fase = 90;
+		GenConfig.Simetria = 0.5;
+		if (!uGeneradorConfigurar ( GENERADOR_2, &GenConfig )) uoHuboErrorTxt("No pudimos configurar GEN.");
+		uGeneradorEncender ( GENERADORES_TODOS );
+	}
+
+	//uHALdacInicializar ( UHAL_DAC_TODOS );
+	//uHALdacdmaComenzar ( UHAL_DAC_1, senial1, 45 );
+	//uHALdacdmaComenzar ( UHAL_DAC_2, senial1, 45 );
+	//uHALdacEstablecerValor ( UHAL_DAC_2, 2000 );
+
 
 	// Cargo parámetros de leds
 	configASSERT ( ERROR_LED != (LedRojoEnPlaca = LedsRTOS_InicializarLed ( U_LED_ROJO_EP )) );

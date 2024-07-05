@@ -24,8 +24,9 @@
 
 /****** Librerías (includes) *********************************************************************/
 
-#include "uSeniales.h"   // Necesaria para senial_tipo
-                         // Ya incluye stdint y stdbool
+#include "uOSAL.h"
+#include "uHAL.h"
+#include "uSeniales.h"
 
 /****** Definiciones públicas (macros) ***********************************************************/
 
@@ -38,7 +39,8 @@ typedef enum {
 	GENERADOR_1,
 	GENERADOR_2,
 	CANTIDAD_GENERADORES,
-	GENERADORES_TODOS = CANTIDAD_GENERADORES
+	GENERADORES_TODOS = CANTIDAD_GENERADORES,
+	GENERADOR_NO_IDENTIFICADO
 } gen_id_e;
 
 // Acople del generador
@@ -55,7 +57,7 @@ typedef struct {
 	float        Minimo;       // en voltios
 	double       Frecuencia;   // de la señal en Hertz
 	uint32_t     Divisor;      // de muestreo: establece por cuánto se divide la frecuancia base
-	uint32_t     Largo;        // cantidad de muestras de la señal resultante (solo salida)
+	float     	 Largo;        // cantidad de muestras de la señal resultante (solo salida)
 	float        Fase;         // en grados, entre 0º y 360º
 	float        Simetria;        // número entre 0 y 1 (no aplica en senoidal)
 	gen_acople_e Acople;
@@ -83,10 +85,10 @@ typedef enum {
 
 bool uGeneradorInicializar (gen_id_e);
 bool uGeneradorConfigurar  (gen_id_e, gen_conf_s *);
-bool uGeneradorEncender    (gen_id_e);
-bool uGeneradorApagar      (gen_id_e);
 bool uGeneradorLeerConfiguracion   (gen_id_e, gen_conf_s *);
 gen_estados_e uGeneradorLeerEstado (gen_id_e);
+bool uGeneradorEncender    (gen_id_e);
+bool uGeneradorApagar      (gen_id_e);
 
 /*************************************************************************************************/
 #endif /* ISPEL_UGENERADOR_H_ */

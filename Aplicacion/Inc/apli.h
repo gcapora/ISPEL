@@ -14,27 +14,29 @@ extern "C" {
 
 /****** Librerías (includes) *********************************************************************/
 
-#include "cmsis_os.h"	// ¿Por qué había que incluir esta librería?
+// Sistema operativo y capas intermedias
+#include "cmsis_os.h"
 #include "FreeRTOS.h"
+#include "supporting_Functions.h"
 #include "uOSAL.h"
-#include "uCapturadora.h"
-#include "uGenerador.h"
+
+// Módulos de aplicación
 #include "Captu_RTOS.h"
+#include "Gen_RTOS.h"
 #include "Leds_RTOS.h"
 #include "Botones_RTOS.h"
-#include "apli_interpretador.h"
-
-/* Desarrollo includes. */
 #include "tarea_test_1.h"
-#include "supporting_Functions.h"
+#include "apli_interpretador.h"
 
 /****** Definiciones públicas (macros) ***********************************************************/
 
-#define FREC_TESTIGO 		1000.0
-#define UN_SEGUNDO			pdMS_TO_TICKS( 1000UL )
-#define PERIODO_1MS			pdMS_TO_TICKS( 1UL )
-#define PERIODO_10MS			pdMS_TO_TICKS( 10UL )
-#define MENSAJE_LARGO_MAX	100
+#define FREC_TESTIGO 			1000.0
+#define FREC_MAX_SENIAL_GEN	100e3
+#define UN_SEGUNDO				pdMS_TO_TICKS( 1000UL )
+#define PERIODO_1MS				pdMS_TO_TICKS( 1UL )
+#define PERIODO_10MS				pdMS_TO_TICKS( 10UL )
+#define TIEMPO_SEPARADOR		1000 // en milisegundos
+#define MENSAJE_LARGO_MAX		100
 
 /****** Definiciones públicas de tipos de datos (public typedef) *********************************/
 
@@ -50,6 +52,7 @@ extern SemaphoreHandle_t	MutexApliEscribir;
 void 			apli_inicializar( void );
 void 			apli_alerta( const char * );
 BaseType_t	apli_mensaje( const char *, TickType_t );
+void			apli_separador(const char * );
 BaseType_t	tomar_escritura( TickType_t );
 BaseType_t	devolver_escritura( void );
 

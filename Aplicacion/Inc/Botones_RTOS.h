@@ -15,9 +15,8 @@
 
 /****** Librerías (includes) *********************************************************************/
 
-#include "stdbool.h"		// Esta librería es usada por la función TareaLedsInicializar
-#include "apli.h"			// Aquí están declarados los recursos compartidos
-#include <uBotones.h>	// Módulo específico de utilización de botones
+#include "uBotones.h"
+#include "apli.h"
 
 /****** Definiciones públicas (macros) ***********************************************************/
 

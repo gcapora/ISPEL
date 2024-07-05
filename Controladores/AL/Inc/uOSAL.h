@@ -44,8 +44,10 @@ void     uoLedInvertir       	( uint16_t );
 
 void     uoEscribirTxt        ( const char * );
 void     uoEscribirUint      	( uint32_t );
+void		uoEscribirReal			( double, uint8_t );
 void     uoEscribirTxtTxt     ( const char *, const char * );
 void     uoEscribirTxtUint		( const char *, uint32_t );
+void		uoEscribirTxtReal		( const char *, double, uint8_t );
 void		uoEscribirTxtTxtTxt	( const char *, const char *, const char * );
 void     uoEscribirTxtUintTxt	( const char *, uint32_t, const char * );
 bool		uoLeerChar 				( char *, uint32_t );

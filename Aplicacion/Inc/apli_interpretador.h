@@ -14,7 +14,6 @@ extern "C" {
 
 /****** Librerías (includes) *********************************************************************/
 
-#include <stdbool.h>
 #include "apli.h"
 
 /****** Definiciones públicas (macros) ***********************************************************/
@@ -23,6 +22,9 @@ extern "C" {
 #define CMD_CAPTURADORA		"CAPTU"
 #define CMD_ENTRADA			"ENTRADA"
 #define CMD_GENERADOR		"GEN"
+#define CMD_SALIDA_1			"S1"
+#define CMD_SALIDA_2			"S2"
+#define CMD_SALIDA_X			"TODOS"
 #define CMD_CONFIGURAR		"CONFIG"
 #define CMD_OBTENER			"OBTENER"
 #define CMD_INICIAR			"INICIAR"
@@ -31,6 +33,9 @@ extern "C" {
 #define CMD_APAGAR			"APAGAR"
 #define CMD_ESCRIBIR			"ESCRIBIR"
 #define CMD_LEER			   "LEER"
+
+#define MENSAJE_LARGO_MAX	100
+#define VALOR_LARGO_MAX		16
 
 /****** Definiciones públicas de tipos de datos (public typedef) *********************************/
 

@@ -14,7 +14,7 @@
 
 /****** Definiciones privadas (macros) ***********************************************************/
 
-#define RETARDO_CAPTURADORA_DISPONIBLE	pdMS_TO_TICKS( 25UL )
+#define RETARDO_CAPTURADORA_DISPONIBLE	pdMS_TO_TICKS( 50UL )
 #define RETARDO_CAPTURADORA_CORRIENDO	pdMS_TO_TICKS( 3UL )
 
 /****** Definiciones privadas de tipos (private typedef) *****************************************/

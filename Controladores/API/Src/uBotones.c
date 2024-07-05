@@ -8,9 +8,7 @@
 
 /****** Librerías (includes) *********************************************************************/
 
-#include <uBotones.h>
-#include "apli.h"	// TODO sacar esto cuando haya implementado uOSAL
-#include "uOSAL.h"
+#include "uBotones.h"
 
 /****** Definiciones privadas (macros) ***********************************************************/
 
@@ -25,6 +23,7 @@ typedef enum {
 	 BOTON_PRESIONADO,
 	 BOTON_A_CONFIRMAR_NO_PRESIONADO
 }				boton_estado_t;
+
 typedef struct {
 	hal_pin_id_t	pinBoton;			// identificador de pin según uHAL.h
     bool			inicializado;

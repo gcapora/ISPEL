@@ -16,9 +16,7 @@
 
 /****** Librerías (includes) *********************************************************************/
 
-#include "math.h"
-#include "uOSAL.h"
-#include "uHALdac.h"
+#include <math.h>
 #include "uGenerador.h"
 
 /****** Definiciones privadas (macros) ***********************************************************/
@@ -58,6 +56,9 @@ bool     uGenConfiguracionesSonIguales (gen_conf_s, gen_conf_s);
 */
 float    uGenEstimarVoltios (uint32_t NUM32, dac_id_e DAC_ID)
 {
+	/*float Cuenta = ((double)NUM32-(double)CERO_DAC[DAC_ID]) * TRANSFERENCIA_DAC[DAC_ID];
+	uoEscribirTxtReal("Voltios=", Cuenta, 3);
+	uoEscribirTxt("\n");*/
 	return (float) ( (double) NUM32 - (double) CERO_DAC[DAC_ID] ) * TRANSFERENCIA_DAC[DAC_ID];
 }
 
@@ -79,12 +80,18 @@ uint32_t uGenEstimarCuentas (float VOLT, dac_id_e DAC_ID)
 bool  uGenConfiguradoDesdeSenial (dac_id_e GEN)
 {
 	dac_id_e DAC_N = (dac_id_e) GEN;
-	Generador[GEN].Configurar.Tipo   = Generador[GEN].Senial.Tipo;
-	Generador[GEN].Configurar.Maximo = uGenEstimarVoltios (Generador[GEN].Senial.Maximo, DAC_N);
-	Generador[GEN].Configurar.Minimo = uGenEstimarVoltios (Generador[GEN].Senial.Minimo, DAC_N);
-	Generador[GEN].Configurar.Largo  = Generador[GEN].Senial.Largo;
-	Generador[GEN].Configurar.Fase   = Generador[GEN].Senial.Fase;
-	Generador[GEN].Configurar.Simetria  = Generador[GEN].Senial.Simetria;
+	Generador[GEN].Configurar.Tipo  			= Generador[GEN].Senial.Tipo;
+	Generador[GEN].Configurar.Maximo		 	= uGenEstimarVoltios (Generador[GEN].Senial.Maximo, DAC_N);
+	Generador[GEN].Configurar.Minimo		 	= uGenEstimarVoltios (Generador[GEN].Senial.Minimo, DAC_N);
+	Generador[GEN].Configurar.Fase   		= Generador[GEN].Senial.Fase;
+	Generador[GEN].Configurar.Simetria		= Generador[GEN].Senial.Simetria;
+	Generador[GEN].Configurar.Frecuencia	= uHALdacdmaLeerFrecuenciaMuestreo(GEN)
+														* Generador[GEN].Senial.Multiplicador
+														/ Generador[GEN].Senial.Largo;
+	Generador[GEN].Configurar.Largo  		= 1.0 * Generador[GEN].Senial.Largo
+														/ Generador[GEN].Senial.Multiplicador;
+	Generador[GEN].Configurar.Divisor		= uHALdacdmaLeerFrecuenciaBase ()
+														/ uHALdacdmaLeerFrecuenciaMuestreo(GEN);
 	return true;
 }
 
@@ -129,7 +136,7 @@ bool uGeneradorInicializar (gen_id_e GEN)
 	if ( GEN == GENERADOR_1 ) LARGO0 = LARGO0 * 3;
 	if (LARGO0 > UG_CANTIDAD_MUESTRAS_SENIAL) LARGO0 = UG_CANTIDAD_MUESTRAS_SENIAL;
 	   // UG_CANTIDAD_MUESTRAS_SENIAL es lo que reservó la librería uGenerador
-	double FREC_MUESTREO0;
+	// double FREC_MUESTREO0;
 
     // Evalúo si se solicita inicializar todos:
 	if ( GEN == CANTIDAD_GENERADORES ) {
@@ -158,18 +165,12 @@ bool uGeneradorInicializar (gen_id_e GEN)
 	// TODO implementar una función que evalúe la configuración resultante
 
 	// Asigno frecuencia
-	FREC_MUESTREO0 = uHALdacdmaConfigurarFrecuenciaMuestreo (DAC_N, FRECUENCIA_MUESTREO_INICIAL);
-	Generador[GEN].Configurar.Frecuencia = FREC_MUESTREO0 / LARGO0;
-	Generador[GEN].Configurar.Divisor = uHALdacdmaLeerFrecuenciaBase () / FREC_MUESTREO0;  // Metodo mejorable.
+	//FREC_MUESTREO0 = uHALdacdmaConfigurarFrecuenciaMuestreo (DAC_N, FRECUENCIA_MUESTREO_INICIAL);
+	//Generador[GEN].Configurar.Frecuencia = FREC_MUESTREO0 / LARGO0;
+	//Generador[GEN].Configurar.Divisor = uHALdacdmaLeerFrecuenciaBase () / FREC_MUESTREO0;  // Metodo mejorable.
 
 	// Otras configuraciones
 	uGenConfiguradoDesdeSenial (GEN);
-	//Generador[GEN].Configurado.Tipo   = Generador[GEN].Senial.Tipo;
-	//Generador[GEN].Configurado.Maximo = uGenEstimarVoltios (Generador[GEN].Senial.Maximo, DAC_N);
-	//Generador[GEN].Configurado.Minimo = uGenEstimarVoltios (Generador[GEN].Senial.Minimo, DAC_N);
-	//Generador[GEN].Configurado.Largo  = Generador[GEN].Senial.Largo;
-	//Generador[GEN].Configurado.Fase   = Generador[GEN].Senial.Fase;
-	//Generador[GEN].Configurado.Ciclo  = Generador[GEN].Senial.Ciclo;
 	Generador[GEN].Configurar.Acople = DC;
 	Generador[GEN].Estado = GENERADOR_APAGADO;
 
@@ -200,74 +201,47 @@ bool uGeneradorConfigurar  (gen_id_e GEN, gen_conf_s * CONFIG)
 		// Ambas inicializaciones deben ser exitosas para devolver true.
 		return RETORNO;
 	}
-
 	dac_id_e  DAC_N = (dac_id_e) GEN;  // Esto vale si cantidad de generadores y DACs es la misma.
 	double    FrecMuestreo = 0;
 	double    PeriodoFraccional = 1;
-	uint32_t  delta = 0;
 
 	// Evalúo si hubo cambio de configuración - - - - - - - - - - - - - - - - - - - - - - - - - (1)
 	if ( !uGenConfiguracionesSonIguales( *CONFIG, Generador[GEN].Configurar )) {
 		// Hay un cambio en alguna configuración...
 
 		// Cargo datos básicos para rehacer señal
-		Generador[GEN].Senial.Tipo   = CONFIG->Tipo;
-		Generador[GEN].Senial.Maximo = uGenEstimarCuentas ( CONFIG->Maximo, GEN);
-		                               // Pasa de voltios a cuentas
-		Generador[GEN].Senial.Minimo = uGenEstimarCuentas ( CONFIG->Minimo, GEN);  // Idem
-		Generador[GEN].Senial.Fase   = CONFIG->Fase;
-		Generador[GEN].Senial.Simetria  = CONFIG->Simetria;
+		Generador[GEN].Senial.Tipo		   = CONFIG->Tipo;
+		Generador[GEN].Senial.Maximo 		= uGenEstimarCuentas ( CONFIG->Maximo, GEN); // Pasa de voltios a cuentas
+		Generador[GEN].Senial.Minimo 		= uGenEstimarCuentas ( CONFIG->Minimo, GEN); // Pasa de voltios a cuentas
+		Generador[GEN].Senial.Fase			= CONFIG->Fase;
+		Generador[GEN].Senial.Simetria	= CONFIG->Simetria;
 
 		// Calculo frecuencia de muestreo, periodo y multiplicador
-		FrecMuestreo = uHALdacdmaConfigurarFrecuenciaMuestreo ( DAC_N, CONFIG->Frecuencia *
-				                                                UG_CANTIDAD_MUESTRAS_SENIAL);
-		                               // Es la máxima frecuencia posible
+		FrecMuestreo = uHALdacdmaConfigurarFrecuenciaMuestreo  (	DAC_N,
+																					CONFIG->Frecuencia * UG_CANTIDAD_MUESTRAS_SENIAL );
+													// Probamos con la máxima frecuencia de muestreo deseable
 		PeriodoFraccional = FrecMuestreo / CONFIG->Frecuencia;
-		                               // Un PeríodoFraccional que pueda implementarse en las
-		                               // muestras disponibles, teniendo en cuenta que puede haber
-		                               // N períodos, y no sólo uno entero.
-		Generador[GEN].Senial.Multiplicador = floor ( UG_CANTIDAD_MUESTRAS_SENIAL / PeriodoFraccional);
+													// Un PeríodoFraccional que pueda implementarse en las
+													// muestras disponibles, teniendo en cuenta que puede haber
+													// N períodos, y no sólo uno entero.
+		Generador[GEN].Senial.Multiplicador = floor ( UG_CANTIDAD_MUESTRAS_SENIAL / PeriodoFraccional );
 		if (Generador[GEN].Senial.Multiplicador == 0) Generador[GEN].Senial.Multiplicador = 1;
-		                               // El Multiplicador es la cantidad entera de ciclos que entran en la señal a general.
-		Generador[GEN].Senial.Largo  = (uint32_t) round(Generador[GEN].Senial.Multiplicador * PeriodoFraccional );
-		//Generador[GEN].Senial.Largo  = (uint32_t) round(FrecMuestreo / CONFIG->Frecuencia);
-		                               // Ahora el largo total puede incluir más de un período.
+													// El Multiplicador es la cantidad entera de ciclos que entran en la señal a general.
+		Generador[GEN].Senial.Largo  = (uint32_t) round( Generador[GEN].Senial.Multiplicador * PeriodoFraccional );
 
-		// Regenero senial:
-		delta = uoMilisegundos ();
+		// Regenero senial y cargo valores configurados:
 		uGenerarSenial ( &Generador[GEN].Senial );
-		delta = uoMilisegundos () - delta;
-		uoEscribirTxtUint ( "[info] Generar senial demoro (ms) ", delta );
-
-		// Copio configuracion establecida desde senial: (pudo variar...)
-		//uGenConfiguradoDesdeSenial (GEN); // en lugar de esto debería evaluarse de nuevo la señal
-		                                    // Dejamos en Configurar a la configuración solicitada.
-		Generador[GEN].Configurar.Acople = CONFIG->Acople;
-
-		// Calculo frecuencia de senial y divisor del tempo:
-		Generador[GEN].Configurar.Frecuencia = FrecMuestreo / Generador[GEN].Senial.Largo;
-		Generador[GEN].Configurar.Divisor    = (uHALdacdmaLeerFrecuenciaBase () / FrecMuestreo);  // Metodo mejorable.
+		uGenConfiguradoDesdeSenial (GEN);
 
 		// Evaluo posibidades de salida:
 		if ( Generador[GEN].Estado == GENERADOR_ENCENDIDO ) {
 			// Como hubo modificación, debo parar y arrancar para que los cambios se efectivicen:
 			uHALdacParar ( DAC_N );
-			if ( CONFIG->Acople  == CERO) {
-				// Salida equivalente a cero voltios:
-				// uHALdacdmaComenzar ( DAC_N, &CERO_DAC[DAC_N], 1);
+			if ( CONFIG->Acople  == CERO) {	// Salida equivalente a cero voltios:
 				uHALdacEstablecerValor ( DAC_N, CERO_DAC[DAC_N]);
-			} else {
-				// La senial a la salida:
-				//uHALdacdmaComenzar ( DAC_N, Generador[GEN].Senial.Muestra, Generador[GEN].Senial.Largo );
+			} else {									// La senial a la salida:
 				uHALdacdmaComenzar ( DAC_N, Generador[GEN].Senial.Muestras_p, Generador[GEN].Senial.Largo );
 				Generador[GEN].Configurar.Acople = DC;
-
-				/*
-				// Veo si debo sincronizar
-				if (uHALdacdmaSincronizar ()) {
-					//uartSendString((uint8_t *) "Seniales sincronizadas!!! (en ...Configurar)\n\r");
-				}
-				*/
 			}
 		}
 	} //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - (1)
@@ -281,16 +255,15 @@ bool uGeneradorConfigurar  (gen_id_e GEN, gen_conf_s * CONFIG)
 */
 bool uGeneradorEncender (gen_id_e GEN)
 {
-	// Valido parámetro
-	if ( GEN > CANTIDAD_GENERADORES ) uoHuboError();
-	if ( GEN < CANTIDAD_GENERADORES && Generador[GEN].Estado !=  GENERADOR_APAGADO ) return false;
-
 	// Variables locales
 	bool RETORNO = false;
 	dac_id_e DAC_N = (dac_id_e) GEN;  // Esto lo puedo hacer porque la cantidad de
 	                                  // generadores y DACs es la misma.
 
-    // Evalúo si se solicita encender todos:
+	// Valido parámetro
+	if ( GEN > CANTIDAD_GENERADORES ) uoHuboError();
+
+	// Evalúo si se solicita encender todos:
 	if ( GEN == GENERADORES_TODOS ) {
 		RETORNO = uGeneradorEncender (GENERADOR_1);
 		RETORNO = RETORNO && uGeneradorEncender (GENERADOR_2);
@@ -306,13 +279,14 @@ bool uGeneradorEncender (gen_id_e GEN)
 		Generador[GEN].Estado = GENERADOR_ENCENDIDO;
 		RETORNO = true;
 	}
+	if (Generador[GEN].Estado == GENERADOR_ENCENDIDO) RETORNO = true;
 
 	// Veo si debo sincronizar
 	if (uHALdacdmaSincronizar ()) {
 		// uartSendString((uint8_t *) "Seniales sincronizadas!!!\n\r");
 	}
 
-	return true;
+	return RETORNO;
 }
 
 /**------------------------------------------------------------------------------------------------
@@ -360,6 +334,7 @@ bool uGeneradorLeerConfiguracion (gen_id_e GEN, gen_conf_s * CONFIG)
 
    // Asigno
    *CONFIG = Generador[GEN].Configurar;
+   //CONFIG->Tipo = Generador[GEN].Configurar.Tipo;
    return true;
 }
 

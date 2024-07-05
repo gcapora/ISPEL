@@ -51,73 +51,69 @@ gen_conf_s GenConfig = {0};
 /****** Definición de funciones públicas *********************************************************/
 
 /*-------------------------------------------------------------------------------------------------
- * @brief  Inicializa todos los leds a utilizar
- * @param	Ninguno
- * @retval true, si no hubo problemas
- */
-bool TareaTestInicializar (void)
-{
-	// Enciendo DAC
-
-	uGeneradorInicializar ( GENERADORES_TODOS );
-	Frecuencia = 5000;
-	if ( uGeneradorLeerConfiguracion ( GENERADOR_1, &GenConfig )) {
-		GenConfig.Frecuencia = Frecuencia;
-		GenConfig.Tipo = SENOIDAL;
-		GenConfig.Simetria = 0.5;
-		if (!uGeneradorConfigurar ( GENERADOR_1, &GenConfig )) uoHuboErrorTxt("No pudimos configurar GEN.");
-		GenConfig.Tipo = CUADRADA;
-		GenConfig.Fase = 90;
-		GenConfig.Simetria = 0.5;
-		if (!uGeneradorConfigurar ( GENERADOR_2, &GenConfig )) uoHuboErrorTxt("No pudimos configurar GEN.");
-		uGeneradorEncender ( GENERADORES_TODOS );
-	}
-
-	//uHALdacInicializar ( UHAL_DAC_TODOS );
-	//uHALdacdmaComenzar ( UHAL_DAC_1, senial1, 45 );
-	//uHALdacdmaComenzar ( UHAL_DAC_2, senial1, 45 );
-	//uHALdacEstablecerValor ( UHAL_DAC_2, 2000 );
-
-
-	// Cargo parámetros de leds
-	configASSERT ( ERROR_LED != (LedRojoEnPlaca = LedsRTOS_InicializarLed ( U_LED_ROJO_EP )) );
-	configASSERT ( LedsRTOS_ModoLed ( LedRojoEnPlaca, SUSPENSION ) );
-
-	configASSERT ( ERROR_LED != (LedAzulEnPlaca  = LedsRTOS_InicializarLed ( U_LED_AZUL_EP )) );
-	configASSERT ( LedsRTOS_ModoLed ( LedAzulEnPlaca, BALIZA ) );
-
-	// configASSERT ( ERROR_LED != (LedVerdeEnPlaca = TareaLeds_InicializarLed ( U_LED_VERDE_EP )) );
-
-	// Terminada la inicialización...
-	return true;
-}
-
-/*-------------------------------------------------------------------------------------------------
  * @brief  Tarea que actualiza el estado de los leds
  * @param	Ninguno
  */
 void TareaTest_1( void *pvParameters )
 {
+	/* Variables locales ------------------------------------------------------*/
 	uint32_t tiempo1, tiempo2;
-	//capturadora_config_s	CaptuConfig;
-	//entrada_config_s		EntraConfig;
 
-	/* Imprimir la tarea inicializada: */
+	/* Imprimir la tarea inicializada -----------------------------------------*/
 	char *pcTaskName = (char *) pcTaskGetName( NULL );
 	uoEscribirTxt3 ( "MSJ ", pcTaskName, " esta ejecutandose.\n\r" );
 
-	/* Enciendo leds: */
+	/* Configuro y enciendo leds ----------------------------------------------*/
+	configASSERT (	ERROR_LED !=
+						(LedRojoEnPlaca = LedsRTOS_InicializarLed ( U_LED_ROJO_EP )) );
+	configASSERT ( LedsRTOS_ModoLed ( LedRojoEnPlaca, SUSPENSION ) );
+	configASSERT ( ERROR_LED !=
+						(LedAzulEnPlaca  = LedsRTOS_InicializarLed ( U_LED_AZUL_EP )) );
+	configASSERT ( LedsRTOS_ModoLed ( LedAzulEnPlaca, BALIZA ) );
+	// configASSERT ( ERROR_LED !=
+	// (LedVerdeEnPlaca = TareaLeds_InicializarLed ( U_LED_VERDE_EP )) );
 	configASSERT ( LedsRTOS_EncenderLed (LedRojoEnPlaca)  );
 	configASSERT ( LedsRTOS_EncenderLed (LedAzulEnPlaca)  );
 	//configASSERT ( TareaLeds_EncenderLed (LedVerdeEnPlaca) );
 
-  	tiempo2 = uoMicrosegundos();
+	/* Enciendo GENERADORES ---------------------------------------------------*/
+	Frecuencia = 9950;
+	if ( GenRTOS_Obtener ( GENERADOR_1, &GenConfig, portMAX_DELAY )) {
+		//uoEscribirTxtUint("Probando ", GenConfig.Maximo);
+		GenConfig.Frecuencia = Frecuencia;
+		GenConfig.Tipo = SENOIDAL;
+		//GenConfig.Tipo = TRIANGULAR;
+		//GenConfig.Tipo = CUADRADA;
+		GenConfig.Simetria = 0.5;
+		if (!GenRTOS_Configurar ( GENERADOR_1, &GenConfig, portMAX_DELAY ))
+			uoHuboErrorTxt("No pudimos configurar GEN.");
+		GenConfig.Tipo = CUADRADA;
+		//GenConfig.Tipo = TRIANGULAR;
+		GenConfig.Tipo = SENOIDAL;
+		GenConfig.Fase = 90;
+		GenConfig.Simetria = 0.5;
+		GenConfig.Maximo = 2.5;
+		GenConfig.Minimo = 0.5;
+		//GenConfig.Frecuencia = Frecuencia;
+		if (!GenRTOS_Configurar ( GENERADOR_2, &GenConfig, portMAX_DELAY ))
+			uoHuboErrorTxt("No pudimos configurar GEN.");
+		GenRTOS_Encender ( GENERADORES_TODOS, portMAX_DELAY );
+	}
+
+	/* Esta sería una forma de utilizar las funciones de uHALdac.h:
+	uHALdacInicializar ( UHAL_DAC_TODOS );
+	uHALdacdmaComenzar ( UHAL_DAC_1, senial1, 45 );
+	uHALdacdmaComenzar ( UHAL_DAC_2, senial1, 45 );
+	uHALdacEstablecerValor ( UHAL_DAC_2, 2000 );
+	*/
+
+	/* Pruebo ouMili y uoMicro ------------------------------------------------*/
+	tiempo2 = uoMicrosegundos();
   	tiempo1 = uoMilisegundos();
   	while ( (uoMilisegundos()-tiempo1) < 5) {
   	  		// NADA!!!
   	}
   	uoEscribirTxtUintTxt ("Microsegundos tras 5 milisegundos: ", uoMicrosegundos()-tiempo2, "\n\r");
-
   	tiempo2 = uoMicrosegundos();
   	tiempo1 = uoMilisegundos();
   	while ( (uoMicrosegundos()-tiempo2) < 2000) {
@@ -125,12 +121,12 @@ void TareaTest_1( void *pvParameters )
   	}
   	uoEscribirTxtUintTxt ("Milisegundos tras 2000 microsegundos: ", uoMilisegundos()-tiempo1, "\n\r");
 
-	/* Como la mayoría de las tareas, ciclo infinito... */
+	/* Ciclo infinito... ------------------------------------------------------*/
 	for( ;; )
 	{
 		LedsRTOS_ModoLed( LedAzulEnPlaca, TITILANTE );
 		//if (!CaptuRTOS_Comenzar(ESPERA_CAPTU)) apli_alerta ("No pudimos comenzar CAPTURADORA.");
-		vTaskDelay( DELTAT_TEST );
+		vTaskDelay( 4 * DELTAT_TEST );
 
 		/*LedsRTOS_ModoLed( LedAzulEnPlaca, TITILANTE_LENTO );
 		if (!CaptuRTOS_Comenzar(ESPERA_CAPTU)) apli_alerta ("No pudimos comenzar CAPTURADORA.");
@@ -154,14 +150,9 @@ void TareaTest_1( void *pvParameters )
 		*/
 
 		//apli_mensaje(".Nuevo ciclo de led azul en placa.\n\r", UN_SEGUNDO );
-		tomar_escritura(portMAX_DELAY);
-		uoEscribirTxt(".");
-		devolver_escritura();
-		ai_procesar_mensajes();
-		vTaskDelay( DELTAT_TEST );
+
+		vTaskDelay( 2 * DELTAT_TEST );
 	}
 }
-
-
 
 /****************************************************************** FIN DE ARCHIVO ***************/

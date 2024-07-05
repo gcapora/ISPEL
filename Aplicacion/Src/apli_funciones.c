@@ -36,9 +36,22 @@ BaseType_t apli_mensaje ( const char * TEXTO, TickType_t ESPERA )
 	RET = tomar_escritura(ESPERA);
 	if( pdTRUE == RET ) {
 		uoEscribirTxt2 ("MSJ ", TEXTO);
+		uoEscribirTxt ("\n");
 		devolver_escritura();
 	}
 	return RET;
+}
+
+
+void apli_separador(const char * SEPARA)
+{
+	static uint32_t tiempo_anterior = 0;
+	if (uoMilisegundos()-tiempo_anterior >= TIEMPO_SEPARADOR) {
+		tiempo_anterior += TIEMPO_SEPARADOR;
+		tomar_escritura(portMAX_DELAY);
+		uoEscribirTxt(SEPARA);
+		devolver_escritura();
+	}
 }
 
 BaseType_t tomar_escritura ( TickType_t ESPERA )
@@ -50,3 +63,5 @@ BaseType_t devolver_escritura ( void )
 {
 	return xSemaphoreGive( MutexApliEscribir );
 }
+
+

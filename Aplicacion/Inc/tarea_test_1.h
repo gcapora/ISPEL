@@ -15,8 +15,8 @@
 
 /****** Librerías (includes) *********************************************************************/
 
-#include "apli.h"		// Aquí están declarados los recursos compartidos
-#include "Leds_RTOS.h"	// Tarea a testear
+//#include "uGenerador.h"
+#include "apli.h"
 
 /****** Definiciones públicas (macros) ***********************************************************/
 
@@ -26,13 +26,10 @@
 
 /****** Declaraciones de datos externos **********************************************************/
 
-//extern led_id_t LedRojoEnPlaca;
 
 /****** Declaración de funciones públicas ********************************************************/
 
-bool TareaTestInicializar	( void );
 void TareaTest_1 				( void * );
-void Tarea_Capturadora		( void * );
 
 /*************************************************************************************************/
 #ifdef __cplusplus

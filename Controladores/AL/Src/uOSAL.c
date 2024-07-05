@@ -10,9 +10,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "stm32f4xx_hal.h"
-#include "cmsis_os.h"
-#include "FreeRTOS.h"
+#include <math.h>
 #include "uOSAL.h"
 
 /****** Definiciones privadas (macros) ***********************************************************/
@@ -21,6 +19,8 @@
 /****** Definiciones privadas de tipos (private typedef) *****************************************/
 
 #define UOSAL_UART_TIEMPO_ESPERA_US		UOSAL_UART_TIEMPO_ESPERA*1000  // Mismo valor pero en us
+#define MAX_DECIMALES  						10
+#define MAX_DIG_UINT32 						10
 
 /****** Definición de datos privados *************************************************************/
 
@@ -230,6 +230,40 @@ void uoEscribirTxtUint ( const char * P_TEXTO, uint32_t ENTEROP)
 	xSemaphoreTake( MutexEscribirAdmin, portMAX_DELAY );
 	UART_ENVIAR_CADENA ( (uint8_t *) P_TEXTO );
    UART_ENVIAR_CADENA ( Cadena );
+	xSemaphoreGive( MutexEscribirAdmin );
+}
+
+/*-------------------------------------------------------------------------------------------------
+* @brief		Escribe texto y un número por UART
+* @param		Puntero a texto y número entero positivo
+* @retval	Ninguno
+*/
+void uoEscribirTxtReal ( const char * P_TEXTO, double REAL, uint8_t DECIMALES )
+{
+	// Variables locales y datos
+	bool		Negativo = false;
+	uint8_t	ParteEntera [MAX_DIG_UINT32] = {0};
+	uint8_t	Decimales   [MAX_DECIMALES]  = {0};
+	uint32_t	Multiplica = 0;
+
+	// Comprobaciones
+	DECIMALES = (DECIMALES>MAX_DECIMALES)? MAX_DECIMALES : DECIMALES;
+	Multiplica = pow(10, DECIMALES);
+	REAL = round(REAL*Multiplica)/Multiplica; // Quito decimales no buscados
+	if(REAL<0) {
+		Negativo = true;
+		REAL= -REAL;
+	}
+	sprintf( (char *) ParteEntera, "%lu", (uint32_t) REAL );
+	REAL = (1.0 + REAL - (uint32_t)REAL) * Multiplica; // parte fraccional mas un digito inicial
+	sprintf( (char *) Decimales  , "%lu", (uint32_t) REAL );
+
+	xSemaphoreTake( MutexEscribirAdmin, portMAX_DELAY );
+	UART_ENVIAR_CADENA ( (uint8_t *) P_TEXTO );
+	if(Negativo) UART_ENVIAR_CADENA ( (uint8_t *) "-" );
+   UART_ENVIAR_CADENA ( ParteEntera );
+   UART_ENVIAR_CADENA ( (uint8_t *) "." );
+   UART_ENVIAR_CADENA ( &Decimales[1] ); // salteo digito inicial
 	xSemaphoreGive( MutexEscribirAdmin );
 }
 

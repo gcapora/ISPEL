@@ -11,8 +11,7 @@
 
 /****** Librerías (includes) *********************************************************************/
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "uOSAL.h"
 #include "uHAL.h"
 
 /****** Definiciones públicas (macros) ***********************************************************/

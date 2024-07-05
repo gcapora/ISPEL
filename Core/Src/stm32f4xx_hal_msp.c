@@ -22,7 +22,8 @@
 #include "main.h"
 /* USER CODE BEGIN Includes */
 
-#include "uHALconfig.h"
+
+#include "../../Controladores/AL/Inc/uHALconfig.h"
 extern DMA_HandleTypeDef admin_dma_adc1;
 extern DMA_HandleTypeDef admin_dma_adc2;
 

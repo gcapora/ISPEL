@@ -7,11 +7,10 @@
 
 /****** Librerías (includes) *********************************************************************/
 
-#include <stdbool.h>
 #include <math.h>
-#include "stm32f4xx_hal.h"
-#include "stm32f4xx_hal_dac.h"
-#include "uOSAL.h"
+//#include "stm32f4xx_hal.h"
+//#include "stm32f4xx_hal_dac.h"
+//#include "uHAL.h"
 #include "uHALdac.h"
 
 /****** Definiciones privadas (macros) ***********************************************************/
@@ -28,7 +27,7 @@
 #define U_FRECUENCIA_BASE   ((double) UHAL_FRECUENCIA_RELOJ) / 2 / (U_TIM_PREESCALADO+1)
                                 // Frecuencia común para todas las señales.
                                 // No es la máxima, dado que en este caso se divide al menos por 2.
-                                // Resulta ser 180 MHz / 2 / (8+1) = 10 MHz
+                                // Resulta ser 144 MHz / 2 / (7+1) = 9 MHz
 #define DAC_FRECUENCIA_MUESTREO_MINIMA   (UHAL_FRECUENCIA_RELOJ / 2 / (U_TIM_PREESCALADO+1) / 65536)
 
 /****** Definiciones privadas de tipos (private typedef) *****************************************/
@@ -59,7 +58,7 @@ typedef struct {
 
 const uint32_t MAXIMO_DAC[UHAL_CANTIDAD_DACS]        = { 3950, 4010 };
 const uint32_t MINIMO_DAC[UHAL_CANTIDAD_DACS]        = {   50,  100 };
-const uint32_t CERO_DAC  [UHAL_CANTIDAD_DACS]        = { 2000, 2050 };
+const uint32_t CERO_DAC  [UHAL_CANTIDAD_DACS]        = {   0,  0 }; //{ 2000, 2050 };
 const double   TRANSFERENCIA_DAC[UHAL_CANTIDAD_DACS] = { 805.861e-6, 805.861e-6 };
 
 /****** Definición de datos privados *************************************************************/

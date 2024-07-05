@@ -27,15 +27,13 @@
 
 /****** Librerías (includes) *********************************************************************/
 
-#include <stdint.h>
-#include <stdbool.h>
 #include "uHAL.h"
 
 /****** Definiciones públicas (macros) ***********************************************************/
 
 #define UHAL_CANTIDAD_DACS          		2
 #define UHAL_FRECUENCIA_RELOJ					UOSAL_FRECUENCIA_RELOJ // Hz
-#define UHAL_DAC_FRECUENCIA_MUESTREO_MAX	5000000   // 5 Msps. Considera un margen.
+#define UHAL_DAC_FRECUENCIA_MUESTREO_MAX	4000000   // Considera un margen.
 #define MILLON                      		1000000   // 1 millon :-)
 #define MHZ                        		 	MILLON    // 1 megahertz
 #define KHZ                         		1000      // 1 kilohertz

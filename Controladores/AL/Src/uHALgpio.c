@@ -10,8 +10,9 @@
 
 /****** Librerías (includes) *********************************************************************/
 
+//#include "stm32f4xx_hal.h"
+//#include "uHAL.h"
 #include "uHALgpio.h"
-#include "stm32f4xx_hal.h"
 
 /****** Definiciones privadas (macros) ***********************************************************/
 

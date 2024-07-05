@@ -8,10 +8,9 @@
 
 /****** Librerías (includes) *********************************************************************/
 
-#include "stm32f4xx_hal.h"
 #include <math.h>
-#include "uHAL.h"  // Con solo esta librería alcanzaría, pero el resto uHAL... ayuda a la lectura.
-#include "uHALconfig.h"
+//#include "stm32f4xx_hal.h"
+//#include "uHAL.h"
 #include "uHALmap.h"
 
 /****** Definiciones privadas (macros) ***********************************************************/

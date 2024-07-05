@@ -8,7 +8,7 @@
 
 /****** Librerías (includes) *********************************************************************/
 
-#include "math.h"
+#include <math.h>
 #include "uOSAL.h"
 #include "uSeniales.h"
 
@@ -39,19 +39,19 @@ double Cuadrada     (double Grados, double CicloDeTrabajo);
 bool ConfigSenialVerificada (senial_s * Senial)
 {
 	// Errores graves
-	if (Senial->Largo > U_MAX_N_MUESTRAS) uoHuboErrorTxt("verificando senial en uSeniales.");
-	if (Senial->Largo < 2) uoHuboErrorTxt("verificando senial en uSeniales.");
-	if (Senial->Largo > Senial->LargoMaximo) uoHuboErrorTxt("verificando senial en uSeniales.");
+	//if (Senial->Largo > U_MAX_N_MUESTRAS) uoHuboErrorTxt("verificando senial en uSeniales (>UMNM).");
+	if (Senial->Largo < 2) uoHuboErrorTxt("verificando senial en uSeniales (<2).");
 
 	// Correcciones de ciclo y márgenes
+	if (Senial->Largo > Senial->LargoMaximo) Senial->Largo = Senial->LargoMaximo;
 	if (Senial->Simetria > 1)        Senial->Simetria = 1;
-    if (Senial->Simetria < 0)        Senial->Simetria = 0;
-    if (Senial->Maximo > MAXIMO_12B) Senial->Maximo = MAXIMO_12B;
-    if (Senial->Minimo < MINIMO_12B) Senial->Minimo = MINIMO_12B;
-    if (Senial->Multiplicador == 0)  Senial->Multiplicador = 1;
+   if (Senial->Simetria < 0)        Senial->Simetria = 0;
+   if (Senial->Maximo > MAXIMO_12B) Senial->Maximo = MAXIMO_12B;
+   if (Senial->Minimo < MINIMO_12B) Senial->Minimo = MINIMO_12B;
+   if (Senial->Multiplicador == 0)  Senial->Multiplicador = 1;
 
-    // Llevamos los grados entre 0º y 360º
-    Senial->Fase = AcotarGrados( Senial->Fase );
+   // Llevamos los grados entre 0º y 360º
+   Senial->Fase = AcotarGrados( Senial->Fase );
 
 	return true;
 }
@@ -133,17 +133,17 @@ void uGenerarSenial     ( senial_s * Senial )
 	// Elegimos qué otra función utilizar:
 	switch (Senial->Tipo) {
 	        case CUADRADA:
-	        	uGenerarCuadrada (Senial);
-	            break;
+	      	  uGenerarCuadrada (Senial);
+	           break;
 	        case TRIANGULAR:
-	        	uGenerarTriangular (Senial);
-	            break;
+	      	  uGenerarTriangular (Senial);
+	           break;
 	        case SENOIDAL:
-	        	uGenerarSenoidal (Senial);
-	            break;
+	      	  uGenerarSenoidal (Senial);
+	           break;
 	        default:
-	            // Hubo un error
-	        	uoHuboError();
+	           // Hubo un error
+	      	  uoHuboError();
 	    }
 	return;
 }

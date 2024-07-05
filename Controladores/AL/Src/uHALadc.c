@@ -9,8 +9,7 @@
 /****** Librerías (includes) *********************************************************************/
 
 #include <math.h>
-#include "stm32f4xx_hal.h"
-#include "uHAL.h"
+//#include "uHAL.h"
 #include "uHALadc.h"
 
 /****** Definiciones privadas (macros) ***********************************************************/

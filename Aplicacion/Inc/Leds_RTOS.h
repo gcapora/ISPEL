@@ -15,9 +15,8 @@
 
 /****** Librerías (includes) *********************************************************************/
 
-#include "stdbool.h"	// Esta librería es usada por la función TareaLedsInicializar
-#include "apli.h"		// Aquí están declarados los recursos compartidos
-#include <uLeds.h>		// Módulo específico de utilización de leds
+#include "uLeds.h"
+#include "apli.h"
 
 /****** Definiciones públicas (macros) ***********************************************************/
 

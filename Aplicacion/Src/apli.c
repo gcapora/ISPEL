@@ -23,6 +23,7 @@
 #define TAREA_PRIORIDAD_BAJA     ( tskIDLE_PRIORITY + 1UL )
 #define TAREA_PRIORIDAD_MEDIA    ( tskIDLE_PRIORITY + 2UL )
 #define TAREA_PRIORIDAD_ALTA     ( tskIDLE_PRIORITY + 3UL )
+#define UN_MICROSEGUNDO				1
 
 /****** Definiciones privadas de tipos (private typedef) *****************************************/
 
@@ -30,9 +31,10 @@
 /****** Definición de datos privados *************************************************************/
 
 /* Variables usadas para referencias las tareas. */
-TaskHandle_t TareaLeds_m;
-TaskHandle_t TareaBotones_m;
-TaskHandle_t TareaTest1_m, TareaTest2_m;
+TaskHandle_t PALTA_admin;
+TaskHandle_t PMEDIA_admin;
+TaskHandle_t CAPTU_admin;
+TaskHandle_t TareaTest1_m;
 
 /****** Definición de datos públicos *************************************************************/
 
@@ -73,11 +75,10 @@ void apli_inicializar( void )
 	// Inicialización de módulos, tareas y objetos--------------------------------------------------
 
 	configASSERT( true == CaptuRTOS_Inicializar()	);
+	configASSERT( true == GenRTOS_Inicializar()	   );
 	configASSERT( true == LedsRTOS_Inicializar()    );
 	configASSERT( true == BotonesRTOS_Inicializar()	);
 	configASSERT( true == ai_inicializar()				);
-
-	configASSERT( true == TareaTestInicializar()    );
 
 	configASSERT( ERROR_BOTON != (BotonEnPlaca=BotonesRTOS_InicializarBoton(U_BOTON_EP)) );
 	configASSERT( NULL        != (MutexApliEscribir=xSemaphoreCreateMutex()) );
@@ -109,22 +110,26 @@ void apli_inicializar( void )
 
 	// Creación de las tareas ---------------------------------------------------------------------
 
-	/* Tarea Leds en prioridad 1 */
+	/* Tarea PALTA para funciones rápidas cada 1 ms:
+	 * - Lectura de UART
+	 * - Actualización de leds
+	 * - Actualización de botones */
 	ret = xTaskCreate(	Tarea_PALTA_1ms,						// Puntero a la función-tarea.
 								"PALTA_1ms",							// Nombre de tarea. Para desarrollo.
 								(2 * configMINIMAL_STACK_SIZE),	// Tamaño de stack en palabras.
 								NULL,    								// Parametros de la tarea, que no tiene acá
 								TAREA_PRIORIDAD_ALTA,				// Prioridad alta.
-								&TareaLeds_m );						// Variable de administración de tarea.
+								&PALTA_admin );						// Variable de administración de tarea.
 	configASSERT( ret == pdPASS );
 
-	/* Tarea Botones en prioridad 1 */
+	/* Tarea PMEDIA para funciones cada 10 ms:
+	 * */
 	ret = xTaskCreate( 	Tarea_PMEDIA_10ms,
 								"PMEDIA_10ms",
 								(2 * configMINIMAL_STACK_SIZE),
 								NULL,
 								TAREA_PRIORIDAD_MEDIA,
-								&TareaBotones_m );
+								&PMEDIA_admin );
 	configASSERT( ret == pdPASS );
 
 	/* Tarea Test 1 */
@@ -136,13 +141,14 @@ void apli_inicializar( void )
 								&TareaTest1_m );
 	configASSERT( ret == pdPASS );
 
-	/* Tarea Test 2 */
+	/* Tarea CAPTURADORA que exige procesamiento.
+	 * En baja prioridad para que pueda ser interrumpida. */
 	ret = xTaskCreate( 	Tarea_Capturadora,
 								"CAPTURADORA",
 								(2 * configMINIMAL_STACK_SIZE),
 								NULL,
 								TAREA_PRIORIDAD_BAJA,
-								&TareaTest2_m );
+								&CAPTU_admin );
 	configASSERT( ret == pdPASS );
 
 }
@@ -150,37 +156,49 @@ void apli_inicializar( void )
 /*-------------------------------------------------------------------------------------------------
  * @brief	Tarea que se actualiza con ALTA RPIORIDAD cada 1 ms
  * @param	Ninguno
- * @descripcion:
- * 	Incluye:
- * 	- Lectura de UART (solo carga, no procesa).
- * 	- Actualización de leds.
+ * @descripcion
+ *		 		- Lectura de UART (solo carga, no procesa).
+ * 			- Actualización de leds.
+ * 			- Actualización de botones.
+ * Las funciones deben durar lo menos posible.
+ * Utilizamos vTaskDelayUntil() porque es crítico el sincronismo.
  */
 void Tarea_PALTA_1ms( void *pvParameters )
 {
-	/* Variables locales */
+	/* Variables locales ------------------------------------------------------*/
 	char *pcTaskName = (char *) pcTaskGetName( NULL );
-	char Lectura [4] = {0};
-	//uint16_t CaracteresLeidos = 0;
-   TickType_t Tiempo0;
+	char Lectura = '\0';
+	uint8_t ConteoParaBotones=0;
+	TickType_t Tiempo0;
 
-	/* Imprimir la tarea iniciada */
+	/* Imprimir la tarea iniciada ---------------------------------------------*/
 	uoEscribirTxt3 ( "MSJ ", pcTaskName, " esta ejecutandose.\n\r" );
 
-	/* Ciclo infinito, como la mayoría de las tareas: */
+	/* Ciclo infinito: --------------------------------------------------------*/
 	Tiempo0 = xTaskGetTickCount();
 	for( ;; )
 	{
 
-		// Verificamos lectura de UART
-		if ( (uoLeerTxt(Lectura,1,5)) > 0 ) {
-			ai_cargar_caracter( Lectura[0] );
-			//uoEscribirTxt (Lectura);
+		/* Verificamos lectura de UART -----------------------------------------*/
+		if ( (uoLeerChar(&Lectura,UN_MICROSEGUNDO)) > 0 ) {
+			ai_cargar_caracter( Lectura );
 		}
+		if ( (uoLeerChar(&Lectura,UN_MICROSEGUNDO)) > 0 ) {
+			ai_cargar_caracter( Lectura );
+		}
+		// Lo hacemos dos veces por si la frecuencia de PC es más rápida.
+		// Esperando UN_MICROSEGUNDO, toleramos discrepancia de 1000 ppm = 0,1%.
 
-		// Actualización de leds
-		LedsRTOS_ActualizarTodos ( 0 );  // "0" porque prefiero saltear operación que esperarla
+		/* Actualización de leds -----------------------------------------------*/
+		LedsRTOS_ActualizarTodos ( 0 );
+		// "0" porque prefiero saltear operación que esperarla
 
-		// Retardo sincronizado
+		/* Actualizamos botones ------------------------------------------------*/
+		ConteoParaBotones++;
+		if(ConteoParaBotones%5==0) BotonesRTOS_ActualizarTodo ( 0 );
+		// Actualizamos cada 5 ms en una tarea con período de 1 ms.
+
+		/* Retardo sincronizado ------------------------------------------------*/
 		vTaskDelayUntil( &Tiempo0, PERIODO_1MS );
 	}
 }
@@ -189,8 +207,9 @@ void Tarea_PALTA_1ms( void *pvParameters )
  * @brief	Tarea que se actualiza con MEDIA RPIORIDAD cada 10 ms
  * @param	Ninguno
  * @descripcion:
- * 	Incluye:
- * 	- Actualización de botones.
+ * 	- Procesamiento de mensajes.
+ * Las funciones de esta tarea podrían demorar más de 10 ms.
+ * Utilizamos vTaskDelay() porque no es tan crítico el sincronismo.
  */
 void Tarea_PMEDIA_10ms ( void *pvParameters )
 {
@@ -198,16 +217,15 @@ void Tarea_PMEDIA_10ms ( void *pvParameters )
 	char *pcTaskName = (char *) pcTaskGetName( NULL );
 	uoEscribirTxt3 ( "MSJ ", pcTaskName, " esta ejecutandose.\n\r" );
 
-	/* Ciclo infinito, como la mayoría de las tareas: */
+	/* Ciclo infinito: */
 	for( ;; )
 	{
-		BotonesRTOS_ActualizarTodo ( portMAX_DELAY );
-		//ai_procesar_mensaje();
-		vTaskDelay( PERIODO_10MS );  // Se supone que no es tan crítico el sincronismo.
+		ai_procesar_mensajes();
+		//apli_separador(".");
+		vTaskDelay( PERIODO_10MS );
 	}
 }
 
-
-/*---------------------------------------------------------------------
-  FIN DE ARCHIVO
-----------------------------------------------------------------------*/
+/**************************************************************************************************
+*   FIN DE ARCHIVO
+**************************************************************************************************/

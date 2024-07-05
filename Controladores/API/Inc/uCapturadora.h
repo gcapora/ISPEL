@@ -19,7 +19,7 @@
 
 #define U_ENTRADAS_CANTIDAD       				2
 #define U_NUM_MAX_CAPTURAS_PROMEDIAR			16
-#define U_LARGO_CAPTURA								100	// Total de muestras a capturar (incluye PRE_DISPARO y POS_DISPARO)
+#define U_LARGO_CAPTURA								6000	// Total de muestras a capturar (incluye PRE_DISPARO y POS_DISPARO)
 
 #define CAPTURA_UNICA								0b00000001
 #define CAPTURA_CONTINUA							0b00000010  // Sin habilitar por ahora
@@ -37,7 +37,8 @@ typedef enum {
 	ENTRADA_2,
 	ENTRADAS_TODAS,
 	ORIGEN_ALTERNADO = ENTRADAS_TODAS,
-	ORIGEN_ASINCRONICO
+	ORIGEN_ASINCRONICO,
+	ENTRADA_NO_IDENTIFICADA
 } entrada_id_e;
 
 typedef enum {

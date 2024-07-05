@@ -20,11 +20,13 @@ extern "C" {
 
 #define CMD_HOLA				"HOLA"
 #define CMD_CAPTURADORA		"CAPTU"
-#define CMD_ENTRADA			"ENTRADA"
+#define CMD_ENTRADA_1		"E1"
+#define CMD_ENTRADA_2		"E2"
+#define CMD_ENTRADA_X		"EX"
 #define CMD_GENERADOR		"GEN"
 #define CMD_SALIDA_1			"S1"
 #define CMD_SALIDA_2			"S2"
-#define CMD_SALIDA_X			"TODOS"
+#define CMD_SALIDA_X			"SX"
 #define CMD_CONFIGURAR		"CONFIG"
 #define CMD_OBTENER			"OBTENER"
 #define CMD_INICIAR			"INICIAR"
@@ -39,9 +41,26 @@ extern "C" {
 
 /****** Definiciones públicas de tipos de datos (public typedef) *********************************/
 
+typedef enum {
+	TIPO_SENIAL,
+	FREC_SENIAL,
+	FASE_SENIAL,
+	VMAX_SENIAL,
+	VMIN_SENIAL,
+	SIM_SENIAL,
+	ACOPLE_SENIAL,
+	ESCALA,
+	ORIGEN,
+	PROMEDIO,
+	NIVEL,
+	FLANCO,
+	NUM_ATRIBUTOS,
+	ATRIBUTO_NO_IDENTIFICADO
+} atributo_e;
 
 /****** Declaraciones de datos externos **********************************************************/
 
+extern char * ATRIBUTO_ID_TXT[];
 
 /****** Declaración de funciones públicas ********************************************************/
 

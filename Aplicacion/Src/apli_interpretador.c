@@ -18,17 +18,6 @@
 
 typedef char mensaje_t[MENSAJE_LARGO_MAX+1];
 typedef char atributo_valor_t[VALOR_LARGO_MAX+1];
-typedef enum {
-	TIPO_SENIAL,
-	FREC_SENIAL,
-	FASE_SENIAL,
-	VMAX_SENIAL,
-	VMIN_SENIAL,
-	SIM_SENIAL,
-	ACOPLE_SENIAL,
-	NUM_ATRIBUTOS,
-	ATRIBUTO_NO_IDENTIFICADO
-} atributo_e;
 
 /* Definiciones privadas de constantes ***********************************************************/
 
@@ -37,24 +26,29 @@ typedef enum {
 
 static mensaje_t	BuferLectura = {0};  // Debo asegurar un '\0' al final
 static uint32_t	LargoMensaje = 0;
-static char *		ATRIBUTO_ID_TXT [NUM_ATRIBUTOS] = {0};
-//static bool			AtributoLeido [NUM_ATRIBUTOS] = {0};
 QueueHandle_t 		xColaMensajesParaInterpretar;
 
-/* Variables importadas **************************************************************************/
+/* Variables públicas **************************************************************************/
 
+char *	ATRIBUTO_ID_TXT [NUM_ATRIBUTOS] = {0};
 
 /* Private function prototypes *******************************************************************/
 
-bool		caracter_validado( char * );
-bool		comparar_texto( char *, char * );
-void 		cmd_capturadora( char * );
-void 		cmd_generador( char * );
-char* 	subcomando( char *, char * );
-char*		obtener_atributo( char *, atributo_e *, atributo_valor_t );
-bool		cargar_atributo_gen( gen_conf_s *, atributo_e, atributo_valor_t );
-gen_id_e	identificar_generador( char * );
-uint32_t	indice_char_buscado(char *, char );
+bool		caracter_validado ( char* );
+bool		comparar_texto    ( char*, char* );
+
+void 		cmd_generador     ( char* );
+void 		cmd_capturadora   ( char* );
+void		cmd_entrada			( char* );
+char* 	subcomando        ( char*, char* );
+
+char*		obtener_atributo			( char*,                 atributo_e*, atributo_valor_t );
+bool		cargar_atributo_gen		( gen_conf_s*,           atributo_e,  atributo_valor_t );
+bool		cargar_atributo_captu	( capturadora_config_s*, atributo_e,  atributo_valor_t );
+bool		cargar_atributo_entrada	( entrada_config_s*,     atributo_e,  atributo_valor_t );
+
+gen_id_e			identificar_generador ( char* );
+entrada_id_e	identificar_entrada ( char* );
 
 /* Public function *******************************************************************************/
 
@@ -67,13 +61,18 @@ bool ai_inicializar( void )
 	if (xColaMensajesParaInterpretar != NULL) RETORNO = true;
 
 	// Textos de atributos
-	ATRIBUTO_ID_TXT [TIPO_SENIAL]   = "TIPO";
-	ATRIBUTO_ID_TXT [FREC_SENIAL]   = "FREC";
-	ATRIBUTO_ID_TXT [FASE_SENIAL]   = "FASE";
-	ATRIBUTO_ID_TXT [VMAX_SENIAL]   = "VMAX";
-	ATRIBUTO_ID_TXT [VMIN_SENIAL]   = "VMIN";
-	ATRIBUTO_ID_TXT [SIM_SENIAL]    = "SIM";
-	ATRIBUTO_ID_TXT [ACOPLE_SENIAL] = "ACOPLE";
+	ATRIBUTO_ID_TXT [TIPO_SENIAL]		= "TIPO";
+	ATRIBUTO_ID_TXT [FREC_SENIAL]		= "FREC";
+	ATRIBUTO_ID_TXT [FASE_SENIAL]		= "FASE";
+	ATRIBUTO_ID_TXT [VMAX_SENIAL]		= "VMAX";
+	ATRIBUTO_ID_TXT [VMIN_SENIAL]		= "VMIN";
+	ATRIBUTO_ID_TXT [SIM_SENIAL]		= "SIM";
+	ATRIBUTO_ID_TXT [ACOPLE_SENIAL]	= "ACOPLE";
+	ATRIBUTO_ID_TXT [ESCALA] 			= "ESCALA";
+	ATRIBUTO_ID_TXT [ORIGEN] 			= "ORIGEN";
+	ATRIBUTO_ID_TXT [PROMEDIO] 		= "PROM";
+	ATRIBUTO_ID_TXT [NIVEL] 			= "NIVEL";
+	ATRIBUTO_ID_TXT [FLANCO] 			= "FLANCO";
 
 	// Fin
 	return RETORNO;
@@ -226,6 +225,11 @@ void cmd_capturadora( char * COMANDO )
 {
 	// Variables locales
 	char * SUBCMD = subcomando( COMANDO, CMD_CAPTURADORA );
+	char * TEXTO = NULL;
+	bool_t	DeboConfigurar = false;
+	capturadora_config_s CCONFIG = {0};
+	atributo_valor_t	AtributoValorTxt = {0};
+	atributo_e			AtributoId = ATRIBUTO_NO_IDENTIFICADO;
 
 	// Analizo subcomando
 
@@ -239,19 +243,105 @@ void cmd_capturadora( char * COMANDO )
 
 	// CONFIGURAR
 	} else if (comparar_texto(SUBCMD,CMD_CONFIGURAR)) {
-		apli_mensaje( "Aun no puedo configurar Capturadora...", portMAX_DELAY );
+		TEXTO = subcomando( SUBCMD, CMD_CONFIGURAR );
+		// Obtengo parámetros actuales
+		CaptuRTOS_Obtener ( &CCONFIG, portMAX_DELAY );
+		// Busco parámetros nuevos
+		do {
+			TEXTO = obtener_atributo( TEXTO, &AtributoId, AtributoValorTxt );
+			if(AtributoId<NUM_ATRIBUTOS) {
+				// apli_mensaje( ATRIBUTO_ID_TXT[AtributoId], portMAX_DELAY );
+				// apli_mensaje( AtributoValorTxt, portMAX_DELAY );
+				if(true==cargar_atributo_captu(&CCONFIG, AtributoId, AtributoValorTxt))
+					DeboConfigurar = true;
+			}
+		} while(AtributoId<NUM_ATRIBUTOS);
+		if(true==DeboConfigurar) {
+			//apli_mensaje( "Intentamos configurar.", portMAX_DELAY );
+			CaptuRTOS_Configurar( &CCONFIG, portMAX_DELAY );
+		}
+		//apli_mensaje( "Aun no puedo configurar Capturadora...", portMAX_DELAY );
 
-	// CONFIGURAR
+	// OBTENER
 	} else if (comparar_texto(SUBCMD,CMD_OBTENER)) {
-		apli_mensaje( "Debo enviarte configuraciones de capturadora...", portMAX_DELAY );
+		CaptuRTOS_EscribirConfiguraciones(portMAX_DELAY);
 
 	// ENTRADA
-	} else if (comparar_texto(SUBCMD,CMD_ENTRADA)) {
-		apli_mensaje( "Debo ver ENTRADA...", portMAX_DELAY );
+	} else if (identificar_entrada(SUBCMD) <= ENTRADAS_TODAS) {
+		cmd_entrada(SUBCMD);
 
 	// Subcomando NO RECONOCIDO
 	} else {
 		apli_mensaje( "Comando de Capturadora no reconocido.", portMAX_DELAY );
+	}
+}
+
+void cmd_entrada( char* COMANDO )
+{
+	// Variables locales
+	char *	ATRIBUTOS = NULL;
+	char *	SUBCMD = NULL;
+	bool_t	DeboConfigurar = false;
+	entrada_id_e	EntradaId = ENTRADA_NO_IDENTIFICADA;
+	entrada_config_s	EntradaConfig = {0};
+	atributo_valor_t	AtributoValorTxt = {0};
+	atributo_e			AtributoId = ATRIBUTO_NO_IDENTIFICADO;
+
+	// Identifico ENTRADA y apunto subcomando
+	EntradaId = identificar_entrada ( COMANDO );
+	if (EntradaId==ENTRADA_1) {
+		SUBCMD = subcomando( COMANDO, CMD_ENTRADA_1 );
+	} else if (EntradaId==ENTRADA_2) {
+		SUBCMD = subcomando( COMANDO, CMD_ENTRADA_2 );
+	} else if (EntradaId==ENTRADAS_TODAS) {
+		SUBCMD = subcomando( COMANDO, CMD_SALIDA_X );
+	} else {
+		apli_mensaje( "CAPTU ENTRADA no reconocida...", portMAX_DELAY );
+		return;
+	}
+
+	// Analizo subcomando
+
+	// ENCENDER
+	if (comparar_texto(SUBCMD,CMD_ENCENDER)) {
+		if(false==CaptuRTOS_EntradaEncender(EntradaId,portMAX_DELAY)) {
+			apli_mensaje( "CAPTU No pudimos encender ENTRADA.", portMAX_DELAY );
+		}
+	}
+
+	// APAGAR
+	if (comparar_texto(SUBCMD,CMD_APAGAR)) {
+		if(false==CaptuRTOS_EntradaApagar(EntradaId,portMAX_DELAY)) {
+			apli_mensaje( "CAPTU No pudimos apagar ENTRADA.", portMAX_DELAY );
+		}
+	}
+
+	// CONFIGURAR
+	if (comparar_texto(SUBCMD,CMD_CONFIGURAR)) {
+		ATRIBUTOS = subcomando( SUBCMD, CMD_CONFIGURAR );
+		// Obtengo parámetros actuales
+		if (ENTRADA_2==EntradaId) {
+			CaptuRTOS_EntradaObtener ( ENTRADA_2, &EntradaConfig, portMAX_DELAY );
+		} else {
+			CaptuRTOS_EntradaObtener ( ENTRADA_1, &EntradaConfig, portMAX_DELAY );
+		}
+		// Busco atributos
+		do {
+			ATRIBUTOS = obtener_atributo( ATRIBUTOS, &AtributoId, AtributoValorTxt );
+			if(AtributoId<NUM_ATRIBUTOS) {
+				if(true==cargar_atributo_entrada(&EntradaConfig, AtributoId, AtributoValorTxt)) {
+					//uoEscribirTxtReal("Nivel=", EntradaConfig.EscalaVertical, 3);
+					DeboConfigurar = true;
+				}
+				//apli_mensaje( ATRIBUTO_ID_TXT[AtributoId], portMAX_DELAY );
+				//apli_mensaje( AtributoValorTxt, portMAX_DELAY );
+			}
+		} while(AtributoId<NUM_ATRIBUTOS);
+		if(true==DeboConfigurar) {
+			apli_mensaje( "Intentamos configurar.", portMAX_DELAY );
+			//uoEscribirTxtReal("Nivel=", EntradaConfig->EscalaVertical, 3);
+			CaptuRTOS_EntradaConfigurar( EntradaId, &EntradaConfig, portMAX_DELAY );
+		}
 	}
 }
 
@@ -265,7 +355,6 @@ void cmd_generador( char * COMANDO )
 	gen_conf_s	GeneradorConfig = {0};
 	atributo_valor_t	AtributoValorTxt = {0};
 	atributo_e			AtributoId = ATRIBUTO_NO_IDENTIFICADO;
-
 
 	// Analizo subcomando
 
@@ -348,20 +437,32 @@ gen_id_e identificar_generador (char * TEXTO)
 	gen_id_e Generador = GENERADOR_NO_IDENTIFICADO;
 	if (comparar_texto(TEXTO,CMD_SALIDA_1)) {
 		Generador = GENERADOR_1;
-		//TEXTO = subcomando( TEXTO, CMD_SALIDA_1 );
 	} else if (comparar_texto(TEXTO,CMD_SALIDA_2)) {
 		Generador = GENERADOR_2;
-		//TEXTO = subcomando( TEXTO, CMD_SALIDA_2 );
 	} else if (comparar_texto(TEXTO,CMD_SALIDA_X)) {
 		Generador = GENERADORES_TODOS;
-		//TEXTO = subcomando( TEXTO, CMD_SALIDA_X );
 	}
 	if(Generador==GENERADOR_NO_IDENTIFICADO)
 		apli_mensaje( "Generador no identificado.", portMAX_DELAY );
 	return Generador;
 }
 
-char * obtener_atributo( char * TEXTO, atributo_e * P_ATRIB_HALLADO, atributo_valor_t ATRIB_VALOR )
+entrada_id_e identificar_entrada ( char * TEXTO )
+{
+	entrada_id_e Entrada = ENTRADA_NO_IDENTIFICADA;
+	if (comparar_texto(TEXTO,CMD_ENTRADA_1)) {
+		Entrada = ENTRADA_1;
+	} else if (comparar_texto(TEXTO,CMD_ENTRADA_2)) {
+		Entrada = ENTRADA_2;
+	} else if (comparar_texto(TEXTO,CMD_ENTRADA_X)) {
+		Entrada = ENTRADAS_TODAS;
+	}
+	if(Entrada==ENTRADA_NO_IDENTIFICADA)
+		apli_mensaje( "ENTRADA no identificada.", portMAX_DELAY );
+	return Entrada;
+}
+
+char* obtener_atributo( char * TEXTO, atributo_e * P_ATRIB_HALLADO, atributo_valor_t ATRIB_VALOR )
 {
 	// Variables locales ---------------------------------------------
 	char *	AtributoAnalizado = NULL;
@@ -482,6 +583,97 @@ bool cargar_atributo_gen(gen_conf_s * CONFIG, atributo_e ATRID, atributo_valor_t
 		RET = false;
 	}
 
+	return RET;
+}
+
+bool cargar_atributo_captu( capturadora_config_s * CCONFIG, atributo_e ATRID, atributo_valor_t ATRVLR )
+{
+	// Variables locales:
+	bool		RET = false;
+	double	NUM = 0;
+	char*		RETCON = NULL;
+
+	// Evalúo:
+	switch (ATRID) {
+	case ESCALA:
+		NUM = strtod(ATRVLR, &RETCON);
+		if(NUM>0) {
+			CCONFIG->EscalaHorizontal = NUM;
+			RET = true;
+		}
+		break;
+
+	case ORIGEN:
+		if       (0==strcmp(CMD_ENTRADA_1, ATRVLR)) {
+			CCONFIG->OrigenDisparo = ENTRADA_1;
+			RET = true;
+		} else if(0==strcmp(CMD_ENTRADA_2, ATRVLR)) {
+			CCONFIG->OrigenDisparo = ENTRADA_2;
+			RET = true;
+		}
+		break;
+
+	case PROMEDIO:
+		NUM = strtod(ATRVLR, &RETCON);
+		if(NUM>=0) {
+			RET=true;
+			CCONFIG->ModoCaptura = CAPTURA_UNICA;
+			if(NUM>=16) {
+				CCONFIG->ModoCaptura |= CAPTURA_PROMEDIADA_16;
+			} else if(NUM>=4) {
+				CCONFIG->ModoCaptura |= CAPTURA_PROMEDIADA_4;
+			}
+		}
+		break;
+
+	default:
+		RET = false;
+	}
+
+	// Chau!
+	return RET;
+}
+
+bool cargar_atributo_entrada( entrada_config_s * PECONFIG, atributo_e ATRID, atributo_valor_t ATRVLR )
+{
+	// Variables locales:
+	bool		RET = false;
+	double	NUM = 0;
+	char*		RETCON = NULL;
+
+	// Evalúo:
+	switch (ATRID) {
+	case ESCALA:
+		NUM = strtod(ATRVLR, &RETCON);
+		if(NUM>0) {
+			PECONFIG->EscalaVertical = NUM;
+			RET = true;
+		}
+		break;
+
+	case FLANCO:
+		if (0==strcmp("SUBIDA", ATRVLR)) {
+			PECONFIG->FlancoDisparo = SUBIDA;
+			RET = true;
+		} else if(0==strcmp("BAJADA", ATRVLR)) {
+			PECONFIG->FlancoDisparo = BAJADA;
+			RET = true;
+		}
+		break;
+
+	case NIVEL:
+		NUM = strtod(ATRVLR, &RETCON);
+		if(*RETCON == '\0') {
+			PECONFIG->NivelDisparo = NUM;
+			RET = true;
+		}
+		break;
+
+	default:
+		RET = false;
+	}
+
+	// Chau!
 	return RET;
 }
 

@@ -1,9 +1,8 @@
 /**************************************************************************************************
-* @file		....c
+* @file		Captu_RTOS.c
 * @author	Guillermo Caporaletti
-* @brief
-* @date
-*
+* @brief		Funciones de manejo de CAPTURADORA en FreeRTOS.
+* @date		2024
 **************************************************************************************************/
 
 
@@ -22,8 +21,9 @@
 
 /****** Definición de datos privados *************************************************************/
 
-SemaphoreHandle_t CaptuMutexAdmin;	// Esta variable global administra el manejo del semáforo
-												// que administra el acceso a las funciones.
+SemaphoreHandle_t 	CaptuMutexAdmin;	// Esta variable global administra el manejo del semáforo
+													// que administra el acceso a las funciones.
+capturadora_config_s CCONFIG = {0};
 
 /* Configuración ADC */
 capturadora_config_s CAPTU_CONFIG    = {0};
@@ -38,9 +38,8 @@ const char * Entrada_2 = "ENTRADA 2";
 
 /****** Declaración de funciones privadas ********************************************************/
 
-
-/****** Definición de funciones privadas *********************************************************/
-
+void escribir_entrada(entrada_id_e);
+void escribir_captu();
 
 /****** Definición de funciones públicas *********************************************************/
 
@@ -52,15 +51,12 @@ const char * Entrada_2 = "ENTRADA 2";
 bool CaptuRTOS_Inicializar (void)
 {
 	bool_t RET = true;
-
 	// Inicializamos interfase uCapturadora
 	if ( !uCapturadoraInicializar() ) RET = false;
-
-	// Creamos un semáforo Mutex para el acceso concurrente a leds
+	// Semáforo Mutex para acceso concurrente a leds
 	CaptuMutexAdmin = xSemaphoreCreateMutex();
 	configASSERT ( NULL != CaptuMutexAdmin );
-
-	// Terminada la inicialización...
+	// Chau!
 	return RET;
 }
 
@@ -95,12 +91,13 @@ bool CaptuRTOS_Parar ( TickType_t ESPERA )
 	return RET;
 }
 
-bool CaptuRTOS_Configurar ( capturadora_config_s * CCONFIG, TickType_t ESPERA )
+bool CaptuRTOS_Configurar ( capturadora_config_s * PCCONFIG, TickType_t ESPERA )
 {
 	bool_t RET = false;
 	if(pdTRUE == xSemaphoreTake( CaptuMutexAdmin, ESPERA )) {
-		if(uCapturadoraConfigurar(CCONFIG)) {
-			uoEscribirTxt ("MSJ Configuramos Capturadora. \n\r");
+		if(uCapturadoraConfigurar(PCCONFIG)) {
+			escribir_captu();
+			//uoEscribirTxt ("MSJ Configuramos Capturadora. \n\r");
 			RET = true;
 		}
 		xSemaphoreGive( CaptuMutexAdmin );
@@ -108,11 +105,11 @@ bool CaptuRTOS_Configurar ( capturadora_config_s * CCONFIG, TickType_t ESPERA )
 	return RET;
 }
 
-bool CaptuRTOS_Obtener ( capturadora_config_s * CCONFIG, TickType_t ESPERA )
+bool CaptuRTOS_Obtener ( capturadora_config_s * PCCONFIG, TickType_t ESPERA )
 {
 	bool_t RET = false;
 	if(pdTRUE == xSemaphoreTake( CaptuMutexAdmin, ESPERA )) {
-		if(uCapturadoraObtener(CCONFIG)) {
+		if(uCapturadoraObtener(PCCONFIG)) {
 			RET = true;
 		}
 		xSemaphoreGive( CaptuMutexAdmin );
@@ -124,8 +121,11 @@ bool CaptuRTOS_EscribirConfiguraciones ( TickType_t ESPERA )
 {
 	bool_t RET = false;
 	if(pdTRUE == xSemaphoreTake( CaptuMutexAdmin, ESPERA )) {
-		if(uCapturadoraParar()) {
-			uoEscribirTxt ("MSJ (aqui debemos escribir la configuracion) \n\r");
+		if(uCapturadoraObtener(&CCONFIG)) {
+			tomar_escritura(ESPERA);
+			escribir_captu();
+			escribir_entrada(ENTRADAS_TODAS);
+			devolver_escritura();
 			RET = true;
 		}
 		xSemaphoreGive( CaptuMutexAdmin );
@@ -138,7 +138,9 @@ bool CaptuRTOS_EntradaConfigurar ( entrada_id_e ID, entrada_config_s * ECONFIG, 
 	bool_t RET = false;
 	if(pdTRUE == xSemaphoreTake( CaptuMutexAdmin, ESPERA )) {
 		if(uCapturadoraEntradaConfigurar(ID, ECONFIG)) {
-			uoEscribirTxt ("MSJ Configuramos ENTRADA de CAPTURADORA. \n\r");
+			uoEscribirTxt ("MSJ Configuramos ENTRADA de CAPTU: ");
+			uoEscribirTxtReal ("Nivel=", ECONFIG->NivelDisparo,3 );
+			uoEscribirTxt ("\n");
 			RET = true;
 		}
 		xSemaphoreGive( CaptuMutexAdmin );
@@ -350,6 +352,70 @@ void CaptuRTOS_ImprimirSenial32 (void)
 	uoEscribirTxtUint ( "( Escrito en ", Tiempo );
 	uoEscribirTxt     ( " ms. )\n\r" );
 
+}
+
+/****** Definición de funciones privadas *********************************************************/
+
+void escribir_entrada(entrada_id_e ID)
+{
+	entrada_config_s ECONFIG = {0};
+	if(ENTRADAS_TODAS==ID) {
+		escribir_entrada(ENTRADA_1);
+		escribir_entrada(ENTRADA_2);
+	} else if(uCapturadoraEntradaObtener(ID,&ECONFIG)) {
+		// ID de entrada
+		if(ID==ENTRADA_1){
+			uoEscribirTxt("MSJ CAPTU E1 CONFIGURADA");
+		} else if(ID==ENTRADA_2){
+			uoEscribirTxt("MSJ CAPTU E2 CONFIGURADA");
+		} else{
+			uoEscribirTxt("MSJ CAPTU ENTRADA desconocida");
+		}
+		// Encendida?
+		if(ECONFIG.Encendida) {
+			uoEscribirTxt(" ENCENDIDA=SI");
+		} else {
+			uoEscribirTxt(" ENCENDIDA=NO");
+		}
+		// Escala vertical
+		uoEscribirTxtReal(" ESCALA=",ECONFIG.EscalaVertical,3);
+		// Disparo
+		uoEscribirTxtReal(" NIVEL=",ECONFIG.NivelDisparo,3);
+		if(ECONFIG.FlancoDisparo==SUBIDA) {
+			uoEscribirTxt(" FLANCO=SUBIDA");
+		} else if (ECONFIG.FlancoDisparo==BAJADA) {
+			uoEscribirTxt(" FLANCO=BAJADA");
+		} else {
+			uoEscribirTxt(" FLANCO=desconocido");
+		}
+		uoEscribirTxt("\n");
+	}
+}
+
+void escribir_captu( void )
+{
+	uCapturadoraObtener(&CCONFIG);
+	uoEscribirTxtReal("MSJ CAPTU CONFIGURADO ESCALA=",CCONFIG.EscalaHorizontal,6);
+	switch (CCONFIG.OrigenDisparo) {
+	case ENTRADA_1:
+		uoEscribirTxt(" ORIGEN=E1");
+		break;
+	case ENTRADA_2:
+		uoEscribirTxt(" ORIGEN=E2");
+		break;
+	case ORIGEN_ASINCRONICO:
+		uoEscribirTxt(" ORIGEN=ASINCRONICO");
+		break;
+	default:
+		uoEscribirTxt("");
+	}
+	if (CCONFIG.ModoCaptura & CAPTURA_PROMEDIADA_4)
+		uoEscribirTxt(" PROM=4");
+	if (CCONFIG.ModoCaptura & CAPTURA_PROMEDIADA_16)
+		uoEscribirTxt(" PROM=16");
+	if (false==(CCONFIG.ModoCaptura&MASCARA_PROMEDIO))
+		uoEscribirTxt(" PROM=1");
+	uoEscribirTxt("\n");
 }
 
 /****************************************************************** FIN DE ARCHIVO ***************/

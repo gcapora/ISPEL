@@ -51,11 +51,14 @@ void escribir_captu();
 bool CaptuRTOS_Inicializar (void)
 {
 	bool_t RET = true;
+
 	// Inicializamos interfase uCapturadora
 	if ( !uCapturadoraInicializar() ) RET = false;
+
 	// Semáforo Mutex para acceso concurrente a leds
 	CaptuMutexAdmin = xSemaphoreCreateMutex();
 	configASSERT ( NULL != CaptuMutexAdmin );
+
 	// Chau!
 	return RET;
 }
@@ -204,26 +207,26 @@ void Tarea_Capturadora( void *pvParameters )
 	uCapturadoraObtener		( &CAPTU_CONFIG );
 	CAPTU_CONFIG.EscalaHorizontal = 2/FREC_TESTIGO;
 	CAPTU_CONFIG.ModoCaptura      = CAPTURA_PROMEDIADA_16;
+	CAPTU_CONFIG.OrigenDisparo		= ENTRADA_1;
 	uCapturadoraConfigurar	( &CAPTU_CONFIG );
-	P_Senial_E1 = uCapturadoraSenialObtener ( ENTRADA_1 );
-	P_Senial_E2 = uCapturadoraSenialObtener ( ENTRADA_2 );
+	P_Senial_E1 = uCapturadoraLeerSenial ( ENTRADA_1 );
+	P_Senial_E2 = uCapturadoraLeerSenial ( ENTRADA_2 );
 
 	// Configuramos entradas de Capturadora
 
 	uCapturadoraEntradaObtener    ( ENTRADA_1, &ENTRADA_CONFIG );
 	ENTRADA_CONFIG.EscalaVertical = 3;
-	ENTRADA_CONFIG.NivelDisparo   = 1.5;
+	ENTRADA_CONFIG.NivelDisparo   = 1.0;
 	ENTRADA_CONFIG.FlancoDisparo  = SUBIDA;
 	uCapturadoraEntradaConfigurar ( ENTRADA_1, &ENTRADA_CONFIG );
 	ENTRADA_CONFIG.EscalaVertical = 3;
-	ENTRADA_CONFIG.NivelDisparo   = 2.5;
+	ENTRADA_CONFIG.NivelDisparo   = 2.0;
 	ENTRADA_CONFIG.FlancoDisparo  = SUBIDA;
 	uCapturadoraEntradaConfigurar ( ENTRADA_2, &ENTRADA_CONFIG );
 	uCapturadoraEntradaEncender ( ENTRADA_1 );
 	uCapturadoraEntradaEncender ( ENTRADA_2 );
 
 	/* Como la mayoría de las tareas, ciclo infinito... */
-	//Tiempo0 = xTaskGetTickCount();
 	for( ;; )
 	{
 		/* ------------------------------------------------------------------------------------------
@@ -242,11 +245,11 @@ void Tarea_Capturadora( void *pvParameters )
 					if(uCapturadoraIniciar()) {
 						// Logramos iniciar captura. MENSAJE.
 						uoLedEncender ( UOSAL_PIN_LED_VERDE_INCORPORADO );
-						uoEscribirTxt ("MSJ Comenzamos captura (boton)... \n\r");
+						apli_mensaje ("Comenzamos captura (boton).", portMAX_DELAY );
 					} else {
 						// No pudimos iniciar captura.
 						// Esto no debería pasar, por lo que enviamos ADVERTENCIA.
-						uoEscribirTxt ("ADVERTENCIA No pudimos comenzar captura.\n\r");
+						apli_alerta ("No pudimos comenzar captura.");
 					}
 					xSemaphoreGive( CaptuMutexAdmin );
 				}
@@ -263,9 +266,7 @@ void Tarea_Capturadora( void *pvParameters )
 				uCapturadoraActualizar();
 				// Verificamos si debo imprimir una señal
 				if ( uCapturadoraSenialCargada() ){
-					uoEscribirTxt ( Barra );
-					CaptuRTOS_ImprimirSenial32();  // Esto debería adecuarse a un formato luego.
-					uoEscribirTxt ( Barra );
+					CaptuRTOS_ImprimirSenial32();
 					uoLedApagar ( UOSAL_PIN_LED_VERDE_INCORPORADO );
 				}
 				xSemaphoreGive( CaptuMutexAdmin );
@@ -278,80 +279,70 @@ void Tarea_Capturadora( void *pvParameters )
 
 void CaptuRTOS_ImprimirSenial32 (void)
 {
-	// Variables locales:
-	uint32_t i, Muestra, MUESTRA_ENTRADA_1, MUESTRA_ENTRADA_2, Disparo, Tiempo;
+	// Variables locales
+	uint32_t i, Muestra, MUESTRA_ENTRADA_1, MUESTRA_ENTRADA_2, Tiempo, Disparo;
 	capturadora_config_s ConfigCaptura = {0};
 	entrada_config_s     ConfigEntrada = {0};
+	bool_t E1_ENCENDIDA = false;
+	bool_t E2_ENCENDIDA = false;
 
 	// Precondiciones
-	if ( NULL == P_Senial_E1 || NULL == P_Senial_E2 ) uoHuboErrorTxt ("en Imprimir... ppal.");
+	if ( NULL == P_Senial_E1 || NULL == P_Senial_E2 ) uoHuboErrorTxt ("en CaptuRTOS_Imprimir...");
 
-	// Asignaciones iniciales
-	Disparo = P_Senial_E1->Tiempo0;
+	// Imprimimos encabezado de señal
+	tomar_escritura(portMAX_DELAY);
+	uoEscribirTxt ( Barra );
+	uoEscribirTxt ("// Enviamos configuracion de capturadora, entradas y seniales\n");
+	escribir_captu();
 
-	// Escribimos última muestra:
-	uoEscribirTxt ("Senial cargada:");
-	uoEscribirTxt ("\n\rENT_1 \tENT_2\n\r");
-
-	Tiempo = uoMilisegundos();
-
-	for (i=0; i<U_LARGO_CAPTURA; i++) {
-
-		Muestra = P_Senial_E1->Muestras_p[i];
-		MUESTRA_ENTRADA_1 = ( Muestra & MASCARA_DERECHA16   );
-		MUESTRA_ENTRADA_2 = ( Muestra & MASCARA_IZQUIERDA16 ) >> 16;
-
-		if ( (i==Disparo) && (i>0) ) uoEscribirTxt ("---> Disparo <---\n\r");
-
-		uoEscribirUint ( MUESTRA_ENTRADA_1 );	// Dato de ENTRADA 1
-		uoEscribirTxt  ( "\t" );		// Tabulación
-		uoEscribirUint ( MUESTRA_ENTRADA_2 );	// Dato de ENTRADA 2
-		//uEscribirTxt  ( "\t" );		// Tabulación
-		//uEscribirUint ( CantidadProcesadas12[i] );	// Dato de ENTRADA 2
-		uoEscribirTxt  ( "\n\r" );
+	if(false==uCapturadoraEntradaObtener(ENTRADA_1,&ConfigEntrada))
+		apli_alerta("No se pudo imprimir E1.");
+	if(true==(E1_ENCENDIDA = ConfigEntrada.Encendida))
+		escribir_entrada(ENTRADA_1);
+	if(false==uCapturadoraEntradaObtener(ENTRADA_2,&ConfigEntrada))
+		apli_alerta("No se pudo imprimir E2.");
+	if(true==(E2_ENCENDIDA = ConfigEntrada.Encendida))
+		escribir_entrada(ENTRADA_2);
+	if(false==(E1_ENCENDIDA||E2_ENCENDIDA)) {
+		// Nada para imprimir
+		devolver_escritura();
+		return;
 	}
 
 	uCapturadoraObtener ( &ConfigCaptura );
 	uCapturadoraEntradaObtener ( ConfigCaptura.OrigenDisparo, &ConfigEntrada );
+	Disparo = P_Senial_E1->Tiempo0;
+	uoEscribirTxtUint	( "MSJ CapturasSincronizadas=", uCapturadoraObtenerSincronizadas() );
+	uoEscribirTxtUint	( " TiempoCaptura=", uCapturadoraObtenerTiempoCaptura() );
+	uoEscribirTxtUint	( " FM=", (uint32_t) round(uCapturadoraObtenerFrecuenciaMuestreo()) );
+	uoEscribirTxtUint	( " LARGO=", (uint32_t) U_LARGO_CAPTURA);
+	uoEscribirTxtUint	( " DISPARO=", Disparo);
+	uoEscribirTxt     ( "\n");
 
-	uoEscribirTxtUint	( "Capturas sincronizadas \t= ", uCapturadoraLeerSincronizadas() );
-	uoEscribirTxt		( "\n\r" );
-	uoEscribirTxtUint	( "Tiempo de captura \t= ", uCapturadoraLeerTiempoCaptura() );
-	uoEscribirTxt     	( " ms\n\r" );
-	uoEscribirTxtUint	( "Frecuencia muestreo \t= ", (uint32_t) round(uCapturadoraLeerFrecuenciaMuestreo()) );
-	uoEscribirTxt     	( " Hz\n\r");
+	// Imprimimos DATOS de señales
+	Tiempo = uoMilisegundos();
 
-	switch (ConfigCaptura.OrigenDisparo)
-	{
-		case ENTRADA_1:
-			uoEscribirTxt		( "Origen de disparo\t= ENTRADA 1\n\r" );
-			uoEscribirTxtUint	( "Nivel (10V) \t\t= ", (uint32_t) (10.0*ConfigEntrada.NivelDisparo) );
-		   uoEscribirTxt		( "\n\r" );
-		   break;
-		case ENTRADA_2:
-			uoEscribirTxt 		( "Origen de disparo\t= ENTRADA 2\n\r" );
-			uoEscribirTxtUint	( "Nivel (10V) \t\t= ", (uint32_t) (10.0*ConfigEntrada.NivelDisparo) );
-		   uoEscribirTxt		( "\n\r" );
-			break;
-		case ORIGEN_ASINCRONICO:
-			uoEscribirTxt 		( "Origen de disparo\t= ASINCRONICO\n\r" );
-			break;
-		default:
-			// nada
-			break;
-	  }
+	uoEscribirTxt("DATOS ");
+	if(E1_ENCENDIDA) uoEscribirTxt("E1 ");
+	if(E2_ENCENDIDA) uoEscribirTxt("E2 {\n");
 
-	uCapturadoraEntradaObtener ( ENTRADA_1, &ConfigEntrada );
-	uoEscribirTxtUint ( "Escala Entrada 1\t= ", (uint32_t) (uint32_t) round(10.0*ConfigEntrada.EscalaVertical) );
-	uoEscribirTxt     ( "\n\r" );
-	uCapturadoraEntradaObtener ( ENTRADA_2, &ConfigEntrada );
-	uoEscribirTxtUint ( "Escala Entrada 2\t= ", (uint32_t) (uint32_t) round(10.0*ConfigEntrada.EscalaVertical) );
-	uoEscribirTxt     ( "\n\r" );
+	for (i=0; i<U_LARGO_CAPTURA; i++) {
+		Muestra = P_Senial_E1->Muestras_p[i];
+		MUESTRA_ENTRADA_1 = ( Muestra & MASCARA_DERECHA16   );
+		MUESTRA_ENTRADA_2 = ( Muestra & MASCARA_IZQUIERDA16 ) >> 16;
+		if ( (i==Disparo) && (i>0) ) uoEscribirTxt ("// ---> Disparo <---\n");
+		if(E1_ENCENDIDA)						uoEscribirUint ( MUESTRA_ENTRADA_1 );	// Dato de ENTRADA 1
+		if(E1_ENCENDIDA && E2_ENCENDIDA)	uoEscribirTxt  ( "\t" );						// Separación de ENTRADA
+		if(E2_ENCENDIDA) 						uoEscribirUint ( MUESTRA_ENTRADA_2 );	// Dato de ENTRADA 2
+		uoEscribirTxt  ( "\n" );
+	}
+	uoEscribirTxt("}\n");  // Fin de DATOS
 
+	// Fin de impresión
 	Tiempo = uoMilisegundos()-Tiempo;
-	uoEscribirTxtUint ( "( Escrito en ", Tiempo );
-	uoEscribirTxt     ( " ms. )\n\r" );
-
+	uoEscribirTxtUintTxt ( "MSJ Captura escrita en ", Tiempo, " ms.\n" );
+	uoEscribirTxt ( Barra );
+	devolver_escritura();
 }
 
 /****** Definición de funciones privadas *********************************************************/

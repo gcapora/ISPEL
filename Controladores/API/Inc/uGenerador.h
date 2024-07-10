@@ -85,8 +85,8 @@ typedef enum {
 
 bool uGeneradorInicializar (gen_id_e);
 bool uGeneradorConfigurar  (gen_id_e, gen_conf_s *);
-bool uGeneradorLeerConfiguracion   (gen_id_e, gen_conf_s *);
-gen_estados_e uGeneradorLeerEstado (gen_id_e);
+bool uGeneradorObtener   (gen_id_e, gen_conf_s *);
+gen_estados_e uGeneradorObtenerEstado (gen_id_e);
 bool uGeneradorEncender    (gen_id_e);
 bool uGeneradorApagar      (gen_id_e);
 

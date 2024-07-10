@@ -15,7 +15,7 @@
 #ifndef U_LARGO_CAPTURA
 #define U_LARGO_CAPTURA				100
 #endif
-#define U_MUESTRAS_PRE_DISPARO		((uint32_t)( U_LARGO_CAPTURA / 4 ))	// Muestras que guarda previo al disparo (trigger)
+#define U_MUESTRAS_PRE_DISPARO		((uint32_t)( U_LARGO_CAPTURA / 2 ))	// Muestras que guarda previo al disparo (trigger)
 #define U_MUESTRAS_POS_DISPARO		((uint32_t)( U_LARGO_CAPTURA - U_MUESTRAS_PRE_DISPARO ))
 #define U_MUESTRAS_DESCARTADAS		10                                	// Muestras iniciales que dan valores erróneos
 #define U_SOBREMUESTREO          	((uint32_t)( U_LARGO_CAPTURA ))
@@ -196,17 +196,17 @@ bool uCapturadoraObtener ( capturadora_config_s * CONFIG)
 	return true;
 }
 
-double uCapturadoraLeerFrecuenciaMuestreo ( void )
+double uCapturadoraObtenerFrecuenciaMuestreo ( void )
 {
 	return Capturadora.FrecuenciaMuestreo;
 }
 
-uint8_t	uCapturadoraLeerSincronizadas	( void )
+uint8_t	uCapturadoraObtenerSincronizadas	( void )
 {
 	return (uint8_t) (CapturasObjetivo() - Capturadora.CapturasRestantes);
 }
 
-uint32_t	uCapturadoraLeerTiempoCaptura	( void )
+uint32_t	uCapturadoraObtenerTiempoCaptura	( void )
 {
 	return Capturadora.TiempoCaptura;
 }
@@ -232,7 +232,7 @@ bool uCapturadoraEntradaConfigurar 	( entrada_id_e ID, entrada_config_s * PCONFI
 	if ( U_ENTRADAS_CANTIDAD < ID ) return false;
 
 	// Configuramos estructura
-	EntradaAdmin[ID].Config.EscalaVertical  = uCapturadoraLeerEscalaVertical(PCONFIG->EscalaVertical);
+	EntradaAdmin[ID].Config.EscalaVertical  = uCapturadoraObtenerEscalaVertical(PCONFIG->EscalaVertical);
 	EntradaAdmin[ID].Config.NivelDisparo    = PCONFIG->NivelDisparo;
 	if ( EntradaAdmin[ID].Config.NivelDisparo > EntradaAdmin[ID].Config.EscalaVertical )
 		EntradaAdmin[ID].Config.NivelDisparo = EntradaAdmin[ID].Config.EscalaVertical;
@@ -275,12 +275,12 @@ bool uCapturadoraEntradaObtener ( entrada_id_e ID, entrada_config_s * PCONFIG)
 	}
 }
 
-senial_s * uCapturadoraSenialObtener ( entrada_id_e ID )
+senial_s * uCapturadoraLeerSenial ( entrada_id_e ID )
 {
 	return &SenialAdmin[ID];
 }
 
-float  uCapturadoraLeerEscalaVertical	( float VOLTIOS )
+float  uCapturadoraObtenerEscalaVertical	( float VOLTIOS )
 {
 	escala_vertical_e i=ESCALA_VERTICAL_1;
 	float retorno = EscalasVerticales[i];

@@ -255,7 +255,7 @@ void uoEscribirTxtReal ( const char * P_TEXTO, double REAL, uint8_t DECIMALES )
 		REAL= -REAL;
 	}
 	sprintf( (char *) ParteEntera, "%lu", (uint32_t) REAL );
-	REAL = (1.0 + REAL - (uint32_t)REAL) * Multiplica; // parte fraccional mas un digito inicial
+	REAL = round((1.0 + REAL - (uint32_t)REAL) * Multiplica); // parte fraccional mas un digito inicial
 	sprintf( (char *) Decimales  , "%lu", (uint32_t) REAL );
 
 	xSemaphoreTake( MutexEscribirAdmin, portMAX_DELAY );

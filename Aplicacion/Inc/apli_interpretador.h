@@ -35,6 +35,8 @@ extern "C" {
 #define CMD_APAGAR			"APAGAR"
 #define CMD_ESCRIBIR			"ESCRIBIR"
 #define CMD_LEER			   "LEER"
+#define CMD_MENSAJE			"MSJ"
+#define CMD_MENSAJE2			"//"
 
 #define MENSAJE_LARGO_MAX	100
 #define VALOR_LARGO_MAX		16

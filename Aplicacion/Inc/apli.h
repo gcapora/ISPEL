@@ -25,7 +25,7 @@ extern "C" {
 #include "Gen_RTOS.h"
 #include "Leds_RTOS.h"
 #include "Botones_RTOS.h"
-#include "tarea_test_1.h"
+#include "Test_RTOS.h"
 #include "apli_interpretador.h"
 
 /****** Definiciones públicas (macros) ***********************************************************/

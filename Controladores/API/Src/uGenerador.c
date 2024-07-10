@@ -324,7 +324,7 @@ bool uGeneradorApagar      (gen_id_e GEN)
 *          gen_config * donde se almacenará la configuración
 * @retval  true si la operación fue exitosa
 */
-bool uGeneradorLeerConfiguracion (gen_id_e GEN, gen_conf_s * CONFIG)
+bool uGeneradorObtener (gen_id_e GEN, gen_conf_s * CONFIG)
 {
    // Valido parámetro
    if ( GEN > CANTIDAD_GENERADORES ) uoHuboError();
@@ -343,7 +343,7 @@ bool uGeneradorLeerConfiguracion (gen_id_e GEN, gen_conf_s * CONFIG)
 * @param
 * @retval nada
 */
-gen_estados_e uGeneradorLeerEstado  (gen_id_e GEN)
+gen_estados_e uGeneradorObtenerEstado  (gen_id_e GEN)
 {
 	return Generador[GEN].Estado;
 }

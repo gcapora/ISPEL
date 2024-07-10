@@ -132,8 +132,11 @@ bool ai_procesar_mensajes( void )
 		} else if ( comparar_texto(MsjParaProcesar, CMD_GENERADOR) ){
 			cmd_generador( MsjParaProcesar );
 
+		} else if ( comparar_texto(MsjParaProcesar, CMD_MENSAJE) ||
+						comparar_texto(MsjParaProcesar, CMD_MENSAJE2)  ){
+			// No hago nada...
 		} else {
-			uoEscribirTxt( (char *) MsjParaProcesar);
+			apli_mensaje ("Comando no identificado.", portMAX_DELAY );
 		}
 
 	}
@@ -177,7 +180,8 @@ bool caracter_validado( char * PCARACTER )
 
 	// ¿Estamos leyendo el inicio de un mensaje?
 	} else if (EsPrimerCaracter) {
-		if ( 65<=*PCARACTER && 90>=*PCARACTER ) {
+		if ( (65<=*PCARACTER && 90>=*PCARACTER)
+			  || '/'==*PCARACTER                 ) {
 			RET = true;
 			EsPrimerCaracter = false;
 			EspacioPrevio = false;

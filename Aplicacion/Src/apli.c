@@ -39,13 +39,14 @@ TaskHandle_t TareaTest1_m;
 /****** Definición de datos públicos *************************************************************/
 
 boton_id_t  BotonEnPlaca;
+led_id_t    LedRojoEnPlaca, LedVerdeEnPlaca;
 
 /* Semáforos */
 SemaphoreHandle_t		MutexApliEscribir;  // Para integridad de escritura
 
 /* Mensajes... */
-const char *pcTextForMain = "Test ISPEL en ejecucion\r\n";
-const char *Barra         = "========================================\r\n";
+const char *pcTextForMain = "// ISPEL en ejecucion.\n";
+const char *Barra         = "// ===============================================\n";
 
 /****** Declaración de funciones privadas ********************************************************/
 
@@ -82,24 +83,27 @@ void apli_inicializar( void )
 
 	configASSERT( ERROR_BOTON != (BotonEnPlaca=BotonesRTOS_InicializarBoton(U_BOTON_EP)) );
 	configASSERT( NULL        != (MutexApliEscribir=xSemaphoreCreateMutex()) );
+	configASSERT( ERROR_LED   != (LedRojoEnPlaca = LedsRTOS_InicializarLed ( U_LED_ROJO_EP )) );
+	configASSERT( ERROR_LED   != (LedVerdeEnPlaca = LedsRTOS_InicializarLed ( U_LED_VERDE_EP )) );
+	configASSERT( LedsRTOS_ModoLed ( LedRojoEnPlaca, SUSPENSION ) );
+	configASSERT( LedsRTOS_EncenderLed (LedRojoEnPlaca)  );
+
+	uHALmapConfigurarFrecuencia( UHAL_MAP_PE5 , FREC_TESTIGO );  // Señal cuadrada testigo
+	uHALmapEncender            ( UHAL_MAP_PE5 );
 
 	// Mensaje de inicio de APLICACION -------------------------------------------------------------
 
+	tomar_escritura(portMAX_DELAY);
 	uoEscribirTxt ( "\r\n");
 	uoEscribirTxt ( Barra );
 	uoEscribirTxt ( pcTextForMain );
 	uoEscribirTxt ( Barra );
-
-	// Configuramos señal testigo a FREC_TESTIGO
-
-	uHALmapConfigurarFrecuencia( UHAL_MAP_PE5 , FREC_TESTIGO );
-	uHALmapEncender            ( UHAL_MAP_PE5 );
-	uoEscribirTxtUintTxt       ( "Frecuencia de senial cuadrada\t= ",
-			  	  	  	  	  	        (uint32_t) round( uHALmapObtenerFrecuencia(UHAL_MAP_PE5)),
-								        " Hz. \n\r" );
+	uoEscribirTxtUintTxt	( "MSJ Frecuencia de senial testigo (cuadrada) = ",
+			  	  	  	  	  	  (uint32_t) round( uHALmapObtenerFrecuencia(UHAL_MAP_PE5)), " Hz.\n" );
+	devolver_escritura();
 
 	// Probamos leds controlados por UOSAL
-
+	/*
   	uoLedEncender	(UOSAL_PIN_LED_VERDE_INCORPORADO);
   	uoLedEncender	(UOSAL_PIN_LED_AZUL_INCORPORADO);
   	uoLedEncender	(UOSAL_PIN_LED_ROJO_INCORPORADO);
@@ -107,6 +111,7 @@ void apli_inicializar( void )
   	uoEscribirTxt	("Espero 1 segundo con leds incorporados encendidos...\r\n");
   	uoEsperarMilis (1000);
   	uoLedApagar		(UOSAL_PIN_LED_VERDE_INCORPORADO);
+  	*/
 
 	// Creación de las tareas ---------------------------------------------------------------------
 
@@ -182,6 +187,7 @@ void Tarea_PALTA_1ms( void *pvParameters )
 		/* Verificamos lectura de UART -----------------------------------------*/
 		if ( (uoLeerChar(&Lectura,UN_MICROSEGUNDO)) > 0 ) {
 			ai_cargar_caracter( Lectura );
+			//uoEscribirTxt("-");
 		}
 		if ( (uoLeerChar(&Lectura,UN_MICROSEGUNDO)) > 0 ) {
 			ai_cargar_caracter( Lectura );

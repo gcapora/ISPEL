@@ -123,7 +123,7 @@ bool GenRTOS_Obtener ( gen_id_e ID, gen_conf_s * CONFIG, TickType_t ESPERA )
 {
 	bool_t RET = false;
 	if(pdTRUE == xSemaphoreTake( GenMutexAdmin, ESPERA )) {
-		if(uGeneradorLeerConfiguracion(ID,CONFIG)) {
+		if(uGeneradorObtener(ID,CONFIG)) {
 			RET = true;
 		}
 		xSemaphoreGive( GenMutexAdmin );
@@ -153,7 +153,7 @@ void escribir_salida(gen_id_e ID)
 	if(GENERADORES_TODOS==ID) {
 		escribir_salida(GENERADOR_1);
 		escribir_salida(GENERADOR_2);
-	} else if(uGeneradorLeerConfiguracion(ID,&CONFIG)) {
+	} else if(uGeneradorObtener(ID,&CONFIG)) {
 		if(ID==GENERADOR_1){
 			uoEscribirTxt("MSJ GEN S1 CONFIGURADO");
 		} else if(ID==GENERADOR_2){

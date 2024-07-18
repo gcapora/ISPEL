@@ -53,11 +53,12 @@ void 			apli_inicializar( void );
 void 			apli_alerta( const char * );
 BaseType_t	apli_mensaje( const char *, TickType_t );
 void			apli_separador(const char * );
+void			apli_latido(void);
 BaseType_t	tomar_escritura( TickType_t );
 BaseType_t	devolver_escritura( void );
 
-void Tarea_PALTA_1ms( void * );
-void Tarea_PMEDIA_10ms( void * );
+void Tarea_PALTA( void * );
+void Tarea_PMEDIA( void * );
 
 /*************************************************************************************************/
 #ifdef __cplusplus

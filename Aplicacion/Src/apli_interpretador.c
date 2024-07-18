@@ -12,7 +12,7 @@
 
 /* Private macro *********************************************************************************/
 
-#define MENSAJES_MAX_EN_COLA	5
+#define MENSAJES_MAX_EN_COLA	10
 
 /* Definiciones privadas de tipos de datos (private typedef) *************************************/
 
@@ -38,6 +38,7 @@ bool		caracter_validado ( char* );
 bool		comparar_texto    ( char*, char* );
 
 void 		cmd_generador     ( char* );
+void		cmd_salida			( char* );
 void 		cmd_capturadora   ( char* );
 void		cmd_entrada			( char* );
 char* 	subcomando        ( char*, char* );
@@ -61,7 +62,7 @@ bool ai_inicializar( void )
 	if (xColaMensajesParaInterpretar != NULL) RETORNO = true;
 
 	// Textos de atributos
-	ATRIBUTO_ID_TXT [TIPO_SENIAL]		= "TIPO";
+	ATRIBUTO_ID_TXT [TIPO]				= "TIPO";
 	ATRIBUTO_ID_TXT [FREC_SENIAL]		= "FREC";
 	ATRIBUTO_ID_TXT [FASE_SENIAL]		= "FASE";
 	ATRIBUTO_ID_TXT [VMAX_SENIAL]		= "VMAX";
@@ -135,6 +136,13 @@ bool ai_procesar_mensajes( void )
 		} else if ( comparar_texto(MsjParaProcesar, CMD_MENSAJE) ||
 						comparar_texto(MsjParaProcesar, CMD_MENSAJE2)  ){
 			// No hago nada...
+
+		} else if ( comparar_texto(MsjParaProcesar, CMD_TEST) ){
+			Test_Testear ( TEST_GENERAL, UN_SEGUNDO );
+
+		} else if ( comparar_texto(MsjParaProcesar, CMD_ESPERAR) ){
+			vTaskDelay( 5 * UN_SEGUNDO );
+
 		} else {
 			apli_mensaje ("Comando no identificado.", portMAX_DELAY );
 		}
@@ -298,7 +306,7 @@ void cmd_entrada( char* COMANDO )
 	} else if (EntradaId==ENTRADA_2) {
 		SUBCMD = subcomando( COMANDO, CMD_ENTRADA_2 );
 	} else if (EntradaId==ENTRADAS_TODAS) {
-		SUBCMD = subcomando( COMANDO, CMD_SALIDA_X );
+		SUBCMD = subcomando( COMANDO, CMD_ENTRADA_X );
 	} else {
 		apli_mensaje( "CAPTU ENTRADA no reconocida...", portMAX_DELAY );
 		return;
@@ -334,7 +342,6 @@ void cmd_entrada( char* COMANDO )
 			ATRIBUTOS = obtener_atributo( ATRIBUTOS, &AtributoId, AtributoValorTxt );
 			if(AtributoId<NUM_ATRIBUTOS) {
 				if(true==cargar_atributo_entrada(&EntradaConfig, AtributoId, AtributoValorTxt)) {
-					//uoEscribirTxtReal("Nivel=", EntradaConfig.EscalaVertical, 3);
 					DeboConfigurar = true;
 				}
 				//apli_mensaje( ATRIBUTO_ID_TXT[AtributoId], portMAX_DELAY );
@@ -342,8 +349,7 @@ void cmd_entrada( char* COMANDO )
 			}
 		} while(AtributoId<NUM_ATRIBUTOS);
 		if(true==DeboConfigurar) {
-			apli_mensaje( "Intentamos configurar.", portMAX_DELAY );
-			//uoEscribirTxtReal("Nivel=", EntradaConfig->EscalaVertical, 3);
+			//apli_mensaje( "Intentamos configurar.", portMAX_DELAY );
 			CaptuRTOS_EntradaConfigurar( EntradaId, &EntradaConfig, portMAX_DELAY );
 		}
 	}
@@ -353,41 +359,63 @@ void cmd_generador( char * COMANDO )
 {
 	// Variables locales
 	char *	SUBCMD = subcomando( COMANDO, CMD_GENERADOR );
-	char *	TEXTO = NULL;
-	bool_t	DeboConfigurar = false;
-	gen_id_e	GeneradorId = GENERADOR_NO_IDENTIFICADO;
+
+	// Analizo subcomando
+	// OBTENER
+	if (comparar_texto(SUBCMD,CMD_OBTENER)) {
+		GenRTOS_EscribirConfiguraciones(portMAX_DELAY);
+
+	// SALIDA
+	} else if (identificar_generador(SUBCMD) <= GENERADORES_TODOS) {
+		cmd_salida(SUBCMD);
+
+	// Subcomando NO RECONOCIDO
+	} else {
+		apli_mensaje( "Subomando GEN no reconocido.", portMAX_DELAY );
+	}
+}
+
+void cmd_salida( char* COMANDO )
+{
+	// Variables locales
+	char *		ATRIBUTOS = NULL;
+	char *		SUBCMD = NULL;
+	bool_t		DeboConfigurar = false;
+	gen_id_e		GeneradorId = GENERADOR_NO_IDENTIFICADO;
 	gen_conf_s	GeneradorConfig = {0};
 	atributo_valor_t	AtributoValorTxt = {0};
-	atributo_e			AtributoId = ATRIBUTO_NO_IDENTIFICADO;
+	atributo_e	AtributoId = ATRIBUTO_NO_IDENTIFICADO;
+
+	// Identifico Generador
+	GeneradorId = identificar_generador( COMANDO );
+	if (GeneradorId==GENERADOR_1) {
+		SUBCMD = subcomando( COMANDO, CMD_SALIDA_1 );
+	} else if (GeneradorId==GENERADOR_2) {
+		SUBCMD = subcomando( COMANDO, CMD_SALIDA_2 );
+	} else if (GeneradorId==GENERADORES_TODOS) {
+		SUBCMD = subcomando( COMANDO, CMD_SALIDA_X );
+	} else {
+		apli_mensaje( "GEN SALIDA no reconocida...", portMAX_DELAY );
+		return;
+	}
 
 	// Analizo subcomando
 
 	// ENCENDER
 	if (comparar_texto(SUBCMD,CMD_ENCENDER)) {
-		TEXTO = subcomando( SUBCMD, CMD_ENCENDER );
-		GeneradorId = identificar_generador( TEXTO );
-		if(GeneradorId<=CANTIDAD_GENERADORES)
-			GenRTOS_Encender( GeneradorId, portMAX_DELAY );
+		if(false==GenRTOS_Encender(GeneradorId, portMAX_DELAY)) {
+			apli_mensaje( "GEN No pudimos encender SALIDA.", portMAX_DELAY );
+		}
 
 	// APAGAR
 	} else if (comparar_texto(SUBCMD,CMD_APAGAR)) {
-		TEXTO = subcomando( SUBCMD, CMD_APAGAR );
-		GeneradorId = identificar_generador( TEXTO );
-		if(GeneradorId<=CANTIDAD_GENERADORES)
-			GenRTOS_Apagar( GeneradorId, portMAX_DELAY );
+		if(false==GenRTOS_Apagar(GeneradorId, portMAX_DELAY)) {
+			apli_mensaje( "GEN No pudimos apagar SALIDA.", portMAX_DELAY );
+		}
 
 	// CONFIGURAR
 	} else if (comparar_texto(SUBCMD,CMD_CONFIGURAR)) {
-		// Identifico Generador y actualizo TEXTO
-		TEXTO = subcomando( SUBCMD, CMD_CONFIGURAR );
-		GeneradorId = identificar_generador( TEXTO );
-		if (GeneradorId==GENERADOR_1) {
-			TEXTO = subcomando( TEXTO, CMD_SALIDA_1 );
-		} else if (GeneradorId==GENERADOR_2) {
-			TEXTO = subcomando( TEXTO, CMD_SALIDA_2 );
-		} else if (GeneradorId==GENERADORES_TODOS) {
-			TEXTO = subcomando( TEXTO, CMD_SALIDA_X );
-		}
+		ATRIBUTOS = subcomando( SUBCMD, CMD_CONFIGURAR );
 		// Obtengo parámetros actuales
 		if (GENERADOR_2==GeneradorId) {
 			GenRTOS_Obtener ( GENERADOR_2, &GeneradorConfig, portMAX_DELAY );
@@ -397,7 +425,7 @@ void cmd_generador( char * COMANDO )
 		// Busco atributos
 		if(GeneradorId<=CANTIDAD_GENERADORES) {
 			do {
-				TEXTO = obtener_atributo( TEXTO, &AtributoId, AtributoValorTxt );
+				ATRIBUTOS = obtener_atributo( ATRIBUTOS, &AtributoId, AtributoValorTxt );
 				if(AtributoId<NUM_ATRIBUTOS) {
 					if(true==cargar_atributo_gen(&GeneradorConfig, AtributoId, AtributoValorTxt))
 						DeboConfigurar = true;
@@ -406,20 +434,14 @@ void cmd_generador( char * COMANDO )
 				}
 			} while(AtributoId<NUM_ATRIBUTOS);
 			if(true==DeboConfigurar) {
-				apli_mensaje( "Intentamos configurar.", portMAX_DELAY );
 				GenRTOS_Configurar( GeneradorId,&GeneradorConfig, portMAX_DELAY );
 			}
-
 		}
 
 	// OBTENER
-	} else if (comparar_texto(SUBCMD,CMD_OBTENER)) {
-		GenRTOS_EscribirConfiguraciones(portMAX_DELAY);
-
-	// Subcomando NO RECONOCIDO
-	} else {
-		apli_mensaje( "Subomando GEN no reconocido.", portMAX_DELAY );
 	}
+	/*else if (comparar_texto(SUBCMD,CMD_OBTENER)) {
+		GenRTOS_EscribirConfiguraciones(portMAX_DELAY);*/
 }
 
 char* subcomando( char * MSJ, char * CMD )
@@ -519,7 +541,7 @@ bool cargar_atributo_gen(gen_conf_s * CONFIG, atributo_e ATRID, atributo_valor_t
 
 	// Evalúo:
 	switch (ATRID) {
-	case TIPO_SENIAL:
+	case TIPO:
 		if(0==strcmp("SENO", ATRVLR)    ||
 			0==strcmp("SENOIDAL", ATRVLR)  ) {
 			CONFIG->Tipo = SENOIDAL;

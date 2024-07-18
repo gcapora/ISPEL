@@ -1,0 +1,8 @@
+test
+gen apagar sx
+esperar
+gen config sx tipo=triangular frec=10000 fase=0 vmax=2.5 vmin=0.5 sim=0.5 acople=dc
+gen config s2 fase=45 sim=0.75
+gen encender sx
+esperar
+gen config s2 fase=90 sim=1

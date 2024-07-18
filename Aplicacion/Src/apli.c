@@ -79,6 +79,7 @@ void apli_inicializar( void )
 	configASSERT( true == GenRTOS_Inicializar()	   );
 	configASSERT( true == LedsRTOS_Inicializar()    );
 	configASSERT( true == BotonesRTOS_Inicializar()	);
+	configASSERT( true == TestRTOS_Inicializar()		);
 	configASSERT( true == ai_inicializar()				);
 
 	configASSERT( ERROR_BOTON != (BotonEnPlaca=BotonesRTOS_InicializarBoton(U_BOTON_EP)) );
@@ -87,7 +88,6 @@ void apli_inicializar( void )
 	configASSERT( ERROR_LED   != (LedVerdeEnPlaca = LedsRTOS_InicializarLed ( U_LED_VERDE_EP )) );
 	configASSERT( LedsRTOS_ModoLed ( LedRojoEnPlaca, SUSPENSION ) );
 	configASSERT( LedsRTOS_EncenderLed (LedRojoEnPlaca)  );
-
 	uHALmapConfigurarFrecuencia( UHAL_MAP_PE5 , FREC_TESTIGO );  // Señal cuadrada testigo
 	uHALmapEncender            ( UHAL_MAP_PE5 );
 
@@ -119,8 +119,8 @@ void apli_inicializar( void )
 	 * - Lectura de UART
 	 * - Actualización de leds
 	 * - Actualización de botones */
-	ret = xTaskCreate(	Tarea_PALTA_1ms,						// Puntero a la función-tarea.
-								"PALTA_1ms",							// Nombre de tarea. Para desarrollo.
+	ret = xTaskCreate(	Tarea_PALTA,						// Puntero a la función-tarea.
+								"PALTA",								// Nombre de tarea. Para desarrollo.
 								(2 * configMINIMAL_STACK_SIZE),	// Tamaño de stack en palabras.
 								NULL,    								// Parametros de la tarea, que no tiene acá
 								TAREA_PRIORIDAD_ALTA,				// Prioridad alta.
@@ -129,8 +129,8 @@ void apli_inicializar( void )
 
 	/* Tarea PMEDIA para funciones cada 10 ms:
 	 * */
-	ret = xTaskCreate( 	Tarea_PMEDIA_10ms,
-								"PMEDIA_10ms",
+	ret = xTaskCreate( 	Tarea_PMEDIA,
+								"PMEDIA",
 								(2 * configMINIMAL_STACK_SIZE),
 								NULL,
 								TAREA_PRIORIDAD_MEDIA,
@@ -138,8 +138,8 @@ void apli_inicializar( void )
 	configASSERT( ret == pdPASS );
 
 	/* Tarea Test 1 */
-	ret = xTaskCreate( 	TareaTest_1,
-								"TEST 1",
+	ret = xTaskCreate( 	Tarea_Test,
+								"TEST",
 								(2 * configMINIMAL_STACK_SIZE),
 								NULL,
 								TAREA_PRIORIDAD_MEDIA,
@@ -168,7 +168,7 @@ void apli_inicializar( void )
  * Las funciones deben durar lo menos posible.
  * Utilizamos vTaskDelayUntil() porque es crítico el sincronismo.
  */
-void Tarea_PALTA_1ms( void *pvParameters )
+void Tarea_PALTA( void *pvParameters )
 {
 	/* Variables locales ------------------------------------------------------*/
 	char *pcTaskName = (char *) pcTaskGetName( NULL );
@@ -217,7 +217,7 @@ void Tarea_PALTA_1ms( void *pvParameters )
  * Las funciones de esta tarea podrían demorar más de 10 ms.
  * Utilizamos vTaskDelay() porque no es tan crítico el sincronismo.
  */
-void Tarea_PMEDIA_10ms ( void *pvParameters )
+void Tarea_PMEDIA ( void *pvParameters )
 {
 	/* Imprimir la tarea iniciada: */
 	char *pcTaskName = (char *) pcTaskGetName( NULL );
@@ -228,7 +228,8 @@ void Tarea_PMEDIA_10ms ( void *pvParameters )
 	{
 		ai_procesar_mensajes();
 		//apli_separador(".");
-		vTaskDelay( PERIODO_10MS );
+		apli_latido();
+		vTaskDelay( 25 * PERIODO_1MS );
 	}
 }
 

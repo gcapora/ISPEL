@@ -298,10 +298,15 @@ bool uCapturadoraEntradaEncender	( entrada_id_e ID )
 	// Verificación de parámetros
 	if ( U_ENTRADAS_CANTIDAD < ID && ENTRADAS_TODAS!=ID) return false;
 	if ( Capturadora.Estado != CAPTURADORA_INACTIVA ) return false;
-	// Encendemos
-	EntradaAdmin[ID].Estado = ENTRADA_ENCENDIDA;
-	EntradaAdmin[ID].Config.Encendida = true;
-	control = true;
+	// Encendemos todas o una ENTRADA
+	if (ENTRADAS_TODAS==ID) {
+		control = uCapturadoraEntradaEncender(ENTRADA_1);
+		control = control && uCapturadoraEntradaEncender(ENTRADA_2);
+	} else {
+		EntradaAdmin[ID].Estado = ENTRADA_ENCENDIDA;
+		EntradaAdmin[ID].Config.Encendida = true;
+		control = true;
+	}
 	// Salimos
 	return control;
 }
@@ -314,9 +319,14 @@ bool uCapturadoraEntradaApagar ( entrada_id_e ID )
 	if ( U_ENTRADAS_CANTIDAD < ID && ENTRADAS_TODAS!=ID) return false;
 	if ( Capturadora.Estado != CAPTURADORA_INACTIVA ) return false;
 	// Apagamos
-	EntradaAdmin[ID].Estado = ENTRADA_APAGADA;
-	EntradaAdmin[ID].Config.Encendida = false;
-	control = true;
+	if (ENTRADAS_TODAS==ID) {
+		control = uCapturadoraEntradaApagar(ENTRADA_1);
+		control = control && uCapturadoraEntradaApagar(ENTRADA_2);
+	} else {
+		EntradaAdmin[ID].Estado = ENTRADA_APAGADA;
+		EntradaAdmin[ID].Config.Encendida = false;
+		control = true;
+	}
 	// Salimos
 	return control;
 }

@@ -15,7 +15,6 @@
 
 /****** Librerías (includes) *********************************************************************/
 
-//#include "uGenerador.h"
 #include "apli.h"
 
 /****** Definiciones públicas (macros) ***********************************************************/
@@ -23,13 +22,22 @@
 
 /****** Definiciones públicas de tipos de datos (public typedef) *********************************/
 
+ typedef enum {
+ 	TEST_GENERAL,
+ 	NUM_TEST,
+ } tipo_test_e;
 
 /****** Declaraciones de datos externos **********************************************************/
 
 
 /****** Declaración de funciones públicas ********************************************************/
 
-void TareaTest_1 				( void * );
+bool TestRTOS_Inicializar	( void );
+void Tarea_Test 				( void * );
+void Test_Testear				( tipo_test_e, TickType_t );
+void Test_Config_0			( TickType_t );
+void Test_Captu_Inicia		( TickType_t );
+void Test_Gen_Enciende		( TickType_t );
 
 /*************************************************************************************************/
 #ifdef __cplusplus

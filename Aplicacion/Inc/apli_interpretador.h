@@ -37,6 +37,8 @@ extern "C" {
 #define CMD_LEER			   "LEER"
 #define CMD_MENSAJE			"MSJ"
 #define CMD_MENSAJE2			"//"
+#define CMD_ESPERAR			"ESPERAR"
+#define CMD_TEST				"TEST"
 
 #define MENSAJE_LARGO_MAX	100
 #define VALOR_LARGO_MAX		16
@@ -44,7 +46,7 @@ extern "C" {
 /****** Definiciones públicas de tipos de datos (public typedef) *********************************/
 
 typedef enum {
-	TIPO_SENIAL,
+	TIPO,
 	FREC_SENIAL,
 	FASE_SENIAL,
 	VMAX_SENIAL,

@@ -73,8 +73,10 @@ bool	CaptuRTOS_Comenzar ( TickType_t ESPERA )
 	bool_t RET = false;
 	if(pdTRUE == xSemaphoreTake( CaptuMutexAdmin, ESPERA )) {
 		if(uCapturadoraIniciar()) {
-			uoEscribirTxt ("MSJ Comenzamos captura (tarea)... \n\r");
+			apli_mensaje("Comenzamos captura...",portMAX_DELAY);
 			RET = true;
+		} else {
+			apli_mensaje("No pudimos comenzar captura.",portMAX_DELAY);
 		}
 		xSemaphoreGive( CaptuMutexAdmin );
 	}
@@ -168,7 +170,7 @@ bool CaptuRTOS_EntradaEncender ( entrada_id_e ID, TickType_t ESPERA )
 	bool_t RET = false;
 	if(pdTRUE == xSemaphoreTake( CaptuMutexAdmin, ESPERA )) {
 		if(uCapturadoraEntradaEncender(ID)) {
-			uoEscribirTxt ("MSJ Encendimos Entrada de Capturadora. \n\r");
+			uoEscribirTxt ("MSJ CAPTU Encendimos entrada(s).\n");
 			RET = true;
 		}
 		xSemaphoreGive( CaptuMutexAdmin );
@@ -181,7 +183,7 @@ bool CaptuRTOS_EntradaApagar ( entrada_id_e ID, TickType_t ESPERA )
 	bool_t RET = false;
 	if(pdTRUE == xSemaphoreTake( CaptuMutexAdmin, ESPERA )) {
 		if(uCapturadoraEntradaApagar(ID)) {
-			uoEscribirTxt ("MSJ Apagamos Entrada de CAPTURADORA. \n\r");
+			uoEscribirTxt ("MSJ CAPTU Apagamos entrada(s).\n");
 			RET = true;
 		}
 		xSemaphoreGive( CaptuMutexAdmin );
@@ -312,10 +314,10 @@ void CaptuRTOS_ImprimirSenial32 (void)
 	uCapturadoraObtener ( &ConfigCaptura );
 	uCapturadoraEntradaObtener ( ConfigCaptura.OrigenDisparo, &ConfigEntrada );
 	Disparo = P_Senial_E1->Tiempo0;
-	uoEscribirTxtUint	( "MSJ CapturasSincronizadas=", uCapturadoraObtenerSincronizadas() );
-	uoEscribirTxtUint	( " TiempoCaptura=", uCapturadoraObtenerTiempoCaptura() );
+	uoEscribirTxtUint	( "MSJ CAPTU INFO PROMEDIADAS=", uCapturadoraObtenerSincronizadas() );
+	uoEscribirTxtUint	( " CAPTURA_MS=", uCapturadoraObtenerTiempoCaptura() );
 	uoEscribirTxtUint	( " FM=", (uint32_t) round(uCapturadoraObtenerFrecuenciaMuestreo()) );
-	uoEscribirTxtUint	( " LARGO=", (uint32_t) U_LARGO_CAPTURA);
+	uoEscribirTxtUint	( " MUESTRAS=", (uint32_t) U_LARGO_CAPTURA);
 	uoEscribirTxtUint	( " DISPARO=", Disparo);
 	uoEscribirTxt     ( "\n");
 
@@ -330,7 +332,7 @@ void CaptuRTOS_ImprimirSenial32 (void)
 		Muestra = P_Senial_E1->Muestras_p[i];
 		MUESTRA_ENTRADA_1 = ( Muestra & MASCARA_DERECHA16   );
 		MUESTRA_ENTRADA_2 = ( Muestra & MASCARA_IZQUIERDA16 ) >> 16;
-		if ( (i==Disparo) && (i>0) ) uoEscribirTxt ("// ---> Disparo <---\n");
+		//if ( (i==Disparo) && (i>0) ) uoEscribirTxt ("// ---> Disparo <---\n");
 		if(E1_ENCENDIDA)						uoEscribirUint ( MUESTRA_ENTRADA_1 );	// Dato de ENTRADA 1
 		if(E1_ENCENDIDA && E2_ENCENDIDA)	uoEscribirTxt  ( "\t" );						// Separación de ENTRADA
 		if(E2_ENCENDIDA) 						uoEscribirUint ( MUESTRA_ENTRADA_2 );	// Dato de ENTRADA 2
@@ -356,9 +358,9 @@ void escribir_entrada(entrada_id_e ID)
 	} else if(uCapturadoraEntradaObtener(ID,&ECONFIG)) {
 		// ID de entrada
 		if(ID==ENTRADA_1){
-			uoEscribirTxt("MSJ CAPTU E1 CONFIGURADA");
+			uoEscribirTxt("MSJ CAPTU E1 INFO");
 		} else if(ID==ENTRADA_2){
-			uoEscribirTxt("MSJ CAPTU E2 CONFIGURADA");
+			uoEscribirTxt("MSJ CAPTU E2 INFO");
 		} else{
 			uoEscribirTxt("MSJ CAPTU ENTRADA desconocida");
 		}
@@ -386,7 +388,7 @@ void escribir_entrada(entrada_id_e ID)
 void escribir_captu( void )
 {
 	uCapturadoraObtener(&CCONFIG);
-	uoEscribirTxtReal("MSJ CAPTU CONFIGURADO ESCALA=",CCONFIG.EscalaHorizontal,6);
+	uoEscribirTxtReal("MSJ CAPTU INFO ESCALA=",CCONFIG.EscalaHorizontal,6);
 	switch (CCONFIG.OrigenDisparo) {
 	case ENTRADA_1:
 		uoEscribirTxt(" ORIGEN=E1");

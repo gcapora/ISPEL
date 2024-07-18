@@ -17,6 +17,7 @@
 
 /****** Definiciones privadas de tipos (private typedef) *****************************************/
 
+SemaphoreHandle_t 	TestMutexAdmin;
 
 /****** Definición de datos públicos *************************************************************/
 
@@ -29,17 +30,26 @@ static gen_conf_s	GenConfig = {0};
 
 /****** Declaración de funciones privadas ********************************************************/
 
-void testeo_temporizadores (void);
-void config0_generadores (void);
-void encender_generadores(void);
+void testeo_temporizadores	(void);
+void config_0_generadores	(void);
+void encender_generadores	(void);
 
 /****** Definición de funciones públicas *********************************************************/
+
+bool TestRTOS_Inicializar (void)
+{
+	// Semáforo Mutex para acceso concurrente
+	TestMutexAdmin = xSemaphoreCreateMutex();
+	configASSERT ( NULL != TestMutexAdmin );
+	//Chau!
+	return true;
+}
 
 /*-------------------------------------------------------------------------------------------------
  * @brief
  * @param
  */
-void TareaTest_1( void *pvParameters )
+void Tarea_Test( void *pvParameters )
 {
 	/* Variables locales ------------------------------------------------------*/
 
@@ -53,7 +63,7 @@ void TareaTest_1( void *pvParameters )
 	configASSERT ( LedsRTOS_EncenderLed (LedAzulEnPlaca)  );
 
 	/* Configuración inicial de generadores y encendido */
-	config0_generadores();
+	config_0_generadores();
 	//encender_generadores();
 
 	/* Esta sería una forma de utilizar las funciones de uHALdac.h:
@@ -98,6 +108,50 @@ void TareaTest_1( void *pvParameters )
 	}
 }
 
+
+void Test_Testear ( tipo_test_e TIPO_TEST, TickType_t ESPERA )
+{
+	if(pdTRUE == xSemaphoreTake( TestMutexAdmin, ESPERA )) {
+		config_0_generadores();
+		encender_generadores();
+		vTaskDelay( ESPERA_CAPTU );
+		CaptuRTOS_Comenzar( ESPERA );
+		xSemaphoreGive( TestMutexAdmin );
+	} else {
+		apli_mensaje("No pudimos ejecutar testeo.", 3 * UN_SEGUNDO);
+	}
+}
+
+void Test_Config_0 (TickType_t ESPERA)
+{
+	if(pdTRUE == xSemaphoreTake( TestMutexAdmin, ESPERA )) {
+		config_0_generadores();
+		xSemaphoreGive( TestMutexAdmin );
+	} else {
+		apli_mensaje("No pudimos ejecutar Test_Config_0.", 3 * UN_SEGUNDO);
+	}
+}
+
+void Test_Captu_Inicia (TickType_t ESPERA)
+{
+	if(pdTRUE == xSemaphoreTake( TestMutexAdmin, ESPERA )) {
+		CaptuRTOS_Comenzar( ESPERA );
+		xSemaphoreGive( TestMutexAdmin );
+	} else {
+		apli_mensaje("No pudimos ejecutar Test_Captu_Inicia.", 3 * UN_SEGUNDO);
+	}
+}
+
+void Test_Gen_Enciende (TickType_t ESPERA)
+{
+	if(pdTRUE == xSemaphoreTake( TestMutexAdmin, ESPERA )) {
+		encender_generadores();
+		xSemaphoreGive( TestMutexAdmin );
+	} else {
+		apli_mensaje("No pudimos ejecutar Test_Captu_Inicia.", 3 * UN_SEGUNDO);
+	}
+}
+
 /****** Definición de funciones privadas *********************************************************/
 
 void testeo_temporizadores (void)
@@ -117,7 +171,7 @@ void testeo_temporizadores (void)
 	uoEscribirTxtUintTxt ("// Milisegundos tras 2000 microsegundos: ", uoMilisegundos()-tiempo1, "\n\r");
 }
 
-void config0_generadores (void)
+void config_0_generadores (void)
 {
 	Frecuencia = 10000;
 	if ( GenRTOS_Obtener ( GENERADOR_1, &GenConfig, portMAX_DELAY )) {

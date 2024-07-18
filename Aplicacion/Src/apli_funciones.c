@@ -14,6 +14,8 @@
 
 /* Private macro -------------------------------------------------------------*/
 
+#define	TIEMPO_LATIDO	30000	// En milisegundos
+
 /* Private variables ---------------------------------------------------------*/
 
 /* Variables importadas ------------------------------------------------------*/
@@ -51,6 +53,19 @@ void apli_separador(const char * SEPARA)
 		tomar_escritura(portMAX_DELAY);
 		uoEscribirTxt(SEPARA);
 		devolver_escritura();
+	}
+}
+
+void apli_latido(void)
+{
+	static uint32_t tiempo_ultimo = 0;
+	if ( (uoMilisegundos()-tiempo_ultimo) > TIEMPO_LATIDO ) {
+		tomar_escritura    ( 3 * UN_SEGUNDO );
+		tiempo_ultimo = uoMilisegundos();
+		uoEscribirTxtUint  ("HOLA Aca ISPEL para lo que sea. [", tiempo_ultimo / 60000);
+		uoEscribirTxtUint  (" min ", (tiempo_ultimo/1000) % 60);
+		uoEscribirTxt      (" s]\n");
+		devolver_escritura ();
 	}
 }
 

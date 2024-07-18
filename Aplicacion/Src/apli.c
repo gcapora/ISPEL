@@ -39,7 +39,7 @@ TaskHandle_t TareaTest1_m;
 /****** Definición de datos públicos *************************************************************/
 
 boton_id_t  BotonEnPlaca;
-led_id_t    LedRojoEnPlaca, LedVerdeEnPlaca;
+led_id_t    LedRojoEnPlaca, LedVerdeEnPlaca, Led_prueba;
 
 /* Semáforos */
 SemaphoreHandle_t		MutexApliEscribir;  // Para integridad de escritura
@@ -75,19 +75,27 @@ void apli_inicializar( void )
 
 	// Inicialización de módulos, tareas y objetos--------------------------------------------------
 
-	configASSERT( true == CaptuRTOS_Inicializar()	);
-	configASSERT( true == GenRTOS_Inicializar()	   );
 	configASSERT( true == LedsRTOS_Inicializar()    );
 	configASSERT( true == BotonesRTOS_Inicializar()	);
+	configASSERT( true == CaptuRTOS_Inicializar()	);
+	configASSERT( true == GenRTOS_Inicializar()	   );
 	configASSERT( true == TestRTOS_Inicializar()		);
 	configASSERT( true == ai_inicializar()				);
 
-	configASSERT( ERROR_BOTON != (BotonEnPlaca=BotonesRTOS_InicializarBoton(U_BOTON_EP)) );
 	configASSERT( NULL        != (MutexApliEscribir=xSemaphoreCreateMutex()) );
+	configASSERT( ERROR_BOTON != (BotonEnPlaca=BotonesRTOS_InicializarBoton(U_BOTON_EP)) );
+
 	configASSERT( ERROR_LED   != (LedRojoEnPlaca = LedsRTOS_InicializarLed ( U_LED_ROJO_EP )) );
 	configASSERT( ERROR_LED   != (LedVerdeEnPlaca = LedsRTOS_InicializarLed ( U_LED_VERDE_EP )) );
+	configASSERT( ERROR_LED   != (Led_prueba = LedsRTOS_InicializarLed ( HAL_PIN_PB11 )) );
+	configASSERT( LedsRTOS_ModoLed ( Led_prueba, SUSPENSION ) );
+	configASSERT( LedsRTOS_EncenderLed (Led_prueba)  );
+
+
+
 	configASSERT( LedsRTOS_ModoLed ( LedRojoEnPlaca, SUSPENSION ) );
 	configASSERT( LedsRTOS_EncenderLed (LedRojoEnPlaca)  );
+
 	uHALmapConfigurarFrecuencia( UHAL_MAP_PE5 , FREC_TESTIGO );  // Señal cuadrada testigo
 	uHALmapEncender            ( UHAL_MAP_PE5 );
 

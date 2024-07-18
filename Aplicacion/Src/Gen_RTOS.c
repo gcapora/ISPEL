@@ -10,6 +10,7 @@
 /****** Librerías (includes) *********************************************************************/
 
 #include "Gen_RTOS.h"
+#include "Leds_RTOS.h"
 
 /****** Definiciones privadas (macros) ***********************************************************/
 
@@ -25,8 +26,7 @@ gen_conf_s			GenConfigRTOS = {0};	// Configuración DAC
 
 /****** Definición de datos públicos *************************************************************/
 
-//const char * Entrada_1 = "ENTRADA 1";
-//const char * Entrada_2 = "ENTRADA 2";
+led_id_t	LedGen1, LedGen2;
 
 /****** Declaración de funciones privadas ********************************************************/
 
@@ -50,6 +50,16 @@ bool GenRTOS_Inicializar (void)
 	GenMutexAdmin = xSemaphoreCreateMutex();
 	configASSERT ( NULL != GenMutexAdmin );
 
+	// Leds indicadores
+
+	configASSERT( ERROR_LED   != (LedGen1 = LedsRTOS_InicializarLed ( HAL_PIN_PB10 )) );
+	configASSERT( ERROR_LED   != (LedGen2 = LedsRTOS_InicializarLed ( HAL_PIN_PE15 )) );
+	configASSERT( LedsRTOS_ModoLed ( LedGen1, PLENO ) );
+	configASSERT( LedsRTOS_ModoLed ( LedGen2, PLENO ) );
+
+	/*configASSERT( LedsRTOS_EncenderLed (LedGen1)  );
+	configASSERT( LedsRTOS_EncenderLed (LedGen2)  );*/
+
 	// Terminada la inicialización...
 	return RET;
 }
@@ -65,10 +75,14 @@ bool GenRTOS_Encender ( gen_id_e ID, TickType_t ESPERA )
 	if(pdTRUE == xSemaphoreTake( GenMutexAdmin, ESPERA )) {
 		if(uGeneradorEncender(ID)) {
 			if(ID==GENERADOR_1) {
+				LedsRTOS_EncenderLed (LedGen1);
 				apli_mensaje ("GEN S1 encendido.", portMAX_DELAY );
 			} else if(ID==GENERADOR_2){
+				LedsRTOS_EncenderLed (LedGen2);
 				apli_mensaje ("GEN S2 encendido.", portMAX_DELAY );
 			} else if(ID==GENERADORES_TODOS){
+				LedsRTOS_EncenderLed (LedGen1);
+				LedsRTOS_EncenderLed (LedGen2);
 				apli_mensaje ("GEN TODOS encendidos.", portMAX_DELAY );
 			}
 			RET = true;
@@ -84,10 +98,14 @@ bool GenRTOS_Apagar ( gen_id_e ID, TickType_t ESPERA )
 	if(pdTRUE == xSemaphoreTake( GenMutexAdmin, ESPERA )) {
 		if(uGeneradorApagar(ID)) {
 			if(ID==GENERADOR_1) {
+				LedsRTOS_ApagarLed (LedGen1);
 				apli_mensaje ("GEN S1 apagado.", portMAX_DELAY );
 			} else if(ID==GENERADOR_2){
+				LedsRTOS_ApagarLed (LedGen2);
 				apli_mensaje ("GEN S2 apagado.", portMAX_DELAY );
 			} else if(ID==GENERADORES_TODOS){
+				LedsRTOS_ApagarLed (LedGen1);
+				LedsRTOS_ApagarLed (LedGen2);
 				apli_mensaje ("GEN TODOS apagados.", portMAX_DELAY );
 			}
 			RET = true;

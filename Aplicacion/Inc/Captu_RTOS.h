@@ -15,6 +15,7 @@
 /****** Librerías (includes) *********************************************************************/
 
 #include "uCapturadora.h"
+#include "Leds_RTOS.h"
 #include "apli.h"
 
 /****** Definiciones públicas (macros) ***********************************************************/

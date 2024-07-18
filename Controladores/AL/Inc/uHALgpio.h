@@ -19,15 +19,15 @@
 
 // Configuraciones de GPIO
 #define U_GPIO_MODO_ENTRADA		0x0UL
-#define U_GPIO_MODO_SALIDA		0x1UL
-#define U_GPIO_MODO_SALIDA_TE	U_GPIO_MODO_SALIDA | (0x0UL << 4U) // Equivalente a push-pull
-#define U_GPIO_MODO_SALIDA_DA	U_GPIO_MODO_SALIDA | (0x1UL << 4U) // Equivalente a open-drain
-#define U_GPIO_NO_TIRAR	    	0x00000000U
+#define U_GPIO_MODO_SALIDA			0x1UL
+#define U_GPIO_MODO_SALIDA_TE		U_GPIO_MODO_SALIDA | (0x0UL << 4U) // Tirar-empujar (push-pull)
+#define U_GPIO_MODO_SALIDA_DA		U_GPIO_MODO_SALIDA | (0x1UL << 4U) // Drenador-abierto (open-drain)
+#define U_GPIO_NO_TIRAR	    		0x00000000U
 #define U_GPIO_TIRAR_ARRIBA		0x00000001U
-#define U_GPIO_TIRAR_ABAJO		0x00000002U
-#define U_GPIO_VELOCIDAD_BAJA	0x00000000U
-#define U_GPIO_VELOCIDAD_MEDIA  0x00000001U
-#define U_GPIO_VELOCIDAD_ALTA	0x00000002U
+#define U_GPIO_TIRAR_ABAJO			0x00000002U
+#define U_GPIO_VELOCIDAD_BAJA		0x00000000U
+#define U_GPIO_VELOCIDAD_MEDIA	0x00000001U
+#define U_GPIO_VELOCIDAD_ALTA		0x00000002U
 
 /****** Definiciones públicas de tipos de datos (public typedef) *********************************/
 

@@ -18,14 +18,15 @@
 
 typedef struct {
 	hal_pin_id_t	pinLed;			// identificador de pin según uHAL.h
-    bool			inicializado;
-    led_estado_t	estado;			// estado lógico del led: encendido en algún modo o apagado
-    led_modo_t		modo;
-    int16_t     	nEncendido;
-    int16_t     	nApagado;
-    int16_t     	nActual;
-    uint16_t		CuentaModoSuspension;
-    int8_t			SentidoCuentaModoSuspension;
+	bool_t			inicializado;
+	bool_t			salida_negada;
+   led_estado_t	estado;			// estado lógico del led: encendido en algún modo o apagado
+   led_modo_t		modo;
+   int16_t     	nEncendido;
+   int16_t     	nApagado;
+   int16_t     	nActual;
+   uint16_t			CuentaModoSuspension;
+   int8_t			SentidoCuentaModoSuspension;
 } led_control_t;
 
 /****** Definición de datos privados *************************************************************/
@@ -86,6 +87,9 @@ led_id_t uLedInicializar(hal_pin_id_t pin_led) {
         }
     }
 
+    /*uoEscribirTxtUint("LED_Nro=",IdLed);
+    uoEscribirTxt("\n");*/
+
     if ( Id_Establecido == false ) return ERROR_LED;
 
     // Reseteamos valores
@@ -98,9 +102,18 @@ led_id_t uLedInicializar(hal_pin_id_t pin_led) {
     vectorLedControl[IdLed].SentidoCuentaModoSuspension = 1;
     vectorLedControl[IdLed].CuentaModoSuspension = 0;
     vectorLedControl[IdLed].inicializado = true;
+    if( pin_led==HAL_PIN_PB0 || pin_led==HAL_PIN_PB7 || pin_led==HAL_PIN_PB14 ) {
+       vectorLedControl[IdLed].salida_negada = false;
+    } else {
+       vectorLedControl[IdLed].salida_negada = true;
+    }
 
     // Inicializamos pin gpio
-    pin_config.Modo = U_GPIO_MODO_SALIDA;
+    if( pin_led==HAL_PIN_PB0 || pin_led==HAL_PIN_PB7 || pin_led==HAL_PIN_PB14 ) {
+   	 pin_config.Modo = U_GPIO_MODO_SALIDA;
+    } else {
+   	 pin_config.Modo = MODO_LED_EXT;
+    }
     pin_config.Tirar = U_GPIO_NO_TIRAR;
     pin_config.Velocidad = U_GPIO_VELOCIDAD_BAJA;
     uHALgpioInicializar ( pin_led, &pin_config );
@@ -160,6 +173,9 @@ bool uLedActualizar(led_id_t led_id) {
     }
 
     // Escribo y actualizo estado físico
+    if (true==vectorLedControl[led_id].salida_negada) {
+   	 salida = !salida;
+    }
     uHALgpioEscribir (vectorLedControl[led_id].pinLed, salida);
 
     // Actualizo fase del período

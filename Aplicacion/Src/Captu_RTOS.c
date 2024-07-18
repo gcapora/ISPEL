@@ -19,6 +19,7 @@
 /****** Definiciones privadas de tipos (private typedef) *****************************************/
 
 
+
 /****** Definición de datos privados *************************************************************/
 
 SemaphoreHandle_t 	CaptuMutexAdmin;	// Esta variable global administra el manejo del semáforo
@@ -242,7 +243,9 @@ void Tarea_Capturadora( void *pvParameters )
 			// Verificamos lectura de boton.
 			if ( true == BotonesRTOS_BotonFlancoPresionado ( BotonEnPlaca ) ){
 				// Se presionó un botón para iniciar captura.
-				if(pdTRUE == xSemaphoreTake( CaptuMutexAdmin, RETARDO_CAPTURADORA_DISPONIBLE )) {
+				CaptuRTOS_Comenzar ( RETARDO_CAPTURADORA_DISPONIBLE );
+
+				/*if(pdTRUE == xSemaphoreTake( CaptuMutexAdmin, RETARDO_CAPTURADORA_DISPONIBLE )) {
 					// Intentamos iniciar captura.
 					if(uCapturadoraIniciar()) {
 						// Logramos iniciar captura. MENSAJE.
@@ -254,7 +257,7 @@ void Tarea_Capturadora( void *pvParameters )
 						apli_alerta ("No pudimos comenzar captura.");
 					}
 					xSemaphoreGive( CaptuMutexAdmin );
-				}
+				}*/
 				// Sin retardo.
 			} else {
 				// Retardo largo porque estamos inactivos
@@ -295,8 +298,8 @@ void CaptuRTOS_ImprimirSenial32 (void)
 	tomar_escritura(portMAX_DELAY);
 	uoEscribirTxt ( Barra );
 	uoEscribirTxt ("// Enviamos configuracion de capturadora, entradas y seniales\n");
-	escribir_captu();
 
+	// Imprimimos configuraciones de entradas (si corresponde)
 	if(false==uCapturadoraEntradaObtener(ENTRADA_1,&ConfigEntrada))
 		apli_alerta("No se pudo imprimir E1.");
 	if(true==(E1_ENCENDIDA = ConfigEntrada.Encendida))
@@ -311,10 +314,12 @@ void CaptuRTOS_ImprimirSenial32 (void)
 		return;
 	}
 
+	// Imprimimos configuración de capturadora
+	escribir_captu();
 	uCapturadoraObtener ( &ConfigCaptura );
 	uCapturadoraEntradaObtener ( ConfigCaptura.OrigenDisparo, &ConfigEntrada );
 	Disparo = P_Senial_E1->Tiempo0;
-	uoEscribirTxtUint	( "MSJ CAPTU INFO PROMEDIADAS=", uCapturadoraObtenerSincronizadas() );
+	uoEscribirTxtUint	( "CAPTU INFO PROMEDIADAS=", uCapturadoraObtenerSincronizadas() );
 	uoEscribirTxtUint	( " CAPTURA_MS=", uCapturadoraObtenerTiempoCaptura() );
 	uoEscribirTxtUint	( " FM=", (uint32_t) round(uCapturadoraObtenerFrecuenciaMuestreo()) );
 	uoEscribirTxtUint	( " MUESTRAS=", (uint32_t) U_LARGO_CAPTURA);
@@ -358,11 +363,12 @@ void escribir_entrada(entrada_id_e ID)
 	} else if(uCapturadoraEntradaObtener(ID,&ECONFIG)) {
 		// ID de entrada
 		if(ID==ENTRADA_1){
-			uoEscribirTxt("MSJ CAPTU E1 INFO");
+			uoEscribirTxt("CAPTU E1 INFO");
 		} else if(ID==ENTRADA_2){
-			uoEscribirTxt("MSJ CAPTU E2 INFO");
+			uoEscribirTxt("CAPTU E2 INFO");
 		} else{
-			uoEscribirTxt("MSJ CAPTU ENTRADA desconocida");
+			uoEscribirTxt("MSJ CAPTU ENTRADA desconocida.\n");
+			return;
 		}
 		// Encendida?
 		if(ECONFIG.Encendida) {
@@ -388,7 +394,7 @@ void escribir_entrada(entrada_id_e ID)
 void escribir_captu( void )
 {
 	uCapturadoraObtener(&CCONFIG);
-	uoEscribirTxtReal("MSJ CAPTU INFO ESCALA=",CCONFIG.EscalaHorizontal,6);
+	uoEscribirTxtReal("CAPTU INFO ESCALA=",CCONFIG.EscalaHorizontal,6);
 	switch (CCONFIG.OrigenDisparo) {
 	case ENTRADA_1:
 		uoEscribirTxt(" ORIGEN=E1");

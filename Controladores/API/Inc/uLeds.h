@@ -18,6 +18,7 @@
 
 #define CANTIDAD_LED    10
 #define ERROR_LED       -1
+#define MODO_LED_EXT		U_GPIO_MODO_SALIDA_DA	// Modo de los leds externos a la placa Nucleo
 
 /****** Definiciones públicas de tipos de datos (public typedef) *********************************/
 
@@ -46,16 +47,16 @@ typedef enum {
 
 /****** Declaración de funciones públicas ********************************************************/
 
-led_id_t	uLedInicializar (hal_pin_id_t);
-bool		uLedEncender (led_id_t);
-bool		uLedApagar (led_id_t);
-bool		uLedActualizar (led_id_t);
-bool		uLedActualizarTodo ( void );
-bool		uLedConfigurarModo (led_id_t, led_modo_t);
-led_estado_t uLedObtenerEstado (led_id_t);
-led_estado_t uLedObtenerEstadoFisico (led_id_t);
+led_id_t		uLedInicializar (hal_pin_id_t);
+bool			uLedEncender (led_id_t);
+bool			uLedApagar (led_id_t);
+bool			uLedActualizar (led_id_t);
+bool			uLedActualizarTodo ( void );
+bool			uLedConfigurarModo (led_id_t, led_modo_t);
+led_estado_t	uLedObtenerEstado (led_id_t);
+led_estado_t	uLedObtenerEstadoFisico (led_id_t);
 led_modo_t	uLedObtenerModo (led_id_t);
-bool		uLedDesinicializar (led_id_t);
+bool			uLedDesinicializar (led_id_t);
 
 /*************************************************************************************************/
 #endif /* __ISPEL_ULED_H */

@@ -29,10 +29,11 @@
 /****** Declaración de funciones públicas ********************************************************/
 
 bool 	GenRTOS_Inicializar					( void );
-bool	GenRTOS_Encender						( gen_id_e, TickType_t );
-bool	GenRTOS_Apagar							( gen_id_e, TickType_t );
 bool	GenRTOS_Configurar					( gen_id_e, gen_conf_s *, TickType_t );
 bool	GenRTOS_Obtener						( gen_id_e, gen_conf_s *, TickType_t );
+bool	GenRTOS_Encender						( gen_id_e, TickType_t );
+bool	GenRTOS_Apagar							( gen_id_e, TickType_t );
+bool	GenRTOS_EstaEncendido				( gen_id_e, TickType_t );
 bool	GenRTOS_EscribirConfiguraciones	( TickType_t );
 //void	Tarea_Capturadora						( void * );
 

@@ -92,6 +92,15 @@ bool BotonesRTOS_BotonFlancoPresionado ( boton_id_t BOTON )
 	return RET;
 }
 
+bool BotonesRTOS_BotonPresionado ( boton_id_t BOTON )
+{
+	bool RET = false;
+	xSemaphoreTake( MutexManejadorBTNS, portMAX_DELAY );
+	RET = uBotonPresionado ( BOTON );
+	xSemaphoreGive( MutexManejadorBTNS );
+	return RET;
+}
+
 /*-------------------------------------------------------------------------------------------------
  * @brief	Verifica si se produjo un PRESIONADO LARGO de BOTON
  * @param	BOTON = identificador del boton

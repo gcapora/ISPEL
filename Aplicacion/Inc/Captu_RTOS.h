@@ -37,10 +37,12 @@ void	CaptuRTOS_ImprimirSenial32			( void );
 bool	CaptuRTOS_Configurar					( capturadora_config_s *, TickType_t );  // Configuración de base de tiempo y disparo.
 bool	CaptuRTOS_Obtener						( capturadora_config_s *, TickType_t );
 bool	CaptuRTOS_EscribirConfiguraciones( TickType_t );
+bool	CaptuRTOS_EscribirConfiguracionEntrada ( entrada_id_e, TickType_t );
 
-bool  CaptuRTOS_EntradaConfigurar		( entrada_id_e, entrada_config_s *, TickType_t ); // Configuración de un canal.
+bool  CaptuRTOS_EntradaConfigurar		( entrada_id_e, entrada_config_s *, TickType_t );	// Configuración de un canal.
 bool  CaptuRTOS_EntradaObtener			( entrada_id_e, entrada_config_s *, TickType_t );
-bool  CaptuRTOS_EntradaEncender			( entrada_id_e, TickType_t );  // Encendido y apagado de un canal.
+bool  CaptuRTOS_EntradaEstaEncendida	( entrada_id_e, TickType_t );
+bool  CaptuRTOS_EntradaEncender			( entrada_id_e, TickType_t );								// Encendido y apagado de un canal.
 bool  CaptuRTOS_EntradaApagar				( entrada_id_e, TickType_t );
 
 void	Tarea_Capturadora						( void * );

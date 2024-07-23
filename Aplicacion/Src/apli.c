@@ -30,19 +30,22 @@
 
 /****** Definición de datos privados *************************************************************/
 
+static bool_t PresionadoParaEncendido = false;
+
 /* Variables usadas para referencias las tareas. */
-TaskHandle_t PALTA_admin;
-TaskHandle_t PMEDIA_admin;
-TaskHandle_t CAPTU_admin;
-TaskHandle_t TareaTest1_m;
+static TaskHandle_t PALTA_admin;
+static TaskHandle_t PMEDIA_admin;
+static TaskHandle_t CAPTU_admin;
+static TaskHandle_t TareaTest1_m;
 
 /****** Definición de datos públicos *************************************************************/
 
-boton_id_t  BotonEnPlaca;
-led_id_t    LedRojoEnPlaca, LedVerdeEnPlaca, Led_prueba;
-
-/* Semáforos */
-SemaphoreHandle_t		MutexApliEscribir;  // Para integridad de escritura
+bool_t		EquipoEncendido = false;
+boton_id_t  BotonEnPlaca, BotonEncendido;
+boton_id_t	BotonGen1, BotonGen2;
+boton_id_t	BotonCaptu1, BotonCaptu2, BotonCaptuDisparo;
+led_id_t    LedRojoEnPlaca, LedVerdeEnPlaca, LedEncendido;
+SemaphoreHandle_t MutexApliEscribir;  // Para integridad de escritura
 
 /* Mensajes... */
 const char *pcTextForMain = "// ISPEL en ejecucion.\n";
@@ -73,7 +76,7 @@ void apli_inicializar( void )
 	uHALinicializar();						// Capa HAL
 	uHALmapInicializar( UHAL_MAP_PE5 ); // Objeto señal cuadrada MAP=PWM en pin PE5
 
-	// Inicialización de módulos, tareas y objetos--------------------------------------------------
+	// Inicialización de módulos -------------------------------------------------------------------
 
 	configASSERT( true == LedsRTOS_Inicializar()    );
 	configASSERT( true == BotonesRTOS_Inicializar()	);
@@ -82,20 +85,24 @@ void apli_inicializar( void )
 	configASSERT( true == TestRTOS_Inicializar()		);
 	configASSERT( true == ai_inicializar()				);
 
-	configASSERT( NULL        != (MutexApliEscribir=xSemaphoreCreateMutex()) );
-	configASSERT( ERROR_BOTON != (BotonEnPlaca=BotonesRTOS_InicializarBoton(U_BOTON_EP)) );
+	// Inicialización y configuración de objetos ---------------------------------------------------
 
-	configASSERT( ERROR_LED   != (LedRojoEnPlaca = LedsRTOS_InicializarLed ( U_LED_ROJO_EP )) );
-	configASSERT( ERROR_LED   != (LedVerdeEnPlaca = LedsRTOS_InicializarLed ( U_LED_VERDE_EP )) );
-	configASSERT( ERROR_LED   != (Led_prueba = LedsRTOS_InicializarLed ( HAL_PIN_PB11 )) );
-	configASSERT( LedsRTOS_ModoLed ( Led_prueba, SUSPENSION ) );
-	configASSERT( LedsRTOS_EncenderLed (Led_prueba)  );
+	configASSERT( NULL        != (MutexApliEscribir	= xSemaphoreCreateMutex()) 							);
+	configASSERT( ERROR_BOTON != (BotonEnPlaca		= BotonesRTOS_InicializarBoton (U_BOTON_EP))		);
+	configASSERT( ERROR_BOTON != (BotonEncendido		= BotonesRTOS_InicializarBoton (HAL_PIN_PE7))	);
+	configASSERT( ERROR_BOTON != (BotonGen1  			= BotonesRTOS_InicializarBoton (HAL_PIN_PE8))	);
+	configASSERT( ERROR_BOTON != (BotonGen2			= BotonesRTOS_InicializarBoton (HAL_PIN_PG9))	);
+	configASSERT( ERROR_BOTON != (BotonCaptu1			= BotonesRTOS_InicializarBoton (HAL_PIN_PG14))	);
+	configASSERT( ERROR_BOTON != (BotonCaptu2			= BotonesRTOS_InicializarBoton (HAL_PIN_PF15))	);
+	configASSERT( ERROR_BOTON != (BotonCaptuDisparo	= BotonesRTOS_InicializarBoton (HAL_PIN_PE13))	);
+	configASSERT( ERROR_LED   != (LedRojoEnPlaca  	= LedsRTOS_InicializarLed (U_LED_ROJO_EP))		);
+	configASSERT( ERROR_LED   != (LedVerdeEnPlaca 	= LedsRTOS_InicializarLed (U_LED_VERDE_EP))		);
+	configASSERT( ERROR_LED   != (LedEncendido    	= LedsRTOS_InicializarLed (HAL_PIN_PB11))			);
 
-
-
+	configASSERT( LedsRTOS_ModoLed ( LedEncendido, SUSPENSION ) );
+	configASSERT( LedsRTOS_EncenderLed (LedEncendido)  );
 	configASSERT( LedsRTOS_ModoLed ( LedRojoEnPlaca, SUSPENSION ) );
 	configASSERT( LedsRTOS_EncenderLed (LedRojoEnPlaca)  );
-
 	uHALmapConfigurarFrecuencia( UHAL_MAP_PE5 , FREC_TESTIGO );  // Señal cuadrada testigo
 	uHALmapEncender            ( UHAL_MAP_PE5 );
 
@@ -127,16 +134,15 @@ void apli_inicializar( void )
 	 * - Lectura de UART
 	 * - Actualización de leds
 	 * - Actualización de botones */
-	ret = xTaskCreate(	Tarea_PALTA,						// Puntero a la función-tarea.
-								"PALTA",								// Nombre de tarea. Para desarrollo.
+	ret = xTaskCreate(	Tarea_PALTA,							// Puntero a la función-tarea.
+								"PALTA",									// Nombre de tarea. Para desarrollo.
 								(2 * configMINIMAL_STACK_SIZE),	// Tamaño de stack en palabras.
 								NULL,    								// Parametros de la tarea, que no tiene acá
 								TAREA_PRIORIDAD_ALTA,				// Prioridad alta.
 								&PALTA_admin );						// Variable de administración de tarea.
 	configASSERT( ret == pdPASS );
 
-	/* Tarea PMEDIA para funciones cada 10 ms:
-	 * */
+	/* Tarea PMEDIA para funciones cada 10 ms: */
 	ret = xTaskCreate( 	Tarea_PMEDIA,
 								"PMEDIA",
 								(2 * configMINIMAL_STACK_SIZE),
@@ -234,7 +240,62 @@ void Tarea_PMEDIA ( void *pvParameters )
 	/* Ciclo infinito: */
 	for( ;; )
 	{
+		// Prioridad: Procesar los mensajes que estén en cola
 		ai_procesar_mensajes();
+
+		// Verifico botón ENCENDIDO
+		if( BotonesRTOS_BotonFlancoPresionado(BotonEncendido) && false==EquipoEncendido ) {
+			EquipoEncendido = true;
+			PresionadoParaEncendido = true;
+			LedsRTOS_ModoLed (LedEncendido,PLENO);
+		}
+		if( BotonesRTOS_BotonPresionadoLargo(BotonEncendido) && false==PresionadoParaEncendido ) {
+			EquipoEncendido = false;
+			LedsRTOS_ModoLed (LedEncendido,SUSPENSION);
+			GenRTOS_Apagar(GENERADORES_TODOS, portMAX_DELAY);
+			CaptuRTOS_EntradaApagar(ENTRADAS_TODAS, portMAX_DELAY);
+		}
+		if( false==BotonesRTOS_BotonPresionado(BotonEncendido)) {
+			PresionadoParaEncendido = false;
+		}
+
+		// Verifico botón GEN 1
+		if (BotonesRTOS_BotonFlancoPresionado( BotonGen1 ) && EquipoEncendido) {
+			if (GenRTOS_EstaEncendido( GENERADOR_1, 25 * PERIODO_1MS )) {
+				GenRTOS_Apagar( GENERADOR_1, 50 * PERIODO_1MS );
+			} else {
+				GenRTOS_Encender( GENERADOR_1, 50 * PERIODO_1MS );
+			}
+		}
+
+		// Verifico botón GEN 2
+		if (BotonesRTOS_BotonFlancoPresionado( BotonGen2 ) && EquipoEncendido) {
+			if (GenRTOS_EstaEncendido( GENERADOR_2, 25 * PERIODO_1MS )) {
+				GenRTOS_Apagar( GENERADOR_2, 50 * PERIODO_1MS );
+			} else {
+				GenRTOS_Encender( GENERADOR_2, 50 * PERIODO_1MS );
+			}
+		}
+
+		// Verifico botón CAPTU 1
+		if (BotonesRTOS_BotonFlancoPresionado( BotonCaptu1 ) && EquipoEncendido) {
+			if (CaptuRTOS_EntradaEstaEncendida( ENTRADA_1, 25 * PERIODO_1MS )) {
+				CaptuRTOS_EntradaApagar( ENTRADA_1, 50 * PERIODO_1MS );
+			} else {
+				CaptuRTOS_EntradaEncender( ENTRADA_1, 50 * PERIODO_1MS );
+			}
+		}
+
+		// Verifico botón CAPTU 2
+		if (BotonesRTOS_BotonFlancoPresionado( BotonCaptu2 )  && EquipoEncendido) {
+			if (CaptuRTOS_EntradaEstaEncendida( ENTRADA_2, 25 * PERIODO_1MS )) {
+				CaptuRTOS_EntradaApagar( ENTRADA_2, 50 * PERIODO_1MS );
+			} else {
+				CaptuRTOS_EntradaEncender( ENTRADA_2, 50 * PERIODO_1MS );
+			}
+		}
+
+		// FIN DE CICLO
 		//apli_separador(".");
 		apli_latido();
 		vTaskDelay( 25 * PERIODO_1MS );

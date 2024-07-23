@@ -33,6 +33,7 @@ bool 			BotonesRTOS_Inicializar 				( void );
 boton_id_t	BotonesRTOS_InicializarBoton 			( hal_pin_id_t );
 bool			BotonesRTOS_ActualizarTodo 			( TickType_t );
 bool 			BotonesRTOS_BotonFlancoPresionado	( boton_id_t );
+bool 			BotonesRTOS_BotonPresionado			( boton_id_t );
 bool 			BotonesRTOS_BotonPresionadoLargo		( boton_id_t );
 
 /*************************************************************************************************/

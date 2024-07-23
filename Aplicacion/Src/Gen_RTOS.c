@@ -10,7 +10,7 @@
 /****** Librerías (includes) *********************************************************************/
 
 #include "Gen_RTOS.h"
-#include "Leds_RTOS.h"
+//#include "Leds_RTOS.h"
 
 /****** Definiciones privadas (macros) ***********************************************************/
 
@@ -21,12 +21,12 @@
 
 /****** Definición de datos privados *************************************************************/
 
-SemaphoreHandle_t GenMutexAdmin;			// Semáforo que administra el acceso a las funciones.
-gen_conf_s			GenConfigRTOS = {0};	// Configuración DAC
+static SemaphoreHandle_t	GenMutexAdmin;			// Semáforo que administra el acceso a las funciones.
+//static gen_conf_s				GenConfigRTOS = {0};	// Configuración para DACs
 
 /****** Definición de datos públicos *************************************************************/
 
-led_id_t	LedGen1, LedGen2;
+led_id_t		LedGen1, LedGen2;
 
 /****** Declaración de funciones privadas ********************************************************/
 
@@ -51,14 +51,10 @@ bool GenRTOS_Inicializar (void)
 	configASSERT ( NULL != GenMutexAdmin );
 
 	// Leds indicadores
-
 	configASSERT( ERROR_LED   != (LedGen1 = LedsRTOS_InicializarLed ( HAL_PIN_PB10 )) );
 	configASSERT( ERROR_LED   != (LedGen2 = LedsRTOS_InicializarLed ( HAL_PIN_PE15 )) );
 	configASSERT( LedsRTOS_ModoLed ( LedGen1, PLENO ) );
 	configASSERT( LedsRTOS_ModoLed ( LedGen2, PLENO ) );
-
-	/*configASSERT( LedsRTOS_EncenderLed (LedGen1)  );
-	configASSERT( LedsRTOS_EncenderLed (LedGen2)  );*/
 
 	// Terminada la inicialización...
 	return RET;
@@ -72,6 +68,7 @@ bool GenRTOS_Inicializar (void)
 bool GenRTOS_Encender ( gen_id_e ID, TickType_t ESPERA )
 {
 	bool_t RET = false;
+	if( false==EquipoEncendido ) return false;
 	if(pdTRUE == xSemaphoreTake( GenMutexAdmin, ESPERA )) {
 		if(uGeneradorEncender(ID)) {
 			if(ID==GENERADOR_1) {
@@ -149,6 +146,21 @@ bool GenRTOS_Obtener ( gen_id_e ID, gen_conf_s * CONFIG, TickType_t ESPERA )
 	return RET;
 }
 
+bool GenRTOS_EstaEncendido ( gen_id_e ID , TickType_t ESPERA )
+{
+	bool_t RET = false;
+	gen_estados_e ESTADO = 	GENERADOR_APAGADO;
+	if(pdTRUE == xSemaphoreTake( GenMutexAdmin, ESPERA )) {
+		ESTADO = uGeneradorObtenerEstado( ID );
+		if(GENERADOR_ENCENDIDO==ESTADO) {
+			RET = true;
+		}
+		xSemaphoreGive( GenMutexAdmin );
+	}
+	return RET;
+}
+
+
 bool GenRTOS_EscribirConfiguraciones ( TickType_t ESPERA )
 {
 	bool_t		RET = false;
@@ -173,9 +185,9 @@ void escribir_salida(gen_id_e ID)
 		escribir_salida(GENERADOR_2);
 	} else if(uGeneradorObtener(ID,&CONFIG)) {
 		if(ID==GENERADOR_1){
-			uoEscribirTxt("MSJ GEN S1 CONFIGURADO");
+			uoEscribirTxt("MSJ GEN S1 CONFIGURADA");
 		} else if(ID==GENERADOR_2){
-			uoEscribirTxt("MSJ GEN S2 CONFIGURADO");
+			uoEscribirTxt("MSJ GEN S2 CONFIGURADA");
 		} else{
 			uoEscribirTxt("MSJ GEN desconocido");
 		}

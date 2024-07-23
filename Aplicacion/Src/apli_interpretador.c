@@ -353,6 +353,13 @@ void cmd_entrada( char* COMANDO )
 			CaptuRTOS_EntradaConfigurar( EntradaId, &EntradaConfig, portMAX_DELAY );
 		}
 	}
+
+	// OBTENER
+	if (comparar_texto(SUBCMD,CMD_OBTENER)) {
+		CaptuRTOS_EscribirConfiguracionEntrada ( EntradaId, portMAX_DELAY );
+	}
+
+	// FIN
 }
 
 void cmd_generador( char * COMANDO )

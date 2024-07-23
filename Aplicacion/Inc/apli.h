@@ -41,13 +41,14 @@ extern "C" {
 /****** Definiciones públicas de tipos de datos (public typedef) *********************************/
 
 
-/****** Declaraciones de datos externos **********************************************************/
+/****** Declaración de datos publicos (public data) **********************************************/
 
+extern bool_t					EquipoEncendido;
 extern const char *			Barra;
-extern boton_id_t  			BotonEnPlaca;
+extern boton_id_t  			BotonEnPlaca, BotonCaptuDisparo;
 extern SemaphoreHandle_t	MutexApliEscribir;
 
-/****** Declaración de funciones públicas ********************************************************/
+/****** Declaración de funciones públicas (public functions) **************************************/
 
 void 			apli_inicializar( void );
 void 			apli_alerta( const char * );

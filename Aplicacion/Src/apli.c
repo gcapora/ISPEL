@@ -89,15 +89,15 @@ void apli_inicializar( void )
 
 	configASSERT( NULL        != (MutexApliEscribir	= xSemaphoreCreateMutex()) 							);
 	configASSERT( ERROR_BOTON != (BotonEnPlaca		= BotonesRTOS_InicializarBoton (U_BOTON_EP))		);
-	configASSERT( ERROR_BOTON != (BotonEncendido		= BotonesRTOS_InicializarBoton (HAL_PIN_PE7))	);
-	configASSERT( ERROR_BOTON != (BotonGen1  			= BotonesRTOS_InicializarBoton (HAL_PIN_PE8))	);
-	configASSERT( ERROR_BOTON != (BotonGen2			= BotonesRTOS_InicializarBoton (HAL_PIN_PG9))	);
-	configASSERT( ERROR_BOTON != (BotonCaptu1			= BotonesRTOS_InicializarBoton (HAL_PIN_PG14))	);
-	configASSERT( ERROR_BOTON != (BotonCaptu2			= BotonesRTOS_InicializarBoton (HAL_PIN_PF15))	);
-	configASSERT( ERROR_BOTON != (BotonCaptuDisparo	= BotonesRTOS_InicializarBoton (HAL_PIN_PE13))	);
+	configASSERT( ERROR_BOTON != (BotonEncendido		= BotonesRTOS_InicializarBoton (HAL_PIN_PG14))	);
+	configASSERT( ERROR_BOTON != (BotonGen1  			= BotonesRTOS_InicializarBoton (HAL_PIN_PF15))	);
+	configASSERT( ERROR_BOTON != (BotonGen2			= BotonesRTOS_InicializarBoton (HAL_PIN_PE13))	);
+	configASSERT( ERROR_BOTON != (BotonCaptu1			= BotonesRTOS_InicializarBoton (HAL_PIN_PF14))	);
+	configASSERT( ERROR_BOTON != (BotonCaptu2			= BotonesRTOS_InicializarBoton (HAL_PIN_PE11))	);
+	configASSERT( ERROR_BOTON != (BotonCaptuDisparo	= BotonesRTOS_InicializarBoton (HAL_PIN_PE9))	);
 	configASSERT( ERROR_LED   != (LedRojoEnPlaca  	= LedsRTOS_InicializarLed (U_LED_ROJO_EP))		);
-	configASSERT( ERROR_LED   != (LedVerdeEnPlaca 	= LedsRTOS_InicializarLed (U_LED_VERDE_EP))		);
-	configASSERT( ERROR_LED   != (LedEncendido    	= LedsRTOS_InicializarLed (HAL_PIN_PB11))			);
+	//configASSERT( ERROR_LED   != (LedVerdeEnPlaca 	= LedsRTOS_InicializarLed (U_LED_VERDE_EP))		);
+	configASSERT( ERROR_LED   != (LedEncendido    	= LedsRTOS_InicializarLed (HAL_PIN_PE15))			);
 
 	configASSERT( LedsRTOS_ModoLed ( LedEncendido, SUSPENSION ) );
 	configASSERT( LedsRTOS_EncenderLed (LedEncendido)  );

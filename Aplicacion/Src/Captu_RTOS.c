@@ -63,9 +63,9 @@ bool CaptuRTOS_Inicializar (void)
 	configASSERT ( NULL != CaptuMutexAdmin );
 
 	// Leds
-	configASSERT( ERROR_LED   != (LedCaptu1 = LedsRTOS_InicializarLed ( HAL_PIN_PE14 )) );
-	configASSERT( ERROR_LED   != (LedCaptu2 = LedsRTOS_InicializarLed ( HAL_PIN_PE12 )) );
-	configASSERT( ERROR_LED   != (LedCaptuDisparo = LedsRTOS_InicializarLed ( HAL_PIN_PE10 )) );
+	configASSERT( ERROR_LED   != (LedCaptu1 = LedsRTOS_InicializarLed ( HAL_PIN_PE0 )) );
+	configASSERT( ERROR_LED   != (LedCaptu2 = LedsRTOS_InicializarLed ( HAL_PIN_PB0 )) );
+	configASSERT( ERROR_LED   != (LedCaptuDisparo = LedsRTOS_InicializarLed ( HAL_PIN_PE2 )) );
 	configASSERT( LedsRTOS_ModoLed ( LedCaptu1, SUSPENSION ) );
 	configASSERT( LedsRTOS_ModoLed ( LedCaptu2, SUSPENSION ) );
 	configASSERT( LedsRTOS_ModoLed ( LedCaptuDisparo, TITILANTE ) );
@@ -87,7 +87,7 @@ bool	CaptuRTOS_Comenzar ( TickType_t ESPERA )
 			LedsRTOS_EncenderLed ( LedCaptuDisparo );
 			LedsRTOS_ModoLed 		( LedCaptu1, TITILANTE );
 			LedsRTOS_ModoLed 		( LedCaptu2, TITILANTE );
-			LedsRTOS_EncenderLed ( LedVerdeEnPlaca );
+			//LedsRTOS_EncenderLed ( LedVerdeEnPlaca );
 			//uoLedEncender ( UOSAL_PIN_LED_VERDE_INCORPORADO );
 			apli_mensaje("Comenzamos captura...",portMAX_DELAY);
 			RET = true;
@@ -309,7 +309,7 @@ void Tarea_Capturadora( void *pvParameters )
 					LedsRTOS_ApagarLed	( LedCaptuDisparo );
 					LedsRTOS_ModoLed 		( LedCaptu1, SUSPENSION );
 					LedsRTOS_ModoLed		( LedCaptu2, SUSPENSION );
-					LedsRTOS_ApagarLed	( LedVerdeEnPlaca );
+					//LedsRTOS_ApagarLed	( LedVerdeEnPlaca );
 				}
 				xSemaphoreGive( CaptuMutexAdmin );
 				// Sin retardo.

@@ -102,14 +102,18 @@ led_id_t uLedInicializar(hal_pin_id_t pin_led) {
     vectorLedControl[IdLed].SentidoCuentaModoSuspension = 1;
     vectorLedControl[IdLed].CuentaModoSuspension = 0;
     vectorLedControl[IdLed].inicializado = true;
-    if( pin_led==HAL_PIN_PB0 || pin_led==HAL_PIN_PB7 || pin_led==HAL_PIN_PB14 ) {
+    //if( pin_led==HAL_PIN_PB0 || pin_led==HAL_PIN_PB7 || pin_led==HAL_PIN_PB14 ) {
+    // Como usamos el PIN_PB0, debemos evitar usar el led en placa verde
+    if( pin_led==HAL_PIN_PB7 || pin_led==HAL_PIN_PB14 ) {
        vectorLedControl[IdLed].salida_negada = false;
     } else {
        vectorLedControl[IdLed].salida_negada = true;
     }
 
     // Inicializamos pin gpio
-    if( pin_led==HAL_PIN_PB0 || pin_led==HAL_PIN_PB7 || pin_led==HAL_PIN_PB14 ) {
+    //if( pin_led==HAL_PIN_PB0 || pin_led==HAL_PIN_PB7 || pin_led==HAL_PIN_PB14 ) {
+    // Como usamos el PIN_PB0, debemos evitar usar el led en placa verde
+    if( pin_led==HAL_PIN_PB7 || pin_led==HAL_PIN_PB14 ) {
    	 pin_config.Modo = U_GPIO_MODO_SALIDA;
     } else {
    	 pin_config.Modo = MODO_LED_EXT;

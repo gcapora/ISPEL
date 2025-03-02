@@ -24,6 +24,7 @@
 static SemaphoreHandle_t	GenMutexAdmin;			// Semáforo que administra el acceso a las funciones.
 //static gen_conf_s				GenConfigRTOS = {0};	// Configuración para DACs
 
+
 /****** Definición de datos públicos *************************************************************/
 
 led_id_t		LedGen1, LedGen2;
@@ -52,9 +53,12 @@ bool GenRTOS_Inicializar (void)
 
 	// Leds indicadores
 	configASSERT( ERROR_LED   != (LedGen1 = LedsRTOS_InicializarLed ( HAL_PIN_PB10 )) );
-	configASSERT( ERROR_LED   != (LedGen2 = LedsRTOS_InicializarLed ( HAL_PIN_PE15 )) );
+	configASSERT( ERROR_LED   != (LedGen2 = LedsRTOS_InicializarLed ( HAL_PIN_PB11 )) );
 	configASSERT( LedsRTOS_ModoLed ( LedGen1, PLENO ) );
 	configASSERT( LedsRTOS_ModoLed ( LedGen2, PLENO ) );
+
+	// Pines de control
+
 
 	// Terminada la inicialización...
 	return RET;

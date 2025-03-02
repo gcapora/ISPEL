@@ -39,6 +39,7 @@ typedef struct {
 
 static uint32_t     Muestras  [CANTIDAD_GENERADORES][UG_CANTIDAD_MUESTRAS_SENIAL] __attribute__((aligned(4))) = {0};
 static gen_manejo_s Generador [CANTIDAD_GENERADORES] = {0};
+static hal_pin_id_t PinControl[CANTIDAD_GENERADORES] = {0};
 
 /****** Declaración de funciones privadas ********************************************************/
 
@@ -136,9 +137,9 @@ bool uGeneradorInicializar (gen_id_e GEN)
 	if ( GEN == GENERADOR_1 ) LARGO0 = LARGO0 * 3;
 	if (LARGO0 > UG_CANTIDAD_MUESTRAS_SENIAL) LARGO0 = UG_CANTIDAD_MUESTRAS_SENIAL;
 	   // UG_CANTIDAD_MUESTRAS_SENIAL es lo que reservó la librería uGenerador
-	// double FREC_MUESTREO0;
+	hal_pin_config_s pin_config = {0};
 
-    // Evalúo si se solicita inicializar todos:
+   // Evalúo si se solicita inicializar todos:
 	if ( GEN == CANTIDAD_GENERADORES ) {
 		RETORNO = uGeneradorInicializar (GENERADOR_1);
 		RETORNO = RETORNO && uGeneradorInicializar (GENERADOR_2);
@@ -173,6 +174,16 @@ bool uGeneradorInicializar (gen_id_e GEN)
 	uGenConfiguradoDesdeSenial (GEN);
 	Generador[GEN].Configurar.Acople = DC;
 	Generador[GEN].Estado = GENERADOR_APAGADO;
+
+	// Inicializar pin de control
+	PinControl[GENERADOR_1] = HAL_PIN_PB12;
+	PinControl[GENERADOR_2] = HAL_PIN_PB13;
+
+  	pin_config.Modo      = U_GPIO_MODO_SALIDA_DA;
+   pin_config.Tirar     = U_GPIO_NO_TIRAR;
+   pin_config.Velocidad = U_GPIO_VELOCIDAD_BAJA;
+   uHALgpioInicializar ( PinControl[GEN], &pin_config );
+   uHALgpioEscribir    ( PinControl[GEN], true ); // true es colector abierto
 
     // Fin...
 	return true;
@@ -276,6 +287,7 @@ bool uGeneradorEncender (gen_id_e GEN)
 		uHALdacdmaComenzar ( DAC_N,
 				             Generador[GEN].Senial.Muestras_p,
 							 Generador[GEN].Senial.Largo    );
+	   uHALgpioEscribir ( PinControl[GEN], false ); // Enciende pin de control
 		Generador[GEN].Estado = GENERADOR_ENCENDIDO;
 		RETORNO = true;
 	}
@@ -313,6 +325,7 @@ bool uGeneradorApagar      (gen_id_e GEN)
 
 	// Actuo...
 	uHALdacParar ( DAC_N );
+   uHALgpioEscribir ( PinControl[GEN], true ); // Enciende pin de control
 	Generador[GEN].Estado = GENERADOR_APAGADO;
 	return true;
 }

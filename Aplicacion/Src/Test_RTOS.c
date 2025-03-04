@@ -173,7 +173,7 @@ void testeo_temporizadores (void)
 
 void config_0_generadores (void)
 {
-	Frecuencia = 10000;
+	Frecuencia = 1000;
 	if ( GenRTOS_Obtener ( GENERADOR_1, &GenConfig, portMAX_DELAY )) {
 		GenConfig.Frecuencia = Frecuencia;
 		GenConfig.Tipo = SENOIDAL;
@@ -181,8 +181,8 @@ void config_0_generadores (void)
 		//GenConfig.Tipo = CUADRADA;
 		GenConfig.Fase = 0;
 		GenConfig.Simetria = 0.5;
-		GenConfig.Maximo = 2.5;
-		GenConfig.Minimo = 0.5;
+		GenConfig.Maximo = 5.02;
+		GenConfig.Minimo = -5.02;
 		GenConfig.Acople = DC;
 		if (!GenRTOS_Configurar ( GENERADOR_1, &GenConfig, portMAX_DELAY ))
 			uoHuboErrorTxt("No pudimos configurar GEN.");

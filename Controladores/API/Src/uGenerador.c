@@ -151,7 +151,7 @@ bool uGeneradorInicializar (gen_id_e GEN)
 	uHALdacInicializar ( DAC_N );
 
 	// Cargo senial inicial
-	Generador[GEN].Senial.Tipo = SENOIDAL;
+	Generador[GEN].Senial.Tipo = TRIANGULAR;
 	Generador[GEN].Senial.Maximo = MAXIMO_DAC[DAC_N];
 	Generador[GEN].Senial.Minimo = MINIMO_DAC[DAC_N];
 	Generador[GEN].Senial.Largo = LARGO0;

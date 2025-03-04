@@ -19,7 +19,8 @@
 
 #define U_ENTRADAS_CANTIDAD       				2
 #define U_NUM_MAX_CAPTURAS_PROMEDIAR			16
-#define U_LARGO_CAPTURA								4000	// Total de muestras a capturar (incluye PRE_DISPARO y POS_DISPARO)
+#define U_LARGO_CAPTURA								4000	// Total de muestras a capturar
+                                                   // (incluye PRE_DISPARO y POS_DISPARO)
 
 #define CAPTURA_UNICA								0b00000001
 #define CAPTURA_CONTINUA							0b00000010  // Sin habilitar por ahora
@@ -44,21 +45,22 @@ typedef enum {
 typedef enum {
 	SUBIDA,
 	BAJADA //,
-	// AMBOS <--- Esto se implementará en otra etapa porque dede analizarse que hacer cuando se promedia
+	// AMBOS <--- Esto se implementará en otra etapa
+	//            porque dede analizarse que hacer cuando se promedia
 } flanco_e;
 
 typedef struct {
-	double    				EscalaHorizontal;	// [s]  Intervalo a capturar y mostrar en pantalla.
-														//      Este valor determina la frecuencia de muestreo
-	entrada_id_e			OrigenDisparo;		//      Incluye Origen Modo Alternado y Modo Asincronico
-	uint8_t					ModoCaptura;		//      Ver Definiciones públicas (macros)
+	double    				EscalaHorizontal;	// [s] Intervalo a capturar y mostrar en pantalla.
+														//     Este valor determina la frecuencia de muestreo
+	entrada_id_e			OrigenDisparo;		// Incluye Origen Modo Alternado y Modo Asincronico
+	uint8_t					ModoCaptura;		// Ver Definiciones públicas (macros)
 } capturadora_config_s;
 
 typedef struct {
-	float		  	  			EscalaVertical;	// [V]  Máxima tensión positiva, que se adecuará a escalas disponibles
+	float		  	  			EscalaVertical;	// [V]  Máxima tensión positiva, valor nominal,
+	                                       // que se adecuará a escalas disponibles.
 	float	   				NivelDisparo;
 	flanco_e 				FlancoDisparo;
-	//senial_s * 				Senial;			   // Donde almaceno mi señal.
 	bool						Encendida;
 } entrada_config_s;
 

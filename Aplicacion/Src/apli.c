@@ -117,17 +117,6 @@ void apli_inicializar( void )
 			  	  	  	  	  	  (uint32_t) round( uHALmapObtenerFrecuencia(UHAL_MAP_PE5)), " Hz.\n" );
 	devolver_escritura();
 
-	// Probamos leds controlados por UOSAL
-	/*
-  	uoLedEncender	(UOSAL_PIN_LED_VERDE_INCORPORADO);
-  	uoLedEncender	(UOSAL_PIN_LED_AZUL_INCORPORADO);
-  	uoLedEncender	(UOSAL_PIN_LED_ROJO_INCORPORADO);
-
-  	uoEscribirTxt	("Espero 1 segundo con leds incorporados encendidos...\r\n");
-  	uoEsperarMilis (1000);
-  	uoLedApagar		(UOSAL_PIN_LED_VERDE_INCORPORADO);
-  	*/
-
 	// Creación de las tareas ---------------------------------------------------------------------
 
 	/* Tarea PALTA para funciones rápidas cada 1 ms:

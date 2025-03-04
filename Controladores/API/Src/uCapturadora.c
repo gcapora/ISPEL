@@ -45,6 +45,10 @@ typedef enum {
 typedef struct {
 	entrada_config_s				Config;
 	entrada_estado_e				Estado;
+//	uint32_t                   Nivel_0V;          // Cuenta que representa 0V (1).
+//	float                      Cuentas_x_Voltio;  // Transferencia de la escala configurada (2).
+	                                              // Estos valores (1) y (2) deben cargarse cuando
+	                                              // se cambia la escala.
 } entrada_admin_s;
 
 typedef struct {
@@ -64,7 +68,8 @@ typedef enum {
 	ESCALA_VERTICAL_2,
 	ESCALA_VERTICAL_MAXIMA = ESCALA_VERTICAL_2,
 	ESCALAS_VERTICALES_CANTIDAD,
-	ESCALA_VERTICAL_DESBORDADA
+	ESCALA_VERTICAL_DESBORDADA,
+	ESCALA_VERTICAL_NINGUNA
 } escala_vertical_e;
 
 /****** Definición de datos privados **********************************************************/
@@ -76,7 +81,11 @@ static uint32_t 				MuestrasCapturadas12 [U_LARGO_CAPTURA_INICIAL] = {0};
 static uint32_t 				MuestrasProcesadas12 [U_LARGO_CAPTURA] = {0};
 static uint8_t					CantidadProcesadas12 [U_LARGO_CAPTURA] = {0};
 volatile	bool	LecturaCompletada = false;
-const float		EscalasVerticales [ESCALAS_VERTICALES_CANTIDAD] = {3.3, 6.6};
+const float		EscalasVerticales  [ESCALAS_VERTICALES_CANTIDAD] = {10, 20};
+const uint32_t Nivel_0V           [U_ENTRADAS_CANTIDAD]         = {2034, 2028}; // Cuentas que representa 0V de E1 y E2
+const float    Cuentas_por_Voltio [U_ENTRADAS_CANTIDAD]
+											 [ESCALAS_VERTICALES_CANTIDAD] = { {181.5, 58.96},    // E1: escala 10V y 20V
+													                             {179.7, 58.57} };  // E2; escala 10V y 20V
 
 /****** Declaración de funciones privadas ********************************************************/
 
@@ -236,8 +245,8 @@ bool uCapturadoraEntradaConfigurar 	( entrada_id_e ID, entrada_config_s * PCONFI
 	EntradaAdmin[ID].Config.NivelDisparo    = PCONFIG->NivelDisparo;
 	if ( EntradaAdmin[ID].Config.NivelDisparo > EntradaAdmin[ID].Config.EscalaVertical )
 		EntradaAdmin[ID].Config.NivelDisparo = EntradaAdmin[ID].Config.EscalaVertical;
-	if ( EntradaAdmin[ID].Config.NivelDisparo < 0 )
-		EntradaAdmin[ID].Config.NivelDisparo = 0;  // TODO corregir con escala inferior negativa
+	if ( EntradaAdmin[ID].Config.NivelDisparo < -EntradaAdmin[ID].Config.EscalaVertical )
+		EntradaAdmin[ID].Config.NivelDisparo = -EntradaAdmin[ID].Config.EscalaVertical;
 	EntradaAdmin[ID].Config.FlancoDisparo   = PCONFIG->FlancoDisparo;
 	EntradaAdmin[ID].Config.Encendida       = PCONFIG->Encendida;
 
@@ -334,9 +343,10 @@ bool uCapturadoraEntradaApagar ( entrada_id_e ID )
 bool uCapturadoraIniciar ( void )
 {
 	/* Variables locales */
-	bool 				control = false;
-	entrada_id_e	OrigenDisparo = Capturadora.Config.OrigenDisparo;
-	uint32_t 		i;
+	bool 				   control = false;
+	entrada_id_e	   OrigenDisparo = Capturadora.Config.OrigenDisparo;
+	escala_vertical_e EscalaVerticalEnum = ESCALA_VERTICAL_NINGUNA;
+	uint32_t 		   i;
 
 	/* Precondiciones */
 	if ( CAPTURADORA_INACTIVA != Capturadora.Estado ) {
@@ -352,10 +362,15 @@ bool uCapturadoraIniciar ( void )
 	if (false==control) return control;
 
 	/* Configuramos parámetros y lanzamos muestreo */
+
+	EscalaVerticalEnum = EscalaVerticalId (EntradaAdmin[OrigenDisparo].Config.EscalaVertical);
+	                                                                            // Identifica número de escala
 	if ( OrigenDisparo <= ENTRADA_2 ) {
-		Capturadora.NivelDisparo  = EntradaAdmin[OrigenDisparo].Config.NivelDisparo   /
-											 EntradaAdmin[OrigenDisparo].Config.EscalaVertical *
-											 MAXIMO_12B;
+		Capturadora.NivelDisparo  = EntradaAdmin[OrigenDisparo].Config.NivelDisparo
+										    * Cuentas_por_Voltio [OrigenDisparo] [EscalaVerticalEnum]
+									       + Nivel_0V[OrigenDisparo];
+		// Capturadora.NidelDisparo está en cuentas, pero EntradaAdmin[...].Config.NivelDisparo está en voltios.
+		// Se debe adecuar un nivel de +/-EscalaVertical a cuentas de 0-4095.
 		Capturadora.FlancoDisparo = EntradaAdmin[OrigenDisparo].Config.FlancoDisparo;
 	}
 	Capturadora.CapturasRestantes = CapturasObjetivo();

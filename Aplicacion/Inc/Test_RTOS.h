@@ -22,10 +22,6 @@
 
 /****** Definiciones públicas de tipos de datos (public typedef) *********************************/
 
- typedef enum {
- 	TEST_GENERAL,
- 	NUM_TEST,
- } tipo_test_e;
 
 /****** Declaraciones de datos externos **********************************************************/
 
@@ -34,10 +30,9 @@
 
 bool TestRTOS_Inicializar	( void );
 void Tarea_Test 				( void * );
-void Test_Testear				( tipo_test_e, TickType_t );
 void Test_Config_0			( TickType_t );
-void Test_Captu_Inicia		( TickType_t );
-void Test_Gen_Enciende		( TickType_t );
+void Test_Generador			( TickType_t );
+void Test_Capturadora      ( TickType_t );
 
 /*************************************************************************************************/
 #ifdef __cplusplus

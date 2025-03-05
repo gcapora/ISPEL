@@ -58,8 +58,9 @@ typedef struct {
 
 const uint32_t MAXIMO_DAC[UHAL_CANTIDAD_DACS]        = { 3950, 4010 };
 const uint32_t MINIMO_DAC[UHAL_CANTIDAD_DACS]        = {   50,  100 };
-const uint32_t CERO_DAC  [UHAL_CANTIDAD_DACS]        = { 2031, 2046 }; //{ 2000, 2050 };
-const double   TRANSFERENCIA_DAC[UHAL_CANTIDAD_DACS] = { 5.007e-3, 4.955e-3 }; // voltios / cuenta
+const uint32_t CERO_DAC  [UHAL_CANTIDAD_DACS]        = { 2038, 2048 }; // Ideal = 2048
+const double   TRANSFERENCIA_DAC[UHAL_CANTIDAD_DACS] = { 5.017e-3, 4.994e-3 }; // voltios / cuenta
+                                                                               // Ideal = 4.883e-3
 
 /****** Definición de datos privados *************************************************************/
 

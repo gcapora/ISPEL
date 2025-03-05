@@ -65,60 +65,17 @@ void Tarea_Test( void *pvParameters )
 	/* Configuración inicial de generadores y encendido */
 	config_0_generadores();
 	//encender_generadores();
-
-	/* Esta sería una forma de utilizar las funciones de uHALdac.h:
-	uHALdacInicializar ( UHAL_DAC_TODOS );
-	uHALdacdmaComenzar ( UHAL_DAC_1, senial1, 45 );
-	uHALdacdmaComenzar ( UHAL_DAC_2, senial1, 45 );
-	uHALdacEstablecerValor ( UHAL_DAC_2, 2000 );
-	*/
-
 	testeo_temporizadores();
 
 	/* Ciclo infinito... ------------------------------------------------------*/
 	for( ;; )
 	{
-
 		LedsRTOS_ModoLed( LedAzulEnPlaca, PLENO );
-		vTaskDelay( 1 * DELTAT_TEST );
-
-		//if (!CaptuRTOS_Comenzar(ESPERA_CAPTU)) apli_alerta ("No pudimos comenzar CAPTURADORA.");
-		/*LedsRTOS_ModoLed( LedAzulEnPlaca, TITILANTE_LENTO );
-		if (!CaptuRTOS_Comenzar(ESPERA_CAPTU)) apli_alerta ("No pudimos comenzar CAPTURADORA.");
-		vTaskDelay( 1UL );
-		CaptuRTOS_Parar(ESPERA_CAPTU);
-		vTaskDelay( DELTAT_TEST );*/
-
-		/*CaptuRTOS_Obtener( &CaptuConfig, ESPERA_CAPTU );
-		CaptuConfig.OrigenDisparo = ENTRADA_2;
-		CaptuRTOS_Configurar( &CaptuConfig, ESPERA_CAPTU );
-		if (!CaptuRTOS_Comenzar(ESPERA_CAPTU)) apli_alerta ("No pudimos comenzar CAPTURADORA.");
-		vTaskDelay( DELTAT_TEST );*/
-
-		/*LedsRTOS_ModoLed( LedAzulEnPlaca, BALIZA );
-		CaptuRTOS_EntradaObtener( ENTRADA_2, &EntraConfig, ESPERA_CAPTU);
-		EntraConfig.NivelDisparo = 1.65;
-		EntraConfig.FlancoDisparo = BAJADA;
-		CaptuRTOS_EntradaConfigurar( ENTRADA_2, &EntraConfig, ESPERA_CAPTU);
-		if (!CaptuRTOS_Comenzar(ESPERA_CAPTU)) apli_alerta ("No pudimos comenzar CAPTURADORA.");
-		*/
+		vTaskDelay( 2 * DELTAT_TEST );
 
 		LedsRTOS_ModoLed( LedAzulEnPlaca, BALIZA );
-		vTaskDelay( 5 * DELTAT_TEST );
-	}
-}
+		vTaskDelay( 10 * DELTAT_TEST );
 
-
-void Test_Testear ( tipo_test_e TIPO_TEST, TickType_t ESPERA )
-{
-	if(pdTRUE == xSemaphoreTake( TestMutexAdmin, ESPERA )) {
-		config_0_generadores();
-		encender_generadores();
-		vTaskDelay( ESPERA_CAPTU );
-		CaptuRTOS_Comenzar( ESPERA );
-		xSemaphoreGive( TestMutexAdmin );
-	} else {
-		apli_mensaje("No pudimos ejecutar testeo.", 3 * UN_SEGUNDO);
 	}
 }
 
@@ -132,23 +89,139 @@ void Test_Config_0 (TickType_t ESPERA)
 	}
 }
 
-void Test_Captu_Inicia (TickType_t ESPERA)
+void Test_Generador ( TickType_t ESPERA )
 {
+	gen_conf_s	GenConfigTest = {0};
 	if(pdTRUE == xSemaphoreTake( TestMutexAdmin, ESPERA )) {
-		CaptuRTOS_Comenzar( ESPERA );
+
+		// Mensaje inicial
+		apli_mensaje("Comenzando TEST de Generador.", UN_SEGUNDO);
+		apli_mensaje("Precondicion: Las salidas S1 y S2 deben estar conectadas a un osciloscopio.", UN_SEGUNDO);
+
+		// Configuro generadores en señal CUADRADA
+		if ( GenRTOS_Obtener ( GENERADOR_1, &GenConfigTest, ESPERA )) {
+			GenConfigTest.Frecuencia = 1000;
+			GenConfigTest.Tipo = CUADRADA;
+			GenConfigTest.Fase = 0;
+			GenConfigTest.Simetria = 0.5;
+			GenConfigTest.Maximo = 4.0;
+			GenConfigTest.Minimo = 0.0;
+			GenConfigTest.Acople = DC;
+			GenRTOS_Configurar ( GENERADOR_1, &GenConfigTest, portMAX_DELAY );
+			GenRTOS_Configurar ( GENERADOR_2, &GenConfigTest, portMAX_DELAY );
+			encender_generadores();
+			apli_mensaje("SX encendidas con senal CUADRADA 0V-4V 1kHz.", 3 * UN_SEGUNDO);
+			vTaskDelay( 30 * UN_SEGUNDO );
+		} else {
+			apli_mensaje("No pudimos ejecutar testeo de Generador (senal cuadrada).", 3 * UN_SEGUNDO);
+			return;
+		}
+
+		// Congiguramos senial 10 kHz CUADRADA y TRIANGULAR
+		GenConfigTest.Frecuencia = 10000;
+		GenConfigTest.Tipo = CUADRADA;
+		GenConfigTest.Fase = 0;
+		GenConfigTest.Simetria = 0.5;
+		GenConfigTest.Maximo = 4.0;
+		GenConfigTest.Minimo = -4.0;
+		GenConfigTest.Acople = DC;
+		GenRTOS_Configurar ( GENERADOR_1, &GenConfigTest, portMAX_DELAY );
+		GenConfigTest.Tipo = TRIANGULAR;
+		GenRTOS_Configurar ( GENERADOR_2, &GenConfigTest, portMAX_DELAY );
+		apli_mensaje("SX con senales TRIANGULAR y CUADRADA 6V pico 10kHz.", 3 * UN_SEGUNDO);
+		vTaskDelay( 30 * UN_SEGUNDO );
+
+		// Congiguramos senial 9V
+		GenConfigTest.Maximo = 9.0;
+		GenConfigTest.Minimo = -9.0;
+		GenConfigTest.Tipo = SENOIDAL;
+		GenRTOS_Configurar ( GENERADOR_1, &GenConfigTest, portMAX_DELAY );
+		GenRTOS_Configurar ( GENERADOR_2, &GenConfigTest, portMAX_DELAY );
+		apli_mensaje("SX con senales 9V pico.", 3 * UN_SEGUNDO);
+		vTaskDelay( 30 * UN_SEGUNDO );
+
+		// Congiguramos senial 10 kHz CUADRADA y TRIANGULAR
+		GenConfigTest.Frecuencia = 100000;
+		GenConfigTest.Tipo = SENOIDAL;
+		GenConfigTest.Fase = 0;
+		GenConfigTest.Simetria = 0.5;
+		GenConfigTest.Maximo = 1.25;
+		GenConfigTest.Minimo = -1.25;
+		GenConfigTest.Acople = DC;
+		GenRTOS_Configurar ( GENERADOR_1, &GenConfigTest, portMAX_DELAY );
+		GenRTOS_Configurar ( GENERADOR_2, &GenConfigTest, portMAX_DELAY );
+		apli_mensaje("SX con senal SENOIDAL 100 kHz 1v pico.", 3 * UN_SEGUNDO);
+		vTaskDelay( 30 * UN_SEGUNDO );
+
+		// Fin
+		GenRTOS_Apagar ( GENERADORES_TODOS, portMAX_DELAY );
+		apli_mensaje("Terminamos TEST de Generador. Apagamos salids SX.", 3 * UN_SEGUNDO);
 		xSemaphoreGive( TestMutexAdmin );
 	} else {
-		apli_mensaje("No pudimos ejecutar Test_Captu_Inicia.", 3 * UN_SEGUNDO);
+		apli_mensaje("No pudimos ejecutar testeo de Generador (inicio).", 3 * UN_SEGUNDO);
 	}
 }
 
-void Test_Gen_Enciende (TickType_t ESPERA)
+
+void Test_Capturadora (TickType_t ESPERA)
 {
+	capturadora_config_s	CaptuConfigTest = {0};
+	entrada_config_s     EntradaConfigTest = {0};
+
 	if(pdTRUE == xSemaphoreTake( TestMutexAdmin, ESPERA )) {
-		encender_generadores();
+
+		// Mensaje inicial
+		apli_mensaje("Comenzando TEST de Capturadora.", UN_SEGUNDO);
+		apli_mensaje("Precondicion: Las entradas E1 y E2 deben estar conectadas a la salida de prueba.", UN_SEGUNDO);
+
+		// Configuro Capturadora
+		if ( !CaptuRTOS_Obtener ( &CaptuConfigTest, ESPERA )) {
+			apli_mensaje("No pudimos ejecutar testeo de Capturadora (obteniendo configuracion).", 3 * UN_SEGUNDO);
+			return;
+		}
+		CaptuConfigTest.EscalaHorizontal = 0.001;
+		CaptuConfigTest.OrigenDisparo    = ENTRADA_1;
+		CaptuConfigTest.ModoCaptura      = CAPTURA_UNICA;
+		if ( !CaptuRTOS_Configurar ( &CaptuConfigTest, ESPERA )) {
+			apli_mensaje("No pudimos ejecutar testeo de Capturadora (configurando).", 3 * UN_SEGUNDO);
+			return;
+		}
+
+		// Configuro entradas
+		if ( !CaptuRTOS_EntradaObtener ( ENTRADA_1, &EntradaConfigTest, ESPERA )) {
+			apli_mensaje("No pudimos ejecutar testeo de Capturadora (obteniendo entrada).", 3 * UN_SEGUNDO);
+			return;
+		}
+		EntradaConfigTest.EscalaVertical = 6;
+		EntradaConfigTest.FlancoDisparo  = SUBIDA;
+		EntradaConfigTest.NivelDisparo   = 2.5;
+		if ( !CaptuRTOS_EntradaConfigurar ( ENTRADA_1, &EntradaConfigTest, ESPERA )) {
+			apli_mensaje("No pudimos ejecutar testeo de Capturadora (configurando entrada).", 3 * UN_SEGUNDO);
+			return;
+		}
+		if ( !CaptuRTOS_EntradaConfigurar ( ENTRADA_2, &EntradaConfigTest, ESPERA )) {
+			apli_mensaje("No pudimos ejecutar testeo de Capturadora (configurando entrada).", 3 * UN_SEGUNDO);
+			return;
+		}
+
+		// Enciendo entradas
+		if ( !CaptuRTOS_EntradaEncender (ENTRADAS_TODAS, ESPERA) ) {
+			apli_mensaje("No pudimos ejecutar testeo de Capturadora (encendiendo entradas).", 3 * UN_SEGUNDO);
+			return;
+		}
+
+		// Capturo...
+		if ( !CaptuRTOS_Comenzar(ESPERA) ) {
+			apli_mensaje("No pudimos ejecutar testeo de Capturadora (capturando).", 3 * UN_SEGUNDO);
+			return;
+		}
+
+		vTaskDelay( 10 * UN_SEGUNDO );
+		CaptuRTOS_EntradaApagar (ENTRADAS_TODAS, portMAX_DELAY);
+		apli_mensaje("TEST de Capturadora terminado.", 3 * UN_SEGUNDO);
 		xSemaphoreGive( TestMutexAdmin );
 	} else {
-		apli_mensaje("No pudimos ejecutar Test_Captu_Inicia.", 3 * UN_SEGUNDO);
+		apli_mensaje("No pudimos ejecutar TEST de Capturadora.", 3 * UN_SEGUNDO);
 	}
 }
 
@@ -181,8 +254,8 @@ void config_0_generadores (void)
 		//GenConfig.Tipo = CUADRADA;
 		GenConfig.Fase = 0;
 		GenConfig.Simetria = 0.5;
-		GenConfig.Maximo = 5.02;
-		GenConfig.Minimo = -5.02;
+		GenConfig.Maximo = 4.0;
+		GenConfig.Minimo = -4.0;
 		GenConfig.Acople = DC;
 		if (!GenRTOS_Configurar ( GENERADOR_1, &GenConfig, portMAX_DELAY ))
 			uoHuboErrorTxt("No pudimos configurar GEN.");

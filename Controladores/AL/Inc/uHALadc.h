@@ -43,10 +43,9 @@ typedef struct {
 
 /****** Declaración de funciones públicas ********************************************************/
 
-bool	uHALadcInicializar            ( adc_id_e );                        // Config estática en uHALconfig.h
-//bool	uHALadcDesInicializar         ( adc_id_e );                        // Falta implementar
-bool  uHALadcConfigurar             ( adc_id_e, adc_config_s * );        // Config dinámica
-bool  uHALadcObtener                ( adc_id_e, adc_config_s * );        // Leer config
+bool	uHALadcInicializar            ( adc_id_e );                        // Configuración estática en uHALconfig.h
+bool  uHALadcConfigurar             ( adc_id_e, adc_config_s * );        // Configuración dinámica
+bool  uHALadcObtener                ( adc_id_e, adc_config_s * );        // Leer configuración dinámica
 bool  uHALadcComenzarLectura        ( adc_id_e, uint32_t *, uint32_t );
 bool	uHALadcPararLectura 				( adc_id_e );
 void	uHALadcLecturaCompletada      ( adc_id_e );                        // Redefinir en aplicación

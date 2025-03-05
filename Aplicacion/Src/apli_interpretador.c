@@ -41,6 +41,7 @@ void 		cmd_generador     ( char* );
 void		cmd_salida			( char* );
 void 		cmd_capturadora   ( char* );
 void		cmd_entrada			( char* );
+void     cmd_test          ( char* );
 char* 	subcomando        ( char*, char* );
 
 char*		obtener_atributo			( char*,                 atributo_e*, atributo_valor_t );
@@ -138,7 +139,8 @@ bool ai_procesar_mensajes( void )
 			// No hago nada...
 
 		} else if ( comparar_texto(MsjParaProcesar, CMD_TEST) ){
-			Test_Testear ( TEST_GENERAL, UN_SEGUNDO );
+			cmd_test (MsjParaProcesar);
+			//Test_Generador ( TEST_GENERAL, UN_SEGUNDO );
 
 		} else if ( comparar_texto(MsjParaProcesar, CMD_ESPERAR) ){
 			vTaskDelay( 5 * UN_SEGUNDO );
@@ -450,6 +452,28 @@ void cmd_salida( char* COMANDO )
 	/*else if (comparar_texto(SUBCMD,CMD_OBTENER)) {
 		GenRTOS_EscribirConfiguraciones(portMAX_DELAY);*/
 }
+
+void cmd_test( char * COMANDO )
+{
+	// Variables locales
+	char *	SUBCMD = subcomando( COMANDO, CMD_TEST );
+
+	// Analizo subcomando
+	if (comparar_texto(SUBCMD, CMD_GENERADOR)) {
+		// TEST GENERADOR
+		Test_Generador ( UN_SEGUNDO );
+		//GenRTOS_EscribirConfiguraciones(portMAX_DELAY);
+
+	} else if (comparar_texto(SUBCMD, CMD_CAPTURADORA)) {
+		// TEST CAPTURADORA
+		Test_Capturadora ( UN_SEGUNDO );
+
+	} else {
+		// Subcomando NO RECONOCIDO
+		apli_mensaje( "Subomando TEST no reconocido.", portMAX_DELAY );
+	}
+}
+
 
 char* subcomando( char * MSJ, char * CMD )
 {

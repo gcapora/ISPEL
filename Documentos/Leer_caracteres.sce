@@ -1,27 +1,31 @@
 /*******************************************************************************
-* ISPEL: Gráfica de los datos capturados
+* ISPEL: Lee el archivo de texto caracter a caracter
 ********************************************************************************
-* Se interpreta un archivo de texto con los datos envados por el sistema 
-* embebido y se grafica.
+* Lee caracter a caracter el archivo de texto 
+* con los datos envados por el equipo.
 *
-* UNDAV, marzo de 2024.
+* Mayo de 2025.
 *******************************************************************************/
 
 // Variables locales
 VERDADERO = %t;
 FALSO = %f;
 LF = ascii(10);
-Leer = %t;
-FinLinea = %f;
-N = 1;
+CR = ascii(13);
+TAB = ascii(9);
+Leer = VERDADERO;
+FinLinea = FALSO;
+NC = 1;
+NL = 0;
 
 
 // Abrimos archivo de datos
-CapturaID = mopen('/home/guille/Documentos/CESE/TF/SW/ISPEL/Docs/Captura_N01_24-07-10.txt', 'r');
+CapturaID = mopen('Captura_N02_24-07-10.txt', 'r');
 if CapturaID == -1 then
     error("No se pudo abrir el archivo.");
 else
-    disp('Archivo de datos abierto.');
+    printf("Abrimos archivo de datos.\n\n");
+    Leer = VERDADERO;
 end
 
 // Analizamos lineas
@@ -33,13 +37,24 @@ while (Leer == VERDADERO) do
     else if (Car == LF) then
         // Fin de linea --> 
         mprintf(LF);
-        N = 1;
-    else if (N<10) then
+        NC = 1;
+        NL=NL + 1;
+    else if (Car == CR) then 
+        // No hago nada!!! 
+        Car = CR;
+    else if (Car == TAB) then 
+        // Tabulación...
+        mprintf("\t");
+    else if (NC<80) then
         mprintf(Car);
-        N = N+1;
+        NC = NC+1;
+    end
+    end
     end
     end
     end
     //min(10, length(Linea)) ));
     //disp(line); // Mostrar la línea leída
 end
+printf("\nLeímos %d líneas.", NL);
+mclose('all');

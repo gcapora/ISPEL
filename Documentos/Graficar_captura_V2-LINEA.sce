@@ -67,7 +67,7 @@ endfunction
 close();
 mprintf('\n================================================================================\n');
 mprintf('ISPEL: Iniciamos análisis de datos.\n');
-CapturaID = mopen('\\NAS-Nidis\home\Documentos Guille\CESE\TF\SW\ISPEL\Docs\Captura_N02_24-07-10.txt', 'r');
+CapturaID = mopen('Captura_N02_24-07-10.txt', 'r');
 if CapturaID == -1 then
     error("No se pudo abrir el archivo.");
 else

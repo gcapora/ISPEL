@@ -1,8 +1,9 @@
 /**************************************************************************************************
  * Archivo: uHAL.h
  * Breve:	Encabeado general de funciones uHAL.
- * Fecha:
- * Autor:	Guillermo F. Caporaletti
+ * Fecha:   Abril de 2025
+ * Autor:	Guillermo F. Caporaletti <ingcaporaletti@gmail.com>
+ * Versión: v1
  *
  *************************************************************************************************/
 

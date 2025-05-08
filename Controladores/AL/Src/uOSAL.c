@@ -1,9 +1,10 @@
 /**************************************************************************************************
  * Archivo: uOSAL.c
  * Breve:	Capa de abstracción de sistema operativo (OSAL) para FreeRTOS en STM32.
- * Fecha:	Desarrollado en 2024
+ * Fecha:	2024
  * Autor:	Guillermo F. Caporaletti
- *
+ * Versión: v1
+ * 
  *************************************************************************************************/
 
 /****** Librerías (includes) *********************************************************************/

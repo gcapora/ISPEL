@@ -1,8 +1,9 @@
 /**************************************************************************************************
-* @file		apli.c
-* @author	Guillermo Caporaletti
-* @brief		Módulo principal de la aplicación ISPEL
-* @date		julio de 2023
+* @file	   apli.c
+* @author  Guillermo Caporaletti
+* @brief   Módulo principal de la aplicación ISPEL, invocado desde "Core\Src\main.c".
+* @date	   Abril de 2025
+* @version v1
 *
 **************************************************************************************************/
 

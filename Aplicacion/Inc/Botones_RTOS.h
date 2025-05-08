@@ -1,7 +1,7 @@
 /**************************************************************************************************
-* @file		tarea_leds.h
+* @file		Botones_RTOS.h
 * @author	Guillermo Caporaletti
-* @brief		Control de botones en RTOS.
+* @brief	Control de botones en RTOS.
 * @date		agosto de 2023
 *
 **************************************************************************************************/

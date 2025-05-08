@@ -21,7 +21,7 @@
 #define UOSAL_FRECUENCIA_RELOJ				144000000.0
 
 // Contador de microsegundos ----------------------------------------------------------------------
-#define UOSAL_MICROSEGUNDOS_TEMPO         TIM5 //UHAL_MICROSEGUNDOS_TEMPO  // Tempo para contar microsegundos
+#define UOSAL_MICROSEGUNDOS_TEMPO         TIM5   // Temporizador para contar microsegundos
 
 // Leds incorporados ------------------------------------------------------------------------------
 #define UOSAL_PUERTO_LEDS_INCORPORADOS    GPIOB
@@ -34,7 +34,7 @@
 /* Constantes de usuario para comunicación */
 #define UOSAL_UART_BAUDIOS                115200  // Velocidad estándar máxima.
 #define UOSAL_UART_LARGO_MAXIMO           256
-#define UOSAL_UART_TIEMPO_ESPERA          100    // [ms]
+#define UOSAL_UART_TIEMPO_ESPERA          100     // [ms]
 /* Definition for USARTx clock resources */
 #define USARTx                            USART3
 #define USARTx_CLK_ENABLE()               __HAL_RCC_USART3_CLK_ENABLE()

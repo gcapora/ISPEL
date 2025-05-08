@@ -1,6 +1,6 @@
 /**************************************************************************************************
-* @file	: apli.interpretador.c
-* @brief	: Carga mensajes de entrada e interpreta.
+* @file	  apli.interpretador.c
+* @brief  Carga mensajes de entrada e interpreta.
 *
 **************************************************************************************************/
 

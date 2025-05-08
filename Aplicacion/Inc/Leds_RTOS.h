@@ -1,5 +1,5 @@
 /**************************************************************************************************
-* @file		tarea_leds.h
+* @file		Leds_RTOS.h
 * @author	Guillermo Caporaletti
 * @brief	Tarea que controla todos los leds.
 * @date		julio de 2023

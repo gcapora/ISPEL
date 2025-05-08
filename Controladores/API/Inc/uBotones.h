@@ -1,8 +1,9 @@
 /**************************************************************************************************
-* @file    ubotones.h
-* @author  Guillermo Caporaletti
-* @brief   Módulo para manejo de botones con antirrebote
-* @date	   agosto de 2023
+* @file    uBotones.h
+* @author  Guillermo F. Caporaletti
+* @brief   Módulo para manejo de botones con antirrebote.
+* @date	   2024
+* @version v1
 *
 **************************************************************************************************/
 

@@ -3,7 +3,7 @@
  * Breve:	Interfaz de abstracción de hardware (HAL) para
  *          pines de entrada-salida de propósito general (GPIO).
  *          Proyecto ISPEL.
- * Fecha:	Creado en julio 2023
+ * Fecha:	2024
  * Autor:	Guillermo F. Caporaletti
  *
  *************************************************************************************************/

@@ -1,8 +1,8 @@
 /**************************************************************************************************
-* @file		Captu_RTOS.c
-* @author	Guillermo Caporaletti
-* @brief		Funciones de manejo de CAPTURADORA en FreeRTOS.
-* @date		2024
+* @file   Captu_RTOS.c
+* @author Guillermo Caporaletti
+* @brief  Funciones de manejo de CAPTURADORA en FreeRTOS.
+* @date   2024
 **************************************************************************************************/
 
 

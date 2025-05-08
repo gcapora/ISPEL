@@ -1,8 +1,8 @@
 /**************************************************************************************************
  * Archivo: uHAL.c
- * Breve:
- * Fecha:	Creado en abril 2024
- * Autor:	Guillermo F. Caporaletti
+ * Breve:   Implementación de uHAL para Nucleo-F429ZI.
+ * Fecha:	  2024
+ * Autor:	  Guillermo F. Caporaletti
  *
  *************************************************************************************************/
 

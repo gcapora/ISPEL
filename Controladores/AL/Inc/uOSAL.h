@@ -1,10 +1,11 @@
 /**************************************************************************************************
  * Archivo: uOSAL.h
  * Breve:	Capa de abstracción de sistema operativo (OSAL).
- *          Incluye un mínimo de funciones de soporte.
+ *          Incluye funciones básicas de soporte.
  *          Creado para proyecto ISPEL.
- * Fecha:	Desarrollado en 2024
- * Autor:	Guillermo F. Caporaletti
+ * Fecha:	2024
+ * Autor:	Guillermo F. Caporaletti <ingcaporaletti@gmail.com>
+ * Versión: v1
  *
  *************************************************************************************************/
 
@@ -24,7 +25,7 @@
 
 /****** Definiciones públicas de tipos de datos (public typedef) *********************************/
 
-typedef bool bool_t;   // Esto es una finura :-)
+typedef bool bool_t;
 
 /****** Declaraciones de datos externos **********************************************************/
 

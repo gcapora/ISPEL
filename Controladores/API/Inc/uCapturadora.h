@@ -1,8 +1,9 @@
 /**************************************************************************************************
- * Archivo: uHALadc.h
- * Breve:
- * Fecha:
+ * Archivo: uCapturadora.h
+ * Breve:   Módulo para manejo de la capturadora.
+ * Fecha:   Marzo de 2025
  * Autor:	Guillermo F. Caporaletti
+ * Version: v1
  *
  *************************************************************************************************/
 

@@ -1,5 +1,5 @@
 /**************************************************************************************************
-* @file		tarea_test_1.h
+* @file		Test_RTOS.h
 * @author	Guillermo Caporaletti
 * @brief	Tarea para testeo
 * @date		julio de 2023

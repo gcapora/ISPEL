@@ -1,8 +1,8 @@
 /**************************************************************************************************
-* @file		tarea_botones.c
+* @file		Botones_RTOS.c
 * @author	Guillermo Caporaletti
-* @brief	Tarea que controla todos los botones.
-* @date		agosto de 2023
+* @brief	Módulo en RTOS que controla todos los botones.
+* @date		2024
 *
 **************************************************************************************************/
 

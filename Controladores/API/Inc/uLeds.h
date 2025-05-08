@@ -2,7 +2,8 @@
 * @file    uleds.h
 * @author  Guillermo Caporaletti
 * @brief   Módulo para manejo de leds
-* @date	   julio de 2023
+* @date	   julio de 2024
+* @version v1
 *
 **************************************************************************************************/
 

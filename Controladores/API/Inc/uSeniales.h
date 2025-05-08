@@ -1,8 +1,9 @@
 /**************************************************************************************************
  * Archivo: uSeniales.h
- * Breve:	Generador y manejador de seniales. Proyecto ISPEL.
- * Fecha:	Creado en noviembre 2023
- * Autor:
+ * Breve:	Generador y manejador de seniales.
+ * Fecha:	Julio de 2024
+ * Autor:   Guillermo F. Caporaletti
+ * Version: v1
  *
  * Descripción:
  *    Define al objeto señal, con su estructura y funciones asociadas.
@@ -10,9 +11,9 @@
  *    Las muestras de la señal son de 12 bits.
  *
  * Pendiente:
- *    - Lograr especificar el alineamiento de los datos dentro del vector, de modo de almacenar dos
- *      señales en el vector de 32 bits.
- *    - Hacer más eficiente la función uDefasar().
+ *  - Lograr especificar el alineamiento de los datos dentro del vector, de modo de almacenar dos
+ *    señales en el vector de 32 bits.
+ *  - Hacer más eficiente la función uDefasar().
  *
  *************************************************************************************************/
 

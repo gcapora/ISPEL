@@ -1,8 +1,8 @@
 /**************************************************************************************************
 * @file		Test_RTOS.c
 * @author	Guillermo Caporaletti
-* @brief		Tarea para testear aplicación.
-* @date		Julio de 2024
+* @brief	Tarea para testear aplicación.
+* @date		2024
 *
 **************************************************************************************************/
 

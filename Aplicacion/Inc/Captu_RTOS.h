@@ -1,5 +1,5 @@
 /**************************************************************************************************
-* @file		Capturadora_RTOS.h
+* @file		Captu_RTOS.h
 * @author	Guillermo Caporaletti
 * @brief
 * @date

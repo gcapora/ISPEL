@@ -1,8 +1,9 @@
 /**************************************************************************************************
-* @file		apli.h
-* @author	Guillermo Caporaletti
-* @brief
-* @date
+* @file	   apli.h
+* @author  Guillermo Caporaletti <ingcaporaletti@gmail.com>
+* @brief   Módulo principal del proyecto ISPEL.
+* @date    Abril 2025
+* @version v1
 **************************************************************************************************/
 
 #ifndef __ISPEL_APLI_H

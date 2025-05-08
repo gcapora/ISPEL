@@ -1,8 +1,10 @@
 /**************************************************************************************************
-* @file		tarea_leds.c
-* @author	Guillermo Caporaletti
-* @brief	Tarea que controla todos los leds.
-* @date		julio de 2023
+* @file	   Leds_RTOS.c
+* @brief   Tarea que controla todos los leds.
+* @author  Guillermo Caporaletti
+* @brief   
+* @date	   2024
+* @version v1
 *
 **************************************************************************************************/
 

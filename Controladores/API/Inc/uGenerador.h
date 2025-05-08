@@ -1,21 +1,22 @@
 /**************************************************************************************************
  * Archivo: uGenerador.h
- * Breve:	Generador de seniales con POO visto desde el usuario. Proyecto ISPEL.
- * Fecha:	Creado en marzo 2024
+ * Breve:	Generador de seniales visto desde el usuario para proyecto ISPEL.
+ * Fecha:	Julio de 2024
  * Autor:	Guillermo F. Caporaletti
+ * Version: v1
  *
  * Descripción:
- *    Desarrolla el objeto Generador visto desde el operario.
- *    Define una estructura gen_config_s con los parámetros de la configuración deseada y otra
- *    estructura del generador con el estado y los datos del modo de funcionamiento resultante.
- *    Dentro de esta estructura, hay un puntero a la señal cargada en el generador.
- *    Las funciones inicializan, configuran, encienden y apagan el generador.
- *    También puede devolver información sobre su propia configuración y la señal cargada.
+ *  - Desarrolla el objeto Generador visto desde el operario.
+ *  - Define una estructura gen_config_s con los parámetros de la configuración deseada.
+ *  - Define tipos de datos enumeración para identificar generadores, acople y estado de generador.
+ *  - Las funciones inicializan, configuran, encienden y apagan el generador. También puede 
+ *    devolver información sobre su propia configuración y la señal cargada.
  *
  * Para mejorar:
  *  - Almacenamos 4 bytes por muestra en la senial aunque usamos solo 12 bits. Debe probrarse
  *    utilizando alineamiento derecha e izquierda de un mismo vector de 32 bits para almacenar dos
- *    señales. Esto baja a la mitad la memoria utilizada por canal.
+ *    señales. Esto bajaría a la mitad la memoria utilizada por canal.
+ *  - Analizar si son necesarios los campos Divisor y Largo de la estructura gen_conf_s.
  *
  *************************************************************************************************/
 
@@ -59,7 +60,7 @@ typedef struct {
 	uint32_t     Divisor;      // de muestreo: establece por cuánto se divide la frecuancia base
 	float     	 Largo;        // cantidad de muestras de la señal resultante (solo salida)
 	float        Fase;         // en grados, entre 0º y 360º
-	float        Simetria;        // número entre 0 y 1 (no aplica en senoidal)
+	float        Simetria;     // número entre 0 y 1 (no aplica en senoidal)
 	gen_acople_e Acople;
 } gen_conf_s;
 
@@ -83,9 +84,9 @@ typedef enum {
 
 /****** Declaración de funciones públicas ********************************************************/
 
-bool uGeneradorInicializar	(gen_id_e);
-bool uGeneradorConfigurar	(gen_id_e, gen_conf_s *);
-bool uGeneradorObtener		(gen_id_e, gen_conf_s *);
+bool uGeneradorInicializar (gen_id_e);
+bool uGeneradorConfigurar  (gen_id_e, gen_conf_s *);
+bool uGeneradorObtener     (gen_id_e, gen_conf_s *);
 gen_estados_e uGeneradorObtenerEstado (gen_id_e);
 bool uGeneradorEncender    (gen_id_e);
 bool uGeneradorApagar      (gen_id_e);

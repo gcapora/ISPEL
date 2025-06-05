@@ -29,7 +29,7 @@
 
 void apli_alerta ( const char * TEXTO )
 {
-	uoEscribirTxt3 ( "ALERTA ", TEXTO, "\n\r");
+	uoEscribirTxt3 ( "ALERTA ", TEXTO, "\r\n");
 }
 
 BaseType_t apli_mensaje ( const char * TEXTO, TickType_t ESPERA )
@@ -38,7 +38,7 @@ BaseType_t apli_mensaje ( const char * TEXTO, TickType_t ESPERA )
 	RET = tomar_escritura(ESPERA);
 	if( pdTRUE == RET ) {
 		uoEscribirTxt2 ("MSJ ", TEXTO);
-		uoEscribirTxt ("\n");
+		uoEscribirTxt ("\r\n");
 		devolver_escritura();
 	}
 	return RET;
@@ -62,9 +62,9 @@ void apli_latido(void)
 	if ( (uoMilisegundos()-tiempo_ultimo) > TIEMPO_LATIDO ) {
 		tomar_escritura    ( 3 * UN_SEGUNDO );
 		tiempo_ultimo = uoMilisegundos();
-		uoEscribirTxtUint  ("HOLA Aca ISPEL para lo que sea. [", tiempo_ultimo / 60000);
+		uoEscribirTxtUint  ("HOLA Aca ISPEL en linea. [", tiempo_ultimo / 60000);
 		uoEscribirTxtUint  (" min ", (tiempo_ultimo/1000) % 60);
-		uoEscribirTxt      (" s]\n");
+		uoEscribirTxt      (" s]\r\n");
 		devolver_escritura ();
 	}
 }

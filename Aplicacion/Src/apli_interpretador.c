@@ -25,7 +25,7 @@ typedef char atributo_valor_t[VALOR_LARGO_MAX+1];
 /* Private variables *****************************************************************************/
 
 static mensaje_t	BuferLectura = {0};  // Debo asegurar un '\0' al final
-static uint32_t	LargoMensaje = 0;
+static uint32_t		LargoMensaje = 0;
 QueueHandle_t 		xColaMensajesParaInterpretar;
 
 /* Variables públicas **************************************************************************/
@@ -34,23 +34,23 @@ char *	ATRIBUTO_ID_TXT [NUM_ATRIBUTOS] = {0};
 
 /* Private function prototypes *******************************************************************/
 
-bool		caracter_validado ( char* );
-bool		comparar_texto    ( char*, char* );
+bool	caracter_validado 		( char* );
+bool	comparar_texto    		( char*, char* );
 
-void 		cmd_generador     ( char* );
-void		cmd_salida			( char* );
-void 		cmd_capturadora   ( char* );
-void		cmd_entrada			( char* );
-void     cmd_test          ( char* );
-char* 	subcomando        ( char*, char* );
+void 	cmd_generador     		( char* );
+void	cmd_salida				( char* );
+void 	cmd_capturadora   		( char* );
+void	cmd_entrada				( char* );
+void    cmd_test          		( char* );
+char* 	subcomando      		( char*, char* );
 
-char*		obtener_atributo			( char*,                 atributo_e*, atributo_valor_t );
-bool		cargar_atributo_gen		( gen_conf_s*,           atributo_e,  atributo_valor_t );
-bool		cargar_atributo_captu	( capturadora_config_s*, atributo_e,  atributo_valor_t );
-bool		cargar_atributo_entrada	( entrada_config_s*,     atributo_e,  atributo_valor_t );
+char*	obtener_atributo		( char*,                 atributo_e*, atributo_valor_t );
+bool	cargar_atributo_gen		( gen_conf_s*,           atributo_e,  atributo_valor_t );
+bool	cargar_atributo_captu	( capturadora_config_s*, atributo_e,  atributo_valor_t );
+bool	cargar_atributo_entrada	( entrada_config_s*,     atributo_e,  atributo_valor_t );
 
-gen_id_e			identificar_generador ( char* );
-entrada_id_e	identificar_entrada ( char* );
+gen_id_e identificar_generador	( char* );
+entrada_id_e identificar_entrada ( char* );
 
 /* Public function *******************************************************************************/
 

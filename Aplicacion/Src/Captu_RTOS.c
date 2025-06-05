@@ -107,7 +107,7 @@ bool CaptuRTOS_Parar ( TickType_t ESPERA )
 			LedsRTOS_ApagarLed ( LedCaptuDisparo );
 			LedsRTOS_ModoLed ( LedCaptu1, SUSPENSION );
 			LedsRTOS_ModoLed ( LedCaptu2, SUSPENSION );
-			uoEscribirTxt ("MSJ Paramos captura (tarea). \n\r");
+			uoEscribirTxt ("MSJ Paramos captura (tarea). \r\n");
 			RET = true;
 		}
 		xSemaphoreGive( CaptuMutexAdmin );
@@ -121,7 +121,7 @@ bool CaptuRTOS_Configurar ( capturadora_config_s * PCCONFIG, TickType_t ESPERA )
 	if(pdTRUE == xSemaphoreTake( CaptuMutexAdmin, ESPERA )) {
 		if(uCapturadoraConfigurar(PCCONFIG)) {
 			escribir_captu();
-			//uoEscribirTxt ("MSJ Configuramos Capturadora. \n\r");
+			//uoEscribirTxt ("MSJ Configuramos Capturadora. \r\n");
 			RET = true;
 		}
 		xSemaphoreGive( CaptuMutexAdmin );
@@ -177,7 +177,7 @@ bool CaptuRTOS_EntradaConfigurar ( entrada_id_e ID, entrada_config_s * ECONFIG, 
 		if(uCapturadoraEntradaConfigurar(ID, ECONFIG)) {
 			uoEscribirTxt ("MSJ Configuramos ENTRADA de CAPTU: ");
 			uoEscribirTxtReal ("Nivel=", ECONFIG->NivelDisparo,3 );
-			uoEscribirTxt ("\n");
+			uoEscribirTxt ("\r\n");
 			RET = true;
 		}
 		xSemaphoreGive( CaptuMutexAdmin );
@@ -220,7 +220,7 @@ bool CaptuRTOS_EntradaEncender ( entrada_id_e ID, TickType_t ESPERA )
 		if(uCapturadoraEntradaEncender(ID)) {
 			if ( ENTRADA_1==ID || ENTRADAS_TODAS==ID ) LedsRTOS_EncenderLed ( LedCaptu1 );
 			if ( ENTRADA_2==ID || ENTRADAS_TODAS==ID ) LedsRTOS_EncenderLed ( LedCaptu2 );
-			uoEscribirTxt ("MSJ CAPTU Encendimos entrada(s).\n");
+			uoEscribirTxt ("MSJ CAPTU Encendimos entrada(s).\r\n");
 			RET = true;
 		}
 		xSemaphoreGive( CaptuMutexAdmin );
@@ -235,7 +235,7 @@ bool CaptuRTOS_EntradaApagar ( entrada_id_e ID, TickType_t ESPERA )
 		if(uCapturadoraEntradaApagar(ID)) {
 			if ( ENTRADA_1==ID || ENTRADAS_TODAS==ID ) LedsRTOS_ApagarLed ( LedCaptu1 );
 			if ( ENTRADA_2==ID || ENTRADAS_TODAS==ID ) LedsRTOS_ApagarLed ( LedCaptu2 );
-			uoEscribirTxt ("MSJ CAPTU Apagamos entrada(s).\n");
+			uoEscribirTxt ("MSJ CAPTU Apagamos entrada(s).\r\n");
 			RET = true;
 		}
 		xSemaphoreGive( CaptuMutexAdmin );
@@ -253,7 +253,7 @@ void Tarea_Capturadora( void *pvParameters )
 	char *pcTaskName = (char *) pcTaskGetName( NULL );
 
 	/* Imprimir la tarea inicializada: */
-	uoEscribirTxt3 ( "MSJ ", pcTaskName, " esta ejecutandose.\n\r" );
+	uoEscribirTxt3 ( "MSJ ", pcTaskName, " esta ejecutandose.\r\n" );
 
 	// Configura Capturadora
 	uCapturadoraObtener		( &CAPTU_CONFIG );
@@ -287,18 +287,17 @@ void Tarea_Capturadora( void *pvParameters )
 		/* 1) ESTADO DISPONIBLE -------------------------------------------------------------------*/
 		if(uCapturadoraEstaDisponible()) {
 			// Verificamos lectura de boton.
-			if( EquipoEncendido                                       &&
-				 (BotonesRTOS_BotonFlancoPresionado(BotonEnPlaca)   ||
-				  BotonesRTOS_BotonFlancoPresionado(BotonCaptuDisparo))  ){
+			if( EquipoEncendido && BotonesRTOS_BotonFlancoPresionado(BotonCaptuDisparo) ){
 				// Se presionó un botón para iniciar captura.
+				// Nota: se quitó BotonesRTOS_BotonFlancoPresionado(BotonEnPlaca)
+				// porque se reserva para ENCENDI/ESPERA del equipo.
 				CaptuRTOS_Comenzar ( RETARDO_CAPTURADORA_DISPONIBLE );
-				// Sin retardo.
 			} else {
 				// Retardo largo porque estamos inactivos
 				vTaskDelay( RETARDO_CAPTURADORA_DISPONIBLE );
 			}
 
-		/* 2) ESTADO CAPTURANDO -------------------------------------------------------------------*/
+		/* 2) ESTADO CAPTURANDO -----------------------------------------------------------------*/
 		} else {
 			if(pdTRUE == xSemaphoreTake( CaptuMutexAdmin, RETARDO_CAPTURADORA_CORRIENDO )) {
 				// Revisamos capturadora
@@ -312,11 +311,10 @@ void Tarea_Capturadora( void *pvParameters )
 					//LedsRTOS_ApagarLed	( LedVerdeEnPlaca );
 				}
 				xSemaphoreGive( CaptuMutexAdmin );
-				// Sin retardo.
-			} // <-- Fin de estado capturando --------------------------------------------------------
-		} // <----- Fin de evaluación de estado de Capturadora
-	} // <-------- Fin ciclo infinito de hilo de tarea
-} // <----------- Fin Tarea_Capturadora()
+			} // <-- Fin de estado capturando -----------------------------------------------------
+		} // <------ Fin de evaluación de estado de Capturadora
+	} // <---------- Fin ciclo infinito de hilo de tarea
+} // <-------------- Fin Tarea_Capturadora()
 
 /****** Definición de funciones privadas *********************************************************/
 
@@ -335,7 +333,7 @@ void CaptuRTOS_ImprimirSenial32 (void)
 	// Imprimimos encabezado de señal
 	tomar_escritura(portMAX_DELAY);
 	uoEscribirTxt ( Barra );
-	uoEscribirTxt ("// Enviamos configuracion de capturadora, entradas y seniales\n");
+	uoEscribirTxt ("// Enviamos configuracion de capturadora, entradas y seniales\r\n");
 
 	// Imprimimos configuraciones de entradas (si corresponde)
 	if(false==uCapturadoraEntradaObtener(ENTRADA_1,&ConfigEntrada))
@@ -362,7 +360,7 @@ void CaptuRTOS_ImprimirSenial32 (void)
 	uoEscribirTxtUint	( " FM=", (uint32_t) round(uCapturadoraObtenerFrecuenciaMuestreo()) );
 	uoEscribirTxtUint	( " MUESTRAS=", (uint32_t) U_LARGO_CAPTURA);
 	uoEscribirTxtUint	( " DISPARO=", Disparo);
-	uoEscribirTxt     ( "\n");
+	uoEscribirTxt     ( "\r\n");
 
 	// Imprimimos DATOS de señales
 	Tiempo = uoMilisegundos();
@@ -370,23 +368,23 @@ void CaptuRTOS_ImprimirSenial32 (void)
 	uoEscribirTxt("DATOS ");
 	if(E1_ENCENDIDA) uoEscribirTxt("E1 ");
 	if(E2_ENCENDIDA) uoEscribirTxt("E2 ");
-	if (E1_ENCENDIDA || E2_ENCENDIDA) uoEscribirTxt("{\n");
+	if (E1_ENCENDIDA || E2_ENCENDIDA) uoEscribirTxt("{\r\n");
 
 	for (i=0; i<U_LARGO_CAPTURA; i++) {
 		Muestra = P_Senial_E1->Muestras_p[i];
 		MUESTRA_ENTRADA_1 = ( Muestra & MASCARA_DERECHA16   );
 		MUESTRA_ENTRADA_2 = ( Muestra & MASCARA_IZQUIERDA16 ) >> 16;
-		//if ( (i==Disparo) && (i>0) ) uoEscribirTxt ("// ---> Disparo <---\n");
+		//if ( (i==Disparo) && (i>0) ) uoEscribirTxt ("// ---> Disparo <---\r\n");
 		if(E1_ENCENDIDA)						uoEscribirUint ( MUESTRA_ENTRADA_1 );	// Dato de ENTRADA 1
 		if(E1_ENCENDIDA && E2_ENCENDIDA)	uoEscribirTxt  ( "\t" );						// Separación de ENTRADA
 		if(E2_ENCENDIDA) 						uoEscribirUint ( MUESTRA_ENTRADA_2 );	// Dato de ENTRADA 2
-		uoEscribirTxt  ( "\n" );
+		uoEscribirTxt  ( "\r\n" );
 	}
-	uoEscribirTxt("}\n");  // Fin de DATOS
+	uoEscribirTxt("}\r\n");  // Fin de DATOS
 
 	// Fin de impresión
 	Tiempo = uoMilisegundos()-Tiempo;
-	uoEscribirTxtUintTxt ( "MSJ Captura escrita en ", Tiempo, " ms.\n" );
+	uoEscribirTxtUintTxt ( "MSJ Captura escrita en ", Tiempo, " ms.\r\n" );
 	uoEscribirTxt ( Barra );
 	devolver_escritura();
 }
@@ -404,7 +402,7 @@ void escribir_entrada(entrada_id_e ID)
 		} else if(ID==ENTRADA_2){
 			uoEscribirTxt("CAPTU E2 CONFIGURADA");
 		} else{
-			uoEscribirTxt("MSJ CAPTU ENTRADA desconocida.\n");
+			uoEscribirTxt("MSJ CAPTU ENTRADA desconocida.\r\n");
 			return;
 		}
 		// Encendida?
@@ -424,7 +422,7 @@ void escribir_entrada(entrada_id_e ID)
 		} else {
 			uoEscribirTxt(" FLANCO=desconocido");
 		}
-		uoEscribirTxt("\n");
+		uoEscribirTxt("\r\n");
 	}
 }
 
@@ -451,7 +449,7 @@ void escribir_captu( void )
 		uoEscribirTxt(" PROM=16");
 	if (false==(CCONFIG.ModoCaptura&MASCARA_PROMEDIO))
 		uoEscribirTxt(" PROM=1");
-	uoEscribirTxt("\n");
+	uoEscribirTxt("\r\n");
 }
 
 /****************************************************************** FIN DE ARCHIVO ***************/

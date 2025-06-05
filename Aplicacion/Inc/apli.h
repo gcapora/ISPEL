@@ -2,8 +2,8 @@
 * @file	   apli.h
 * @author  Guillermo Caporaletti <ingcaporaletti@gmail.com>
 * @brief   Módulo principal del proyecto ISPEL.
-* @date    Abril 2025
-* @version v1
+* @date    Junio 2025
+* @version v1.1
 **************************************************************************************************/
 
 #ifndef __ISPEL_APLI_H
@@ -31,13 +31,27 @@ extern "C" {
 
 /****** Definiciones públicas (macros) ***********************************************************/
 
+// Frecuencias
 #define FREC_TESTIGO 			1000.0
-#define FREC_MAX_SENIAL_GEN	100e3
+#define FREC_MAX_SENIAL_GEN		100e3
+
+// Tiempos
 #define UN_SEGUNDO				pdMS_TO_TICKS( 1000UL )
+#define PERIODO_10MS			pdMS_TO_TICKS( 10UL )
 #define PERIODO_1MS				pdMS_TO_TICKS( 1UL )
-#define PERIODO_10MS				pdMS_TO_TICKS( 10UL )
 #define TIEMPO_SEPARADOR		1000 // en milisegundos
+
+// Pines destacados
+#define PIN_BOTON_ENCENDIDO		HAL_PIN_PG14
+#define PIN_BOTON_GEN_SAL_1		HAL_PIN_PF15
+#define PIN_BOTON_GEN_SAL_2		HAL_PIN_PE13
+#define PIN_BOTON_CAPTU_ENT_1	HAL_PIN_PF14
+#define PIN_BOTON_CAPTU_ENT_2	HAL_PIN_PE11
+#define PIN_BOTON_CAPTU_DISPARO	HAL_PIN_PE9
+
+// Otros
 #define MENSAJE_LARGO_MAX		100
+
 
 /****** Definiciones públicas de tipos de datos (public typedef) *********************************/
 
@@ -45,22 +59,21 @@ extern "C" {
 /****** Declaración de datos publicos (public data) **********************************************/
 
 extern bool_t					EquipoEncendido;
-extern const char *			Barra;
-extern boton_id_t  			BotonEnPlaca, BotonCaptuDisparo;
-extern SemaphoreHandle_t	MutexApliEscribir;
+extern const char *				Barra;
+extern boton_id_t  				BotonEnPlaca, BotonCaptuDisparo;
+extern SemaphoreHandle_t		MutexApliEscribir;
 
 /****** Declaración de funciones públicas (public functions) **************************************/
 
-void 			apli_inicializar( void );
-void 			apli_alerta( const char * );
+void 		apli_inicializar( void );
+void 		apli_alerta( const char * );
 BaseType_t	apli_mensaje( const char *, TickType_t );
-void			apli_separador(const char * );
-void			apli_latido(void);
+void		apli_separador(const char * );
+void		apli_latido(void);
 BaseType_t	tomar_escritura( TickType_t );
 BaseType_t	devolver_escritura( void );
-
-void Tarea_PALTA( void * );
-void Tarea_PMEDIA( void * );
+void		Tarea_PALTA( void * );
+void		Tarea_PMEDIA( void * );
 
 /*************************************************************************************************/
 #ifdef __cplusplus

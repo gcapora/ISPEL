@@ -164,16 +164,16 @@ bool uCapturadoraConfigurar ( capturadora_config_s * CONFIG)
 
 	// Precondiciones y correcciones
 	if ( CAPTURADORA_INACTIVA != Capturadora.Estado) {
-		//uoEscribirTxt("ADVERTENCIA Se intento configurar Capturadora estando activa.\n\r");
+		//uoEscribirTxt("ADVERTENCIA Se intento configurar Capturadora estando activa.\r\n");
 		return false;
 	}
 	if ( CONFIG->EscalaHorizontal < U_ESCALA_HORIZONTAL_MINIMA ) {
 		CONFIG->EscalaHorizontal = U_ESCALA_HORIZONTAL_MINIMA;
-		//uoEscribirTxt ("ADVERTENCIA Correccion de ESCALA HORIZONTAL de capturadora.\n\r");
+		//uoEscribirTxt ("ADVERTENCIA Correccion de ESCALA HORIZONTAL de capturadora.\r\n");
 	}
 	// TODO Verificar escala máxima posible.
 	if ( false==ValidarOrigenDisparo(&CONFIG->OrigenDisparo) ) {
-		//uoEscribirTxt ("ADVERTENCIA Correccion de ORIGEN de disparo.\n\r");
+		//uoEscribirTxt ("ADVERTENCIA Correccion de ORIGEN de disparo.\r\n");
 	}
 	CONFIG->ModoCaptura = CAPTURA_UNICA | (CONFIG->ModoCaptura&MASCARA_PROMEDIO);
 
@@ -379,7 +379,7 @@ bool uCapturadoraIniciar ( void )
 		CantidadProcesadas12 [i] = 0;
 	}
 	if ( true == control ) {
-		//uoEscribirTxt ("Llamamos a uHALadc.\n\r");
+		//uoEscribirTxt ("Llamamos a uHALadc.\r\n");
 		control = uHALadcComenzarLectura (	UHAL_ADC_1,						// Lanza muestreo en ADC 1 y 2
 														MuestrasCapturadas12,		// Vector donde almaceno lo muestreado
 														U_LARGO_CAPTURA_INICIAL );	// Largo del vector
@@ -407,7 +407,7 @@ bool uCapturadoraParar ( void )
 	// Paramos muestreo
 	if ( true == control && Capturadora.Estado == CAPTURADORA_CAPTURANDO ) {
 		control = uHALadcPararLectura ( UHAL_ADC_1 );
-		//uoEscribirTxt ("MSJ Paramos captura...\n\r");
+		//uoEscribirTxt ("MSJ Paramos captura...\r\n");
 		Capturadora.Estado = CAPTURADORA_INACTIVA;
 	}
 
@@ -637,32 +637,32 @@ void ImprimirSenial32 (void)
 
 	// Escribimos última muestra:
 	uoEscribirTxt ("Senial cargada:");
-	uoEscribirTxt ("\n\rENT_1 \tENT_2\n\r");
+	uoEscribirTxt ("\r\n\rENT_1 \tENT_2\r\n\r");
 
 	for (i=0; i<U_LARGO_CAPTURA; i++) {
 
 		MUESTRA_ENTRADA_1 = ( MuestrasProcesadas12[i] & MASCARA_DERECHA16   );
 		MUESTRA_ENTRADA_2 = ( MuestrasProcesadas12[i] & MASCARA_IZQUIERDA16 ) >> 16;
 
-		if ( (i==Disparo) && (i>0) ) uoEscribirTxt ("---> Disparo <---\n\r");
+		if ( (i==Disparo) && (i>0) ) uoEscribirTxt ("---> Disparo <---\r\n");
 
 		uoEscribirUint ( MUESTRA_ENTRADA_1 );	// Dato de ENTRADA 1
 		uoEscribirTxt  ( "\t" );		// Tabulación
 		uoEscribirUint ( MUESTRA_ENTRADA_2 );	// Dato de ENTRADA 2
 		//uEscribirTxt  ( "\t" );		// Tabulación
 		//uEscribirUint ( CantidadProcesadas12[i] );	// Dato de ENTRADA 2
-		uoEscribirTxt  ( "\n\r" );
+		uoEscribirTxt  ( "\r\n" );
 	}
 	uoEscribirTxtUint ( "Capturas promediadas \t= ", CapturasObjetivo() - Capturadora.CapturasRestantes );
-	uoEscribirTxt     ( "\n\r" );
+	uoEscribirTxt     ( "\r\n" );
 	uoEscribirTxtUint ( "Tiempo de captura \t= ", Capturadora.TiempoCaptura );
-	uoEscribirTxt     ( " ms\n\r" );
+	uoEscribirTxt     ( " ms\r\n" );
 	uoEscribirTxtUint ( "Nivel (12B) \t\t= ", Capturadora.NivelDisparo );
-	uoEscribirTxt     ( "\n\r" );
+	uoEscribirTxt     ( "\r\n" );
 	uoEscribirTxtUint ( "Escala Entrada 1\t= ", (uint32_t) (EntradaAdmin[0].Config.EscalaVertical*10) );
-	uoEscribirTxt     ( "\n\r" );
+	uoEscribirTxt     ( "\r\n" );
 	uoEscribirTxtUint ( "Escala Entrada 2\t= ", (uint32_t) (EntradaAdmin[1].Config.EscalaVertical*10) );
-	uoEscribirTxt     ( "\n\r" );
+	uoEscribirTxt     ( "\r\n" );
 }
 
 bool ValidarOrigenDisparo ( entrada_id_e * P_ORIGEN )

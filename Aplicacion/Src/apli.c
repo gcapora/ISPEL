@@ -2,8 +2,8 @@
 * @file	   apli.c
 * @author  Guillermo Caporaletti
 * @brief   Módulo principal de la aplicación ISPEL, invocado desde "Core\Src\main.c".
-* @date	   Abril de 2025
-* @version v1
+* @date	   Junio de 2025
+* @version v1.1
 *
 **************************************************************************************************/
 
@@ -21,10 +21,10 @@
 
 /****** Definiciones privadas (macros) ***********************************************************/
 
-#define TAREA_PRIORIDAD_BAJA     ( tskIDLE_PRIORITY + 1UL )
-#define TAREA_PRIORIDAD_MEDIA    ( tskIDLE_PRIORITY + 2UL )
-#define TAREA_PRIORIDAD_ALTA     ( tskIDLE_PRIORITY + 3UL )
-#define UN_MICROSEGUNDO				1
+#define TAREA_PRIORIDAD_BAJA	( tskIDLE_PRIORITY + 1UL )
+#define TAREA_PRIORIDAD_MEDIA	( tskIDLE_PRIORITY + 2UL )
+#define TAREA_PRIORIDAD_ALTA	( tskIDLE_PRIORITY + 3UL )
+#define UN_MICROSEGUNDO			1
 
 /****** Definiciones privadas de tipos (private typedef) *****************************************/
 
@@ -49,8 +49,8 @@ led_id_t    LedRojoEnPlaca, LedVerdeEnPlaca, LedEncendido;
 SemaphoreHandle_t MutexApliEscribir;  // Para integridad de escritura
 
 /* Mensajes... */
-const char *pcTextForMain = "// ISPEL en ejecucion.\n";
-const char *Barra         = "// ===============================================\n";
+const char *pcTextForMain = "// ISPEL en ejecucion.\r\n";
+const char *Barra         = "// ===============================================\r\n";
 
 /****** Declaración de funciones privadas ********************************************************/
 
@@ -71,41 +71,39 @@ void apli_inicializar( void )
 	BaseType_t ret = pdFAIL;
   	// void* ptr = NULL;
 
-	// Inicialización de capas de abstracción uHAL y uOSAL -----------------------------------------
+	// Inicialización de capas y módulos ----------------------------------------------------------
 
-	uoInicializar();							// Capa OSAL
-	uHALinicializar();						// Capa HAL
-	uHALmapInicializar( UHAL_MAP_PE5 ); // Objeto señal cuadrada MAP=PWM en pin PE5
+	uoInicializar();									// Capa OSAL
+	uHALinicializar();									// Capa HAL
 
-	// Inicialización de módulos -------------------------------------------------------------------
-
-	configASSERT( true == LedsRTOS_Inicializar()    );
-	configASSERT( true == BotonesRTOS_Inicializar()	);
-	configASSERT( true == CaptuRTOS_Inicializar()	);
-	configASSERT( true == GenRTOS_Inicializar()	   );
-	configASSERT( true == TestRTOS_Inicializar()		);
-	configASSERT( true == ai_inicializar()				);
+	configASSERT( true == LedsRTOS_Inicializar() );		// Manejo de leds en RTOS (a nivel de aplicación)
+	configASSERT( true == BotonesRTOS_Inicializar()	);	// Manejo de botones en RTOS
+	configASSERT( true == CaptuRTOS_Inicializar() );	// Capturadora en RTOS
+	configASSERT( true == GenRTOS_Inicializar() );		// Generador en RTOS
+	configASSERT( true == TestRTOS_Inicializar() );		// Módulo de testeo
+	configASSERT( true == ai_inicializar() );			// Interpretador de mensajes
 
 	// Inicialización y configuración de objetos ---------------------------------------------------
 
+	uHALmapInicializar( UHAL_MAP_PE5 ); // Objeto señal cuadrada MAP=PWM en pin PE5
 	configASSERT( NULL        != (MutexApliEscribir	= xSemaphoreCreateMutex()) 							);
 	configASSERT( ERROR_BOTON != (BotonEnPlaca		= BotonesRTOS_InicializarBoton (U_BOTON_EP))		);
-	configASSERT( ERROR_BOTON != (BotonEncendido		= BotonesRTOS_InicializarBoton (HAL_PIN_PG14))	);
-	configASSERT( ERROR_BOTON != (BotonGen1  			= BotonesRTOS_InicializarBoton (HAL_PIN_PF15))	);
-	configASSERT( ERROR_BOTON != (BotonGen2			= BotonesRTOS_InicializarBoton (HAL_PIN_PE13))	);
-	configASSERT( ERROR_BOTON != (BotonCaptu1			= BotonesRTOS_InicializarBoton (HAL_PIN_PF14))	);
-	configASSERT( ERROR_BOTON != (BotonCaptu2			= BotonesRTOS_InicializarBoton (HAL_PIN_PE11))	);
-	configASSERT( ERROR_BOTON != (BotonCaptuDisparo	= BotonesRTOS_InicializarBoton (HAL_PIN_PE9))	);
-	configASSERT( ERROR_LED   != (LedRojoEnPlaca  	= LedsRTOS_InicializarLed (U_LED_ROJO_EP))		);
+	configASSERT( ERROR_BOTON != (BotonEncendido	= BotonesRTOS_InicializarBoton (PIN_BOTON_ENCENDIDO)) );
+	configASSERT( ERROR_BOTON != (BotonGen1  		= BotonesRTOS_InicializarBoton (PIN_BOTON_GEN_SAL_1)) );
+	configASSERT( ERROR_BOTON != (BotonGen2			= BotonesRTOS_InicializarBoton (PIN_BOTON_GEN_SAL_2)) );
+	configASSERT( ERROR_BOTON != (BotonCaptu1		= BotonesRTOS_InicializarBoton (PIN_BOTON_CAPTU_ENT_1)) );
+	configASSERT( ERROR_BOTON != (BotonCaptu2		= BotonesRTOS_InicializarBoton (PIN_BOTON_CAPTU_ENT_2)) );
+	configASSERT( ERROR_BOTON != (BotonCaptuDisparo	= BotonesRTOS_InicializarBoton (PIN_BOTON_CAPTU_DISPARO)) );
+	configASSERT( ERROR_LED   != (LedRojoEnPlaca  	= LedsRTOS_InicializarLed (U_LED_ROJO_EP)) );
+	configASSERT( ERROR_LED   != (LedEncendido    	= LedsRTOS_InicializarLed (HAL_PIN_PE15)) );
 	//configASSERT( ERROR_LED   != (LedVerdeEnPlaca 	= LedsRTOS_InicializarLed (U_LED_VERDE_EP))		);
-	configASSERT( ERROR_LED   != (LedEncendido    	= LedsRTOS_InicializarLed (HAL_PIN_PE15))			);
 
-	configASSERT( LedsRTOS_ModoLed ( LedEncendido, SUSPENSION ) );
-	configASSERT( LedsRTOS_EncenderLed (LedEncendido)  );
-	configASSERT( LedsRTOS_ModoLed ( LedRojoEnPlaca, SUSPENSION ) );
-	configASSERT( LedsRTOS_EncenderLed (LedRojoEnPlaca)  );
-	uHALmapConfigurarFrecuencia( UHAL_MAP_PE5 , FREC_TESTIGO );  // Señal cuadrada testigo
-	uHALmapEncender            ( UHAL_MAP_PE5 );
+	configASSERT( LedsRTOS_ModoLed		( LedEncendido, SUSPENSION ) );
+	configASSERT( LedsRTOS_EncenderLed	( LedEncendido )  );
+	configASSERT( LedsRTOS_ModoLed		( LedRojoEnPlaca, SUSPENSION ) );
+	configASSERT( LedsRTOS_EncenderLed	( LedRojoEnPlaca )  );
+	uHALmapConfigurarFrecuencia	( UHAL_MAP_PE5 , FREC_TESTIGO );  // Señal cuadrada testigo
+	uHALmapEncender				( UHAL_MAP_PE5 );
 
 	// Mensaje de inicio de APLICACION -------------------------------------------------------------
 
@@ -114,8 +112,7 @@ void apli_inicializar( void )
 	uoEscribirTxt ( Barra );
 	uoEscribirTxt ( pcTextForMain );
 	uoEscribirTxt ( Barra );
-	uoEscribirTxtUintTxt	( "MSJ Frecuencia de senial testigo (cuadrada) = ",
-			  	  	  	  	  	  (uint32_t) round( uHALmapObtenerFrecuencia(UHAL_MAP_PE5)), " Hz.\n" );
+	uoEscribirTxtUintTxt ( "MSJ Frecuencia de senial testigo (cuadrada) = ", (uint32_t) round( uHALmapObtenerFrecuencia(UHAL_MAP_PE5)), " Hz.\r\n" );
 	devolver_escritura();
 
 	// Creación de las tareas ---------------------------------------------------------------------
@@ -124,40 +121,40 @@ void apli_inicializar( void )
 	 * - Lectura de UART
 	 * - Actualización de leds
 	 * - Actualización de botones */
-	ret = xTaskCreate(	Tarea_PALTA,							// Puntero a la función-tarea.
-								"PALTA",									// Nombre de tarea. Para desarrollo.
-								(2 * configMINIMAL_STACK_SIZE),	// Tamaño de stack en palabras.
-								NULL,    								// Parametros de la tarea, que no tiene acá
-								TAREA_PRIORIDAD_ALTA,				// Prioridad alta.
-								&PALTA_admin );						// Variable de administración de tarea.
+	ret = xTaskCreate(	Tarea_PALTA,					// Puntero a la función-tarea.
+						"PALTA",						// Nombre de tarea. Para desarrollo.
+						(2 * configMINIMAL_STACK_SIZE),	// Tamaño de stack en palabras.
+						NULL,    						// Parametros de la tarea, que no tiene acá
+						TAREA_PRIORIDAD_ALTA,			// Prioridad alta.
+						&PALTA_admin );					// Variable de administración de tarea.
 	configASSERT( ret == pdPASS );
 
 	/* Tarea PMEDIA para funciones cada 10 ms: */
 	ret = xTaskCreate( 	Tarea_PMEDIA,
-								"PMEDIA",
-								(2 * configMINIMAL_STACK_SIZE),
-								NULL,
-								TAREA_PRIORIDAD_MEDIA,
-								&PMEDIA_admin );
+						"PMEDIA",
+						(2 * configMINIMAL_STACK_SIZE),
+						NULL,
+						TAREA_PRIORIDAD_MEDIA,
+						&PMEDIA_admin );
 	configASSERT( ret == pdPASS );
 
 	/* Tarea Test 1 */
 	ret = xTaskCreate( 	Tarea_Test,
-								"TEST",
-								(2 * configMINIMAL_STACK_SIZE),
-								NULL,
-								TAREA_PRIORIDAD_MEDIA,
-								&TareaTest1_m );
+						"TEST",
+						(2 * configMINIMAL_STACK_SIZE),
+						NULL,
+						TAREA_PRIORIDAD_MEDIA,
+						&TareaTest1_m );
 	configASSERT( ret == pdPASS );
 
 	/* Tarea CAPTURADORA que exige procesamiento.
 	 * En baja prioridad para que pueda ser interrumpida. */
 	ret = xTaskCreate( 	Tarea_Capturadora,
-								"CAPTURADORA",
-								(2 * configMINIMAL_STACK_SIZE),
-								NULL,
-								TAREA_PRIORIDAD_BAJA,
-								&CAPTU_admin );
+						"CAPTURADORA",
+						(2 * configMINIMAL_STACK_SIZE),
+						NULL,
+						TAREA_PRIORIDAD_BAJA,
+						&CAPTU_admin );
 	configASSERT( ret == pdPASS );
 
 }
@@ -181,7 +178,7 @@ void Tarea_PALTA( void *pvParameters )
 	TickType_t Tiempo0;
 
 	/* Imprimir la tarea iniciada ---------------------------------------------*/
-	uoEscribirTxt3 ( "MSJ ", pcTaskName, " esta ejecutandose.\n\r" );
+	uoEscribirTxt3 ( "MSJ ", pcTaskName, " esta ejecutandose.\r\n" );
 
 	/* Ciclo infinito: --------------------------------------------------------*/
 	Tiempo0 = xTaskGetTickCount();
@@ -225,7 +222,7 @@ void Tarea_PMEDIA ( void *pvParameters )
 {
 	/* Imprimir la tarea iniciada: */
 	char *pcTaskName = (char *) pcTaskGetName( NULL );
-	uoEscribirTxt3 ( "MSJ ", pcTaskName, " esta ejecutandose.\n\r" );
+	uoEscribirTxt3 ( "MSJ ", pcTaskName, " esta ejecutandose.\r\n" );
 
 	/* Ciclo infinito: */
 	for( ;; )
@@ -234,18 +231,30 @@ void Tarea_PMEDIA ( void *pvParameters )
 		ai_procesar_mensajes();
 
 		// Verifico botón ENCENDIDO
-		if( BotonesRTOS_BotonFlancoPresionado(BotonEncendido) && false==EquipoEncendido ) {
+		if(		( BotonesRTOS_BotonFlancoPresionado(BotonEncendido) ||
+				BotonesRTOS_BotonFlancoPresionado(BotonEnPlaca) ) &&
+				false==EquipoEncendido ) {
+			// Equipo pasa de estado ESPERA a ENCENDIDO
 			EquipoEncendido = true;
 			PresionadoParaEncendido = true;
 			LedsRTOS_ModoLed (LedEncendido,PLENO);
+			LedsRTOS_ModoLed (LedRojoEnPlaca,TITILANTE);
+			apli_mensaje("Equipo ISPEL en estado ENCENDIDO.", UN_SEGUNDO);
 		}
-		if( BotonesRTOS_BotonPresionadoLargo(BotonEncendido) && false==PresionadoParaEncendido ) {
+		if( 	( BotonesRTOS_BotonPresionadoLargo(BotonEncendido) ||
+				BotonesRTOS_BotonPresionadoLargo(BotonEnPlaca) ) &&
+				false==PresionadoParaEncendido ) {
+			// Equipo pasa de estado ENCENDIDO a ESPERA
 			EquipoEncendido = false;
 			LedsRTOS_ModoLed (LedEncendido,SUSPENSION);
+			LedsRTOS_ModoLed (LedRojoEnPlaca,SUSPENSION);
 			GenRTOS_Apagar(GENERADORES_TODOS, portMAX_DELAY);
 			CaptuRTOS_EntradaApagar(ENTRADAS_TODAS, portMAX_DELAY);
+			apli_mensaje("Equipo ISPEL en estado ESPERA.", UN_SEGUNDO);
 		}
-		if( false==BotonesRTOS_BotonPresionado(BotonEncendido)) {
+		if(		false==BotonesRTOS_BotonPresionado(BotonEncendido) &&
+				false==BotonesRTOS_BotonPresionado(BotonEnPlaca) ) {
+			// Soltamos el boton que cambió el estado del equipo
 			PresionadoParaEncendido = false;
 		}
 

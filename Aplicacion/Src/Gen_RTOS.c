@@ -128,10 +128,10 @@ bool GenRTOS_Configurar ( gen_id_e ID, gen_conf_s * CONFIG, TickType_t ESPERA )
 			CONFIG->Frecuencia = FREC_MAX_SENIAL_GEN;
 		if(uGeneradorConfigurar(ID,CONFIG)) {
 			escribir_salida(ID);
-			/*uoEscribirTxt ("MSJ Configuramos Generador (tarea). \n\r");
+			/*uoEscribirTxt ("MSJ Configuramos Generador (tarea). \r\n");
 			uoEscribirTxtUint (	"MSJ Frecuencia de muestreo = ",
 										uHALdacdmaLeerFrecuenciaMuestreo((dac_id_e )ID)/1000	);
-			uoEscribirTxt (" kHz\n\r");*/
+			uoEscribirTxt (" kHz\r\n");*/
 			RET = true;
 		}
 		xSemaphoreGive( GenMutexAdmin );
@@ -219,7 +219,7 @@ void escribir_salida(gen_id_e ID)
 		} else {
 			uoEscribirTxt(" ACOPLE=desconocido");
 		}
-		uoEscribirTxt("\n");
+		uoEscribirTxt("\r\n");
 	}
 }
 

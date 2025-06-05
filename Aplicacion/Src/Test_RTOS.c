@@ -55,7 +55,7 @@ void Tarea_Test( void *pvParameters )
 
 	/* Imprimir la tarea inicializada -----------------------------------------*/
 	char *pcTaskName = (char *) pcTaskGetName( NULL );
-	uoEscribirTxt3 ( "MSJ ", pcTaskName, " esta ejecutandose.\n\r" );
+	uoEscribirTxt3 ( "MSJ ", pcTaskName, " esta ejecutandose.\r\n" );
 
 	/* Configuro y enciendo leds ----------------------------------------------*/
 	configASSERT ( ERROR_LED != (LedAzulEnPlaca  = LedsRTOS_InicializarLed ( U_LED_AZUL_EP )) );
@@ -65,7 +65,7 @@ void Tarea_Test( void *pvParameters )
 	/* Configuración inicial de generadores y encendido */
 	config_0_generadores();
 	//encender_generadores();
-	testeo_temporizadores();
+	//testeo_temporizadores();
 
 	/* Ciclo infinito... ------------------------------------------------------*/
 	for( ;; )
@@ -235,13 +235,13 @@ void testeo_temporizadores (void)
 	while ( (uoMilisegundos()-tiempo1) < 5) {
 	  		// NADA!!!
 	}
-	uoEscribirTxtUintTxt ("// Microsegundos tras 5 milisegundos: ", uoMicrosegundos()-tiempo2, "\n\r");
+	uoEscribirTxtUintTxt ("// Microsegundos tras 5 milisegundos: ", uoMicrosegundos()-tiempo2, "\r\n");
 	tiempo2 = uoMicrosegundos();
 	tiempo1 = uoMilisegundos();
 	while ( (uoMicrosegundos()-tiempo2) < 2000) {
 		  	// NADA!!!
 	}
-	uoEscribirTxtUintTxt ("// Milisegundos tras 2000 microsegundos: ", uoMilisegundos()-tiempo1, "\n\r");
+	uoEscribirTxtUintTxt ("// Milisegundos tras 2000 microsegundos: ", uoMilisegundos()-tiempo1, "\r\n");
 }
 
 void config_0_generadores (void)

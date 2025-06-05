@@ -59,7 +59,7 @@ float    uGenEstimarVoltios (uint32_t NUM32, dac_id_e DAC_ID)
 {
 	/*float Cuenta = ((double)NUM32-(double)CERO_DAC[DAC_ID]) * TRANSFERENCIA_DAC[DAC_ID];
 	uoEscribirTxtReal("Voltios=", Cuenta, 3);
-	uoEscribirTxt("\n");*/
+	uoEscribirTxt("\r\n");*/
 	return (float) ( (double) NUM32 - (double) CERO_DAC[DAC_ID] ) * TRANSFERENCIA_DAC[DAC_ID];
 }
 
@@ -295,7 +295,7 @@ bool uGeneradorEncender (gen_id_e GEN)
 
 	// Veo si debo sincronizar
 	if (uHALdacdmaSincronizar ()) {
-		// uartSendString((uint8_t *) "Seniales sincronizadas!!!\n\r");
+		// uartSendString((uint8_t *) "Seniales sincronizadas!!!\r\n");
 	}
 
 	return RETORNO;

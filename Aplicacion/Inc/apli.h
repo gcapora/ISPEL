@@ -52,6 +52,8 @@ extern "C" {
 
 // Otros
 #define MENSAJE_LARGO_MAX		100
+#define FORZAR						true
+#define NO_FORZAR					false
 
 
 /****** Definiciones públicas de tipos de datos (public typedef) *********************************/
@@ -72,7 +74,7 @@ void 			apli_inicializar( void );
 void 			apli_alerta( const char * );
 BaseType_t	apli_mensaje( const char *, TickType_t );
 void			apli_separador(const char * );
-void			apli_latido(void);
+void			apli_latido(bool_t);
 uint32_t		mensaje_latido(void);
 BaseType_t	tomar_escritura( TickType_t );
 BaseType_t	devolver_escritura( void );

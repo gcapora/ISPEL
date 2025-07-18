@@ -127,7 +127,7 @@ bool ai_procesar_mensajes( void )
 			SUBCMD = subcomando( MsjParaProcesar, CMD_HOLA );
 			tomar_escritura   ( portMAX_DELAY );
 			uoEscribirTxt2		( "Respondo ", SUBCMD );
-			mensaje_latido();
+			apli_latido(FORZAR);
 			uoEscribirTxt 		( VersionISPEL );
 			devolver_escritura();
 
@@ -492,12 +492,12 @@ void cmd_latido( char * COMANDO )
 	// ENCENDER
 	if (comparar_texto(SUBCMD,CMD_ENCENDER)) {
 		LatidoEncendido = true;
-		apli_mensaje( "// LATIDO encendido.", portMAX_DELAY );
+		apli_mensaje( "LATIDO encendido.", portMAX_DELAY );
 
 	// APAGAR
 	} else if (comparar_texto(SUBCMD,CMD_APAGAR)) {
 		LatidoEncendido = false;
-		apli_mensaje( "// LATIDO apagado.", portMAX_DELAY );
+		apli_mensaje( "LATIDO apagado.", portMAX_DELAY );
 
 	// Subcomando NO RECONOCIDO
 	} else {

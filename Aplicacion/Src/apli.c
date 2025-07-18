@@ -50,9 +50,9 @@ led_id_t    LedRojoEnPlaca, LedVerdeEnPlaca, LedEncendido;
 SemaphoreHandle_t MutexApliEscribir;  // Para integridad de escritura
 
 /* Mensajes... */
-const char *Barra         = "// ===============================================\r\n";
+const char *Barra         = "// ================================================================================\r\n";
 const char *pcTextForMain = "// ISPEL Beta en ejecucion.\r\n";
-const char *VersionISPEL  = "// Firmware: ISPEL Beta v1.1\r\n";
+const char *VersionISPEL  = "// Firmware: ISPEL Beta v1.1 jul-2025\r\n";
 
 /****** Declaración de funciones privadas ********************************************************/
 
@@ -242,7 +242,7 @@ void Tarea_PMEDIA ( void *pvParameters )
 			PresionadoParaEncendido = true;
 			LedsRTOS_ModoLed (LedEncendido,PLENO);
 			LedsRTOS_ModoLed (LedRojoEnPlaca,TITILANTE);
-			apli_mensaje("Equipo ISPEL en estado ENCENDIDO.", UN_SEGUNDO);
+			apli_latido(FORZAR);
 		}
 		if( 	( BotonesRTOS_BotonPresionadoLargo(BotonEncendido) ||
 				BotonesRTOS_BotonPresionadoLargo(BotonEnPlaca) ) &&
@@ -253,7 +253,7 @@ void Tarea_PMEDIA ( void *pvParameters )
 			LedsRTOS_ModoLed (LedRojoEnPlaca,SUSPENSION);
 			GenRTOS_Apagar(GENERADORES_TODOS, portMAX_DELAY);
 			CaptuRTOS_EntradaApagar(ENTRADAS_TODAS, portMAX_DELAY);
-			apli_mensaje("Equipo ISPEL en estado ESPERA.", UN_SEGUNDO);
+			apli_latido(FORZAR);
 		}
 		if(		false==BotonesRTOS_BotonPresionado(BotonEncendido) &&
 				false==BotonesRTOS_BotonPresionado(BotonEnPlaca) ) {
@@ -299,7 +299,7 @@ void Tarea_PMEDIA ( void *pvParameters )
 
 		// FIN DE CICLO
 		//apli_separador(".");
-		apli_latido();
+		apli_latido(NO_FORZAR);
 		vTaskDelay( 25 * PERIODO_1MS );
 	}
 }

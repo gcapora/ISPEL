@@ -53,11 +53,13 @@ void apli_separador(const char * SEPARA)
 	}
 }
 
-void apli_latido(void)
+void apli_latido(bool_t forzar)
 {
 	static uint32_t tiempo_ultimo = 0;
-	if ( true == LatidoEncendido &&
-		  (uoMilisegundos()-tiempo_ultimo) > TIEMPO_LATIDO ) {
+	if ( true == forzar ) {
+		tiempo_ultimo = mensaje_latido();
+
+	} else if (true == LatidoEncendido && (uoMilisegundos()-tiempo_ultimo) > TIEMPO_LATIDO ) {
 		tomar_escritura    ( 3 * UN_SEGUNDO );
 		tiempo_ultimo = mensaje_latido();
 		devolver_escritura ();

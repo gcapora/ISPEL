@@ -27,7 +27,8 @@ extern "C" {
 #define CMD_SALIDA_1			"S1"
 #define CMD_SALIDA_2			"S2"
 #define CMD_SALIDA_X			"SX"
-#define CMD_CONFIGURAR		"CONFIG"
+#define CMD_CONFIGURAR		"CONFIGURAR"
+#define CMD_CONFIGURAR2		"CONFIG"
 #define CMD_OBTENER			"OBTENER"
 #define CMD_INICIAR			"INICIAR"
 #define CMD_PARAR				"PARAR"
@@ -39,6 +40,7 @@ extern "C" {
 #define CMD_MENSAJE2			"//"
 #define CMD_ESPERAR			"ESPERAR"
 #define CMD_TEST				"TEST"
+#define CMD_LATIDO			"LATIDO"
 
 #define MENSAJE_LARGO_MAX	100
 #define VALOR_LARGO_MAX		16

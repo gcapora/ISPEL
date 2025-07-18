@@ -30,7 +30,7 @@ QueueHandle_t 		xColaMensajesParaInterpretar;
 
 /* Variables públicas **************************************************************************/
 
-char *	ATRIBUTO_ID_TXT [NUM_ATRIBUTOS] = {0};
+char*	ATRIBUTO_ID_TXT [NUM_ATRIBUTOS] = {0};
 
 /* Private function prototypes *******************************************************************/
 
@@ -38,18 +38,19 @@ bool	caracter_validado 		( char* );
 bool	comparar_texto    		( char*, char* );
 
 void 	cmd_generador     		( char* );
-void	cmd_salida				( char* );
+void	cmd_salida					( char* );
 void 	cmd_capturadora   		( char* );
-void	cmd_entrada				( char* );
-void    cmd_test          		( char* );
-char* 	subcomando      		( char*, char* );
+void	cmd_entrada					( char* );
+void  cmd_test          		( char* );
+void  cmd_latido          		( char* );
+char*	subcomando      			( char*, char* );
 
-char*	obtener_atributo		( char*,                 atributo_e*, atributo_valor_t );
+char*	obtener_atributo			( char*,                 atributo_e*, atributo_valor_t );
 bool	cargar_atributo_gen		( gen_conf_s*,           atributo_e,  atributo_valor_t );
 bool	cargar_atributo_captu	( capturadora_config_s*, atributo_e,  atributo_valor_t );
 bool	cargar_atributo_entrada	( entrada_config_s*,     atributo_e,  atributo_valor_t );
 
-gen_id_e identificar_generador	( char* );
+gen_id_e identificar_generador ( char* );
 entrada_id_e identificar_entrada ( char* );
 
 /* Public function *******************************************************************************/
@@ -125,7 +126,9 @@ bool ai_procesar_mensajes( void )
 		if ( comparar_texto(MsjParaProcesar, CMD_HOLA) ){
 			SUBCMD = subcomando( MsjParaProcesar, CMD_HOLA );
 			tomar_escritura   ( portMAX_DELAY );
-			uoEscribirTxt2    ( "HOLA, aca ISPEL: ", SUBCMD );
+			uoEscribirTxt2		( "Respondo ", SUBCMD );
+			mensaje_latido();
+			uoEscribirTxt 		( VersionISPEL );
 			devolver_escritura();
 
 		} else if ( comparar_texto(MsjParaProcesar, CMD_CAPTURADORA) ){
@@ -144,6 +147,9 @@ bool ai_procesar_mensajes( void )
 
 		} else if ( comparar_texto(MsjParaProcesar, CMD_ESPERAR) ){
 			vTaskDelay( 5 * UN_SEGUNDO );
+
+		} else if ( comparar_texto(MsjParaProcesar, CMD_LATIDO) ){
+			cmd_latido (MsjParaProcesar);
 
 		} else {
 			apli_mensaje ("Comando no identificado.", portMAX_DELAY );
@@ -256,7 +262,8 @@ void cmd_capturadora( char * COMANDO )
 		CaptuRTOS_Parar(portMAX_DELAY);
 
 	// CONFIGURAR
-	} else if (comparar_texto(SUBCMD,CMD_CONFIGURAR)) {
+	} else if (comparar_texto(SUBCMD,CMD_CONFIGURAR) ||
+				  comparar_texto(SUBCMD,CMD_CONFIGURAR2)  ) {
 		TEXTO = subcomando( SUBCMD, CMD_CONFIGURAR );
 		// Obtengo parámetros actuales
 		CaptuRTOS_Obtener ( &CCONFIG, portMAX_DELAY );
@@ -331,7 +338,8 @@ void cmd_entrada( char* COMANDO )
 	}
 
 	// CONFIGURAR
-	if (comparar_texto(SUBCMD,CMD_CONFIGURAR)) {
+	if ( comparar_texto(SUBCMD,CMD_CONFIGURAR) ||
+		  comparar_texto(SUBCMD,CMD_CONFIGURAR2)  ) {
 		ATRIBUTOS = subcomando( SUBCMD, CMD_CONFIGURAR );
 		// Obtengo parámetros actuales
 		if (ENTRADA_2==EntradaId) {
@@ -423,7 +431,8 @@ void cmd_salida( char* COMANDO )
 		}
 
 	// CONFIGURAR
-	} else if (comparar_texto(SUBCMD,CMD_CONFIGURAR)) {
+	} else if (comparar_texto(SUBCMD,CMD_CONFIGURAR) ||
+			     comparar_texto(SUBCMD,CMD_CONFIGURAR2)  ) {
 		ATRIBUTOS = subcomando( SUBCMD, CMD_CONFIGURAR );
 		// Obtengo parámetros actuales
 		if (GENERADOR_2==GeneradorId) {
@@ -474,6 +483,27 @@ void cmd_test( char * COMANDO )
 	}
 }
 
+void cmd_latido( char * COMANDO )
+{
+	// Variables locales
+	char *	SUBCMD = subcomando( COMANDO, CMD_LATIDO );
+
+	// Analizo subcomando
+	// ENCENDER
+	if (comparar_texto(SUBCMD,CMD_ENCENDER)) {
+		LatidoEncendido = true;
+		apli_mensaje( "// LATIDO encendido.", portMAX_DELAY );
+
+	// APAGAR
+	} else if (comparar_texto(SUBCMD,CMD_APAGAR)) {
+		LatidoEncendido = false;
+		apli_mensaje( "// LATIDO apagado.", portMAX_DELAY );
+
+	// Subcomando NO RECONOCIDO
+	} else {
+		apli_mensaje( "Subomando LATIDO no reconocido.", portMAX_DELAY );
+	}
+}
 
 char* subcomando( char * MSJ, char * CMD )
 {

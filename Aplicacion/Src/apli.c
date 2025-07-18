@@ -2,7 +2,7 @@
 * @file	   apli.c
 * @author  Guillermo Caporaletti
 * @brief   Módulo principal de la aplicación ISPEL, invocado desde "Core\Src\main.c".
-* @date	   Junio de 2025
+* @date	   2025
 * @version v1.1
 *
 **************************************************************************************************/
@@ -41,7 +41,8 @@ static TaskHandle_t TareaTest1_m;
 
 /****** Definición de datos públicos *************************************************************/
 
-bool_t		EquipoEncendido = false;
+volatile bool_t EquipoEncendido = false;
+volatile bool_t LatidoEncendido = true;
 boton_id_t  BotonEnPlaca, BotonEncendido;
 boton_id_t	BotonGen1, BotonGen2;
 boton_id_t	BotonCaptu1, BotonCaptu2, BotonCaptuDisparo;
@@ -49,8 +50,9 @@ led_id_t    LedRojoEnPlaca, LedVerdeEnPlaca, LedEncendido;
 SemaphoreHandle_t MutexApliEscribir;  // Para integridad de escritura
 
 /* Mensajes... */
-const char *pcTextForMain = "// ISPEL en ejecucion.\r\n";
 const char *Barra         = "// ===============================================\r\n";
+const char *pcTextForMain = "// ISPEL Beta en ejecucion.\r\n";
+const char *VersionISPEL  = "// Firmware: ISPEL Beta v1.1\r\n";
 
 /****** Declaración de funciones privadas ********************************************************/
 
@@ -111,6 +113,7 @@ void apli_inicializar( void )
 	uoEscribirTxt ( "\r\n");
 	uoEscribirTxt ( Barra );
 	uoEscribirTxt ( pcTextForMain );
+	uoEscribirTxt ( VersionISPEL );
 	uoEscribirTxt ( Barra );
 	uoEscribirTxtUintTxt ( "MSJ Frecuencia de senial testigo (cuadrada) = ", (uint32_t) round( uHALmapObtenerFrecuencia(UHAL_MAP_PE5)), " Hz.\r\n" );
 	devolver_escritura();

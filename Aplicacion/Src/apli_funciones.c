@@ -14,8 +14,6 @@
 
 /* Private macro -------------------------------------------------------------*/
 
-#define	TIEMPO_LATIDO	30000	// En milisegundos
-
 /* Private variables ---------------------------------------------------------*/
 
 /* Variables importadas ------------------------------------------------------*/
@@ -44,7 +42,6 @@ BaseType_t apli_mensaje ( const char * TEXTO, TickType_t ESPERA )
 	return RET;
 }
 
-
 void apli_separador(const char * SEPARA)
 {
 	static uint32_t tiempo_anterior = 0;
@@ -59,14 +56,26 @@ void apli_separador(const char * SEPARA)
 void apli_latido(void)
 {
 	static uint32_t tiempo_ultimo = 0;
-	if ( (uoMilisegundos()-tiempo_ultimo) > TIEMPO_LATIDO ) {
+	if ( true == LatidoEncendido &&
+		  (uoMilisegundos()-tiempo_ultimo) > TIEMPO_LATIDO ) {
 		tomar_escritura    ( 3 * UN_SEGUNDO );
-		tiempo_ultimo = uoMilisegundos();
-		uoEscribirTxtUint  ("HOLA Aca ISPEL en linea. [", tiempo_ultimo / 60000);
-		uoEscribirTxtUint  (" min ", (tiempo_ultimo/1000) % 60);
-		uoEscribirTxt      (" s]\r\n");
+		tiempo_ultimo = mensaje_latido();
 		devolver_escritura ();
 	}
+}
+
+uint32_t mensaje_latido(void)
+{
+	uint32_t tiempo = uoMilisegundos();
+	if (true==EquipoEncendido) {
+		uoEscribirTxt  ("// Aca ISPEL encendido. ");
+	} else {
+		uoEscribirTxt  ("// Aca ISPEL en espera. ");
+	}
+	uoEscribirTxtUint  ("[", tiempo / 60000);
+	uoEscribirTxtUint  (" min ", (tiempo/1000) % 60);
+	uoEscribirTxt      (" s]\r\n");
+	return tiempo;
 }
 
 BaseType_t tomar_escritura ( TickType_t ESPERA )

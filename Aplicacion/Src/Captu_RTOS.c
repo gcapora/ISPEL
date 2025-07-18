@@ -79,7 +79,7 @@ bool CaptuRTOS_Inicializar (void)
 * @param		ticks que puede esperar.
 * @retval	true, si logró comenzar.
 */
-bool	CaptuRTOS_Comenzar ( TickType_t ESPERA )
+bool CaptuRTOS_Comenzar ( TickType_t ESPERA )
 {
 	bool_t RET = false;
 	if(pdTRUE == xSemaphoreTake( CaptuMutexAdmin, ESPERA )) {
@@ -157,7 +157,7 @@ bool CaptuRTOS_EscribirConfiguraciones ( TickType_t ESPERA )
 	return RET;
 }
 
-bool	CaptuRTOS_EscribirConfiguracionEntrada ( entrada_id_e ID, TickType_t ESPERA)
+bool CaptuRTOS_EscribirConfiguracionEntrada ( entrada_id_e ID, TickType_t ESPERA)
 {
 	bool_t RET = false;
 	if(pdTRUE == xSemaphoreTake( CaptuMutexAdmin, ESPERA )) {

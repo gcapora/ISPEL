@@ -49,6 +49,11 @@ bool ConfigSenialVerificada (senial_s * Senial)
    if (Senial->Maximo > MAXIMO_12B) Senial->Maximo = MAXIMO_12B;
    if (Senial->Minimo < MINIMO_12B) Senial->Minimo = MINIMO_12B;
    if (Senial->Multiplicador == 0)  Senial->Multiplicador = 1;
+	if (Senial->Minimo > Senial->Maximo) {
+		uint32_t nivel = Senial->Maximo;
+		Senial->Maximo = Senial->Minimo;
+		Senial->Minimo = nivel;
+	}
 
    // Llevamos los grados entre 0º y 360º
    Senial->Fase = AcotarGrados( Senial->Fase );
@@ -130,6 +135,8 @@ double Cuadrada (double Grados, double CicloDeTrabajo)
 */
 void uGenerarSenial     ( senial_s * Senial )
 {
+	// Verificaciones de senial
+
 	// Elegimos qué otra función utilizar:
 	switch (Senial->Tipo) {
 	        case CUADRADA:

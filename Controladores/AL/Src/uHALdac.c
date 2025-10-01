@@ -128,7 +128,7 @@ bool uHALdacInicializar ( dac_id_e NUM_DAC )
     if ( DAC_CONFIG[ NUM_DAC ].Estado == NO_INICIALIZADO ) {
 	  DAC_ChannelConfTypeDef sConfig = {0};
 	  sConfig.DAC_Trigger      = DISPARO_DAC [NUM_DAC];
-	  sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE; // Esto habrá que ver si conviene
+	  sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_DISABLE; // Sin búfer tiene más R0 pero más SR
 	  if (HAL_DAC_ConfigChannel( &hdac,
 								 &sConfig,
 								 CANAL_DAC[NUM_DAC]) != HAL_OK) uoHuboError();

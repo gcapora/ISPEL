@@ -149,6 +149,7 @@ bool uGeneradorInicializar (gen_id_e GEN)
 
 	// Inicializo HD
 	uHALdacInicializar ( DAC_N );
+	uHALdacEstablecerValor ( DAC_N, CERO_DAC[DAC_N]);
 
 	// Cargo senial inicial
 	Generador[GEN].Senial.Tipo = TRIANGULAR;
@@ -284,6 +285,7 @@ bool uGeneradorEncender (gen_id_e GEN)
 
 	// Enciendo
 	if (Generador[GEN].Estado == GENERADOR_APAGADO) {
+		uHALdacParar( DAC_N);
 		uHALdacdmaComenzar ( DAC_N,
 				             Generador[GEN].Senial.Muestras_p,
 							 Generador[GEN].Senial.Largo    );
@@ -325,6 +327,7 @@ bool uGeneradorApagar      (gen_id_e GEN)
 
 	// Actuo...
 	uHALdacParar ( DAC_N );
+	uHALdacEstablecerValor ( DAC_N, CERO_DAC[DAC_N]);
    uHALgpioEscribir ( PinControl[GEN], true ); // Enciende pin de control
 	Generador[GEN].Estado = GENERADOR_APAGADO;
 	return true;
